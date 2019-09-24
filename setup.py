@@ -11,7 +11,7 @@ from setuptools import setup, find_packages
 here = path.abspath(path.dirname(__file__))
 
 # *************** Dependencies *********
-INSTALL_REQUIRES = ['sentinel', 'valid8', 'makefun']
+INSTALL_REQUIRES = ['sentinel', 'valid8>=5.0', 'makefun']
 DEPENDENCY_LINKS = []
 SETUP_REQUIRES = ['pytest-runner', 'setuptools_scm', 'six']
 TESTS_REQUIRE = ['pytest', 'pytest-logging']
