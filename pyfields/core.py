@@ -116,8 +116,7 @@ def field(type=ANY_TYPE,  # type: Type[T]
     everytime a new value is provided, and a `TypeError` will be raised if invalid. The corresponding type hint is
     automatically declared by `field` so your IDE will know about it, no need to use additional type hints.
 
-    If you need to be compliant with python <=3.5 and wish to specify a type hint without validating it, you should
-    specify `native=True`.
+    If you wish to specify a type hint without validating it, you should specify `native=True`.
 
     Documentation
     -------------
@@ -168,7 +167,7 @@ def field(type=ANY_TYPE,  # type: Type[T]
     checking, validation, or converters; besides it does not work with classes using `__slots__`. It is used by default
     everytime where it is possible, except if you use one of the abovementioned features. In that case a
     `DescriptorField` will transparently be created. You can force a `DescriptorField` to be created by setting
-    `native=True`.
+    `native=False`.
 
     The `NativeField` class implements the "non-data" descriptor protocol. So the first time the attribute is read, a
     small python method call extra cost is paid. *But* afterwards the attribute is replaced with a native attribute
@@ -189,7 +188,7 @@ def field(type=ANY_TYPE,  # type: Type[T]
 
     :param type: an optional type for the field. If one is provided, it will be checked by default. The field will
         therefore not be a simple (fast) field any more but will be a descriptor (slower) field. You can disable the
-        check by forcing `native=False`
+        check by forcing `native=True`
     :param default: a default value for the field. Providing a `default` makes the field "optional". `default` value
         is not copied on new instances, if you wish a new copy to be created you should provide a `default_factory`
         instead. Only one of `default` or `default_factory` should be provided.
@@ -197,7 +196,7 @@ def field(type=ANY_TYPE,  # type: Type[T]
         field, everytime one is needed. Providing a `default_factory` makes the field "optional". Only one of `default`
         or `default_factory` should be provided.
     :param validators: a validation function definition, sequence of validation function definitions, or dictionary of
-        validation function definitions. TODO add details
+        validation function definitions. See `valid8` "simple syntax" for details
     :param doc: documentation for the field. This is mostly for class readability purposes for now.
     :param name: in python < 3.6 this is mandatory, and should be the same name than the one used used in the class
         definition (typically, `class Foo:    <name> = field(name=<name>)`).
