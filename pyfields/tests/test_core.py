@@ -23,13 +23,13 @@ def test_field(read_first, type_):
 
     if type_ == 'default_factory':
         class Tweety:
-            afraid = field(default_factory=lambda: False, name='afraid')
+            afraid = field(default_factory=lambda: False)
     elif type_ == 'default':
         class Tweety:
-            afraid = field(default=False, name='afraid')
+            afraid = field(default=False)
     elif type_ == 'mandatory':
         class Tweety:
-            afraid = field(name='afraid')
+            afraid = field()
     else:
         raise ValueError()
 
@@ -56,7 +56,7 @@ def test_type():
     """ Tests that when `type` is provided, it works as expected """
 
     class Foo(object):
-        f = field(name='f', type=str)
+        f = field(type=str)
 
     o = Foo()
     o.f = 'hello'
@@ -79,8 +79,9 @@ def test_type_from_pep484_annotations():
 
     # test that the field that is non-native has type checking active
     foo.field_with_native_forced_to_false = 2
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError) as exc_info:
         foo.field_with_native_forced_to_false = 'hello'
+    assert str(exc_info.value).startswith("Invalid value type provided for ")
 
     # by default the type is not checked
     foo.field_with_defaults = 'hello'
@@ -99,16 +100,16 @@ def test_field_validators(case_nb):
 
     class Foo2(object):
         # one single validator
-        f = field(name='f', default="hey", type=str, validators=non_empty)
+        f = field(default="hey", type=str, validators=non_empty)
 
         # one single validator in a list
-        g = field(name='g', type=str, validators=[non_empty])
+        g = field(type=str, validators=[non_empty])
 
         # one single validator accepting three arguments (obj, field, val)
-        gg = field(name='gg', type=str, validators=lambda obj, field, val: obj.f in val)
+        gg = field(type=str, validators=lambda obj, field, val: obj.f in val)
 
         # several validators in a dict. keys and values can contain elements of definition in any order
-        h = field(name='h', type=str, validators=OrderedDict([("h should be non empty", (non_empty, EmptyFailure)),
+        h = field(type=str, validators=OrderedDict([("h should be non empty", (non_empty, EmptyFailure)),
                                                               ("h should contain field f", (lambda obj, val: obj.f in val)),
                                                               ("h should contain 'a'", (lambda val: 'a' in val))]))
 
@@ -152,12 +153,12 @@ def test_field_validators(case_nb):
         if case_nb == 4:
             # override the definition for Foo2.h
             # several validators in a list. Tuples should start with the function
-            Foo2.h = field(name='h', type=str, validators=[(non_empty, "h should be non empty", EmptyFailure),
-                                                           non_empty,
-                                                           (lambda obj, val: obj.f in val, "h should contain field f"),
-                                                           (lambda val: 'a' in val, "h should contain 'a'"),
-                                                           (non_empty, EmptyFailure),
-                                                           ])
+            Foo2.h = field(type=str, validators=[(non_empty, "h should be non empty", EmptyFailure),
+                                                 non_empty,
+                                                 (lambda obj, val: obj.f in val, "h should contain field f"),
+                                                 (lambda val: 'a' in val, "h should contain 'a'"),
+                                                 (non_empty, EmptyFailure),
+                                                 ])
 
         # o.h should be a non-empty string containing 'a' and containing o.f
         with pytest.raises(ValidationError) as exc_info:
@@ -188,4 +189,4 @@ def test_validator_not_compliant_with_native_field():
     """tests that `native=True` can not be set when a validator is provided"""
     with pytest.raises(UnsupportedOnNativeFieldError):
         class Foo(object):
-            f = field(name='f', validators=lambda x: True, native=True)
+            f = field(validators=lambda x: True, native=True)

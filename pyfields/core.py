@@ -5,16 +5,22 @@
 import sys
 from textwrap import dedent
 
-from makefun import with_signature
+from inspect import isfunction
+try:
+    from inspect import signature, Parameter
+except ImportError:
+    from funcsigs import signature, Parameter
+
+from makefun import with_signature, wraps
 import sentinel
 
-from valid8 import Validator, failure_raiser
+from valid8 import Validator, failure_raiser, ValidationError
 from valid8.base import getfullargspec as v8_getfullargspec, get_callable_name
 from valid8.common_syntax import FunctionDefinitionError
 
 try:  # python 3.5+
     from typing import Optional, Set, List, Callable, Dict, Type, Any, TypeVar, Union, Iterable, Tuple, Mapping
-    from valid8 import ValidationFuncs, ValidationError
+    from valid8.common_syntax import ValidationFuncs
     use_type_hints = True
 except ImportError:
     use_type_hints = False
@@ -26,6 +32,13 @@ if PY36:
         from typing import get_type_hints
     except ImportError:
         pass
+
+
+# PY35 = sys.version_info >= (3, 5)
+# if PY35:
+#     KEYWORD_ONLY_IF_POSSIBLE = Parameter.KEYWORD_ONLY
+# else:
+#     KEYWORD_ONLY_IF_POSSIBLE = Parameter.POSITIONAL_OR_KEYWORD
 
 
 class MandatoryFieldInitError(Exception):
@@ -43,7 +56,8 @@ class MandatoryFieldInitError(Exception):
 
 
 # a few symbols used in `fields`
-NO_DEFAULT = sentinel.create('NO_DEFAULT')
+EMPTY = sentinel.create('empty')
+USE_FACTORY = sentinel.create('use_factory')
 _unset = sentinel.create('_unset')
 if use_type_hints:
     T = TypeVar('T')
@@ -79,15 +93,84 @@ else:
     ANY_TYPE = sentinel.create('ANY_TYPE')
 
 
-def field(type=ANY_TYPE,  # type: Type[T]
-          default=NO_DEFAULT,  # type: T
+class Field(object):
+    """
+    Base class for fields
+    """
+    __slots__ = 'is_mandatory', 'default', 'is_default_factory', 'name', 'annotation', 'doc', 'owner_cls'
+
+    def __init__(self,
+                 default=EMPTY,         # type: T
+                 default_factory=None,  # type: Callable[[], T]
+                 annotation=EMPTY,      #
+                 doc=None,              # type: str
+                 name=None              # type: str
+                 ):
+        """See help(field) for details"""
+
+        # default
+        if default_factory is not None:
+            self.is_mandatory = False
+            if default is not EMPTY:
+                raise ValueError("Only one of `default` and `default_factory` should be provided")
+            else:
+                self.default = default_factory
+                self.is_default_factory = True
+        else:
+            self.is_mandatory = default is EMPTY
+            self.default = default
+            self.is_default_factory = False
+
+        # name
+        self.name = name
+        self.owner_cls = None
+
+        # doc
+        self.doc = dedent(doc) if doc is not None else None
+
+        # annotation
+        self.annotation = annotation
+
+    def __set_name__(self, owner,
+                     name  # type: str
+                     ):
+        # called at class creation time
+        self.owner_cls = owner
+
+        if self.name is not None:
+            if self.name != name:
+                raise ValueError("field name '%s' in class '%s' does not correspond to explicitly declared name '%s' "
+                                 "in field constructor" % (name, owner.__class__, self.name))
+        else:
+            self.name = name
+
+    @property
+    def qualname(self):
+        # type: (...) -> str
+
+        if self.owner_cls is not None:
+            try:
+                owner_qualname = self.owner_cls.__qualname__
+            except AttributeError:
+                owner_qualname = str(self.owner_cls)
+        else:
+            owner_qualname = "<unknown_cls>"
+
+        return "%s.%s" % (owner_qualname, self.name)
+
+    def __repr__(self):
+        return "<%s: %s>" % (self.__class__.__name__, self.qualname)
+
+
+def field(type=ANY_TYPE,         # type: Type[T]
+          default=EMPTY,         # type: T
           default_factory=None,  # type: Callable[[], T]
-          validators=None,  # type: Validators
-          doc=None,  # type: str
-          name=None,  # type: str
-          native=None  # type: bool
+          validators=None,       # type: Validators
+          doc=None,              # type: str
+          name=None,             # type: str
+          native=None            # type: bool
           ):
-    # type: (...) -> T
+    # type: (...) -> Union[T, Field]
     """
     Returns a class-level attribute definition. It allows developers to define an attribute without writing an
     `__init__` method. Typically useful for mixin classes.
@@ -182,8 +265,6 @@ def field(type=ANY_TYPE,  # type: Type[T]
      - @cached_property (werkzeug) and https://stackoverflow.com/questions/24704147/python-what-is-a-lazy-property
      - https://stackoverflow.com/questions/42023852/how-can-i-get-the-attribute-name-when-working-with-descriptor-protocol-in-python
      - attrs / dataclasses
-            In python < 3.6 the `name` attribute is mandatory and should be the same name than the one used used in the
-        class field definition (i.e. you should define the field as '<name> = field(name=<name>)').
 
     :param type: an optional type for the field. If one is provided, it will be checked by default. The field will
         therefore not be a simple (fast) field any more but will be a descriptor (slower) field. You can disable the
@@ -197,8 +278,9 @@ def field(type=ANY_TYPE,  # type: Type[T]
     :param validators: a validation function definition, sequence of validation function definitions, or dictionary of
         validation function definitions. See `valid8` "simple syntax" for details
     :param doc: documentation for the field. This is mostly for class readability purposes for now.
-    :param name: in python < 3.6 this is mandatory, and should be the same name than the one used used in the class
-        definition (typically, `class Foo:    <name> = field(name=<name>)`).
+    :param name: in python < 3.6 this is mandatory if you do not use any other decorator on the class (such as
+        `@inject_fields`). If provided, it should be the same name than the one used used in the class field definition
+        (i.e. you should define the field as '<name> = field(name=<name>)').
     :param native: a boolean that can be turned to `False` to force a field to be a descriptor field, or to
         `True` to force it to be a native field. Native fields are faster but can not support type and value validation
          not conversions or callbacks. `None` (default) automatically sets `native=True` if no `validators` nor
@@ -239,61 +321,19 @@ class UnsupportedOnNativeFieldError(Exception):
     pass
 
 
-class Field(object):
+class ClassFieldAccessError(Exception):
     """
-    Base class for fields
+    Error raised when you use <cls>.<field>. This is currently put in place because otherwise the
+    type hints in pycharm get messed up. See below.
     """
-    __slots__ = 'default', 'is_default_factory', 'name', 'doc', 'owner_cls'
+    __slots__ = 'field',
 
-    def __init__(self,
-                 default=NO_DEFAULT,    # type: Any
-                 default_factory=None,  # type: Callable[[], Any]
-                 doc=None,              # type: str
-                 name=None              # type: str
-                 ):
-        """See help(field) for details"""
+    def __init__(self, field):
+        self.field = field
 
-        # default
-        if default_factory is not None:
-            if default is not NO_DEFAULT:
-                raise ValueError("Only one of `default` and `default_factory` should be provided")
-            else:
-                self.default = default_factory
-                self.is_default_factory = True
-        else:
-            self.default = default
-            self.is_default_factory = False
-
-        # name
-        if not PY36 and name is None:
-            raise ValueError("`name` is mandatory in python < 3.6")
-        self.name = name
-        self.owner_cls = None
-
-        # doc
-        self.doc = dedent(doc) if doc is not None else None
-
-    def __set_name__(self, owner, name):
-        # called at class creation time
-        self.owner_cls = owner
-
-        if self.name is not None:
-            if self.name != name:
-                raise ValueError("field name '%s' in class '%s' does not correspond to explicitly declared name '%s' "
-                                 "in field constructor" % (name, owner.__class__, self.name))
-        else:
-            self.name = name
-
-    @property
-    def qualname(self):
-        if self.owner_cls is not None:
-            try:
-                owner_qualname = self.owner_cls.__qualname__
-            except AttributeError:
-                owner_qualname = str(self.owner_cls)
-        else:
-            owner_qualname = "<unknown_cls>"
-        return "%s.%s" % (owner_qualname, self.name)
+    def __str__(self):
+        return "Accessing a `field` from the class is not yet supported. " \
+               "See https://github.com/smarie/python-pyfields/issues/12"
 
 
 class NativeField(Field):
@@ -301,17 +341,24 @@ class NativeField(Field):
     Implements fields that are replaced with a native python one on first read or write access.
     Faster but provides not much flexibility (no validator, no type check, no converter)
     """
-    def __get__(self, obj, objtype):
+    def __get__(self, obj, obj_type):
+        # type: (...) -> T
+
         if obj is None:
             # class-level call ?
-            return self
+            # TODO put back when https://youtrack.jetbrains.com/issue/PY-38151 is solved
+            # return self
+            raise ClassFieldAccessError(self)
+
+        if not PY36 and self.name is None:
+            fix_field_name(obj_type, self)
 
         # Check if the field is already set in the object __dict__
         value = obj.__dict__.get(self.name, _unset)
 
         if value is _unset:
             # mandatory field: raise an error
-            if self.default is NO_DEFAULT:
+            if self.is_mandatory:
                 raise MandatoryFieldInitError(self.name, obj)
 
             # optional: get default
@@ -466,8 +513,8 @@ class DescriptorField(Field):
 
     def __init__(self,
                  type=ANY_TYPE,         # type: Type[T]
-                 default=NO_DEFAULT,    # type: Any
-                 default_factory=None,  # type: Callable[[], Any]
+                 default=EMPTY,         # type: T
+                 default_factory=None,  # type: Callable[[], T]
                  validators=None,       # type: Validators
                  doc=None,              # type: str
                  name=None              # type: str
@@ -495,10 +542,17 @@ class DescriptorField(Field):
         else:
             self.validator = None
 
-    def __get__(self, obj, objtype):
+    def __get__(self, obj, obj_type):
+        # type: (...) -> T
         if obj is None:
             # class-level call ?
-            return self
+            # TODO put back when https://youtrack.jetbrains.com/issue/PY-38151 is solved
+            # return self
+            raise ClassFieldAccessError(self)
+
+        if not PY36 and self.name is None:
+            # lazy-fix the name
+            fix_field_name(obj_type, self)
 
         privatename = '_' + self.name
 
@@ -507,7 +561,7 @@ class DescriptorField(Field):
 
         if value is _unset:
             # mandatory field: raise an error
-            if self.default is NO_DEFAULT:
+            if self.is_mandatory:
                 raise MandatoryFieldInitError(self.name, obj)
 
             # optional: get default
@@ -521,7 +575,20 @@ class DescriptorField(Field):
 
         return value
 
-    def __set__(self, obj, value):
+    def __set__(self,
+                obj,
+                value  # type: T
+                ):
+        if obj is None:
+            # class-level call ?
+            # TODO put back when https://youtrack.jetbrains.com/issue/PY-38151 is solved
+            # return self
+            raise ClassFieldAccessError(self)
+
+        if not PY36 and self.name is None:
+            # lazy-fix the name
+            fix_field_name(obj.__class__, self)
+
         # speedup for vars used several time
         t = self.type
         privatename = "_" + self.name
@@ -534,6 +601,7 @@ class DescriptorField(Field):
         if t is not ANY_TYPE:
             if not isinstance(value, t):
                 # representing the object might fail, protect ourselves
+                # noinspection PyBroadException
                 try:
                     val_repr = str(value)
                 except:
@@ -556,243 +624,286 @@ class DescriptorField(Field):
         setattr(obj, privatename, value)
 
     def __delete__(self, obj):
-        privatename = "_" + self.name
-        delattr(obj, privatename)
+        # privatename = "_" + self.name
+        delattr(obj, "_" + self.name)
 
 
-# class FieldValidator(Validator):
+def inject_fields(*fields  # type: Field
+                  ):
+    """
+    A decorator for `__init__` methods, to make them automatically expose arguments corresponding to all `*fields`.
+    It can be used with or without arguments. If the list of fields is empty, it means "all fields from the class".
+
+    The decorated `__init__` method should have an argument named `'fields'`. This argument will be injected with an
+    object so that users can manually execute the fields initialization. This is done with `fields.init()`.
+
+    >>> import sys, pytest
+    >>> if sys.version_info < (3, 6):
+    ...     pytest.skip('doctest skipped')
+
+    >>> class Wall(object):
+    ...     height = field(doc="Height of the wall in mm.")
+    ...     color = field(default='white', doc="Color of the wall.")
+    ...
+    ...     @inject_fields(height, color)
+    ...     def __init__(self, fields):
+    ...         # initialize all fields received
+    ...         fields.init(self)
+    ...
+    ...     def __repr__(self):
+    ...         return "Wall<height=%r, color=%r>" % (self.height, self.color)
+    ...
+    >>> Wall()
+    Traceback (most recent call last):
+    ...
+    TypeError: __init__() missing 1 required positional argument: 'height'
+    >>> Wall(1)
+    Wall<height=1, color='white'>
+
+    :param fields:
+    :return:
+    """
+    if len(fields) == 1:
+        init_fun_candidate = fields[0]
+        if isfunction(init_fun_candidate):
+            # called without arguments: return the modified init function
+            return _apply_inject_fields(init_fun_candidate)
+
+    # called with arguments: return a decorator
+    return lambda init_fun: _apply_inject_fields(init_fun, fields)
+
+
+class InjectedInitDescriptor(object):
+    """
+    A class member descriptor for the __init__ method that we create with `@inject_fields`.
+    The first time people access `cls.__init__`, the actual method will be created and injected in the class.
+    This descriptor will then disappear and the class will behave normally.
+
+    Inspired by https://stackoverflow.com/a/3412743/7262247
+    """
+    __slots__ = 'init_fun', 'fields'
+
+    def __init__(self, init_fun, fields=None):
+        self.init_fun = init_fun
+        self.fields = fields
+
+    # not useful and may slow things down anyway
+    # def __set_name__(self, owner, name):
+    #     if name != '__init__':
+    #         raise ValueError("this should not happen")
+
+    def __get__(self, obj, objtype):
+        if objtype is not None:
+            # <objtype>.__init__ has been accessed. Create the modified init
+            fields = self.fields
+            if fields is None:
+                fields = collect_all_fields(objtype, auto_set_names=not PY36)
+            elif not PY36:
+                # take this opportunity to apply all field names
+                collect_all_fields(objtype, include_inherited=False, auto_set_names=True)
+
+            new_init = create_init_function(self.init_fun, fields)
+
+            # replace it forever in the class
+            setattr(objtype, '__init__', new_init)
+
+            # return the new init
+            return new_init.__get__(obj, objtype)
+
+
+_apply_inject_fields = InjectedInitDescriptor
+# def _apply_inject_fields(init_fun, fields=None):
 #     """
-#     Extends valid8's Validator to handle the extra (obj, field) context arguments provided on validation
-#     """
-#     def __init__(self, *all_validators):
-#         # dont call super
-#         # super(FieldValidator, self).__init__(error_type=None, help_msg=None, none_policy=None)
-#         self.error_type = ValidationError
-#         self.help_msg = None
-#         self.none_policy = NonePolicy.VALIDATE
-#         self.kw_context_args = dict()
+#     A decorator for the `__init__` function
 #
-#         # set main function to be an "and" of all functions
-#         self.main_function = and_with_additional_args(*all_validators)
-#
-#     def validate(self, obj, field, value):
-#         # first set the validation context to (obj, field)
-#         main_function_bak = self.main_function
-#
-#         # create a partial dynamically
-#         self.main_function = partialize(main_function_bak, obj, field)
-#
-#         # then call validation
-#         try:
-#             self.assert_valid(field.name[1:], value)
-#         finally:
-#             # put back the main function
-#             self.main_function = main_function_bak
-
-
-# def partialize(f, *args):
-#     fp = partial(f, *args)
-#     fp.__name__ = f.__name__
-#     return fp
-
-
-# def and_with_additional_args(*all_validators):
-#     """similar to valid8.and_(*validators) but here our validators have context"""
-#
-#     if len(all_validators) == 1:
-#         return all_validators[0]
-#     else:
-#         def and_v_(obj, field, x):
-#             for validator in all_validators:
-#                 try:
-#                     res = validator(obj, field, x)
-#                 except Exception as e:
-#                     # one validator was unhappy > raise
-#                     partials = [partialize(v, obj, field) for v in all_validators]
-#                     raise AtLeastOneFailed(partials, x, cause=e)
-#                 # if not result_is_success(res): <= DO NOT REMOVE THIS COMMENT
-#                 if (res is not None) or (res is not True):
-#                     # one validator was unhappy > raise
-#                     partials = [partialize(v, obj, field) for v in all_validators]
-#                     raise AtLeastOneFailed(partials, x)
-#
-#             return True
-#
-#         and_v_.__name__ = 'and({})'.format(get_callable_names(all_validators))
-#         return and_v_
-
-
-# def make_validators(validators  # type: Validators
-#                     ):
-#     """
-#     Converts the provided validators into the structures that will be used internally for validation.
-#
-#      - `validators` should either be `None`, a single `Validator`, an iterable of `Validator`s, or a dictionary of
-#        validators (in which case many syntaxes are allowed, see below). See `Validators` type hint.
-#
-#      - A `Validator` is a validation function together with optional error messages and optional error types. See
-#        `make_validator(validator)` for details.
-#
-#     TODO Dict syntax
-#
-#     :param validators: `None`, a single validator, an iterable of validators, or a dict-like of validators
-#     :return: a list of validators or `None`
-#     """
-#     if validators is not None:
-#         try:
-#             # mapping ?
-#             v_items = validators.items()
-#         except AttributeError as e:
-#             try:
-#                 # iterable ?
-#                 v_iter = iter(validators)
-#             except TypeError as e:
-#                 # single validator
-#                 all_validators = (make_validator(validators), )
-#             else:
-#                 # iterable
-#                 all_validators = (make_validator(v) for v in v_iter)
-#         else:
-#             # mapping
-#             def _mapping_entry_to_validator(k, v):
-#                 try:
-#                     # tuple?
-#                     len(v)
-#                 except TypeError:
-#                     # single value
-#                     vals = (k, v)
-#                 else:
-#                     # tuple: chain with key
-#                     vals = chain((k, ), v)
-#
-#                 # find the various elements from the key and value
-#                 callabl, err_msg, err_type = None, None, None
-#                 for _elt in vals:
-#                     if isinstance(_elt, str):
-#                         err_msg = _elt
-#                     else:
-#                         try:
-#                             if issubclass(_elt, Exception):
-#                                 err_type = _elt
-#                             else:
-#                                 callabl = _elt
-#                         except TypeError:
-#                             callabl = _elt
-#
-#                 return make_validator((callabl, err_msg, err_type))
-#
-#             all_validators = (_mapping_entry_to_validator(k, v) for k, v in v_items)
-#
-#         # finally create the validator
-#         return FieldValidator(*all_validators)
-
-
-# def make_validator(validator  # type: ValidatorDef
-#                    ):
-#     """
-#      Converts the provided validator into the structures that will be used internally for validation.
-#
-#      - `validator` is a validation function together with optional error messages and optional error types. It can
-#        therefore be provided as <validation_func>, as (<validation_func>, <err_msg>),
-#        (<validation_func>, <err_type>), or (<validation_func>, <err_msg>, <err_type>). See `Validator` type hint.
-#
-#      - Finally a `<validation_func>` validation function is a `callable` with one, two or three arguments: its
-#        signature should be `f(val)`, `f(obj, val)` or `f(obj, field, val)`. It should return `True` or `None` in case
-#        of success. See `ValidationFunc` type hint.
-#
-#     :param validator:
+#     :param init_fun:
 #     :return:
 #     """
-#     validation_func, help_msg, err_type = None, None, None
-#     try:
-#         nb_elts = len(validator)
-#     except TypeError:
-#         validation_func = validator
+#     if fields is None or len(fields) == 0:
+#         return InjectedInitDescriptor(init_fun)
 #     else:
-#         # a tuple
-#         if nb_elts == 1:
-#             validation_func = validator[0]
-#         elif nb_elts == 2:
-#             if isinstance(validator[1], str):
-#                 validation_func, help_msg, err_type = validator[0], validator[1], None
-#             else:
-#                 validation_func, help_msg, err_type = validator[0], None, validator[1]
-#         elif nb_elts == 3:
-#             validation_func, help_msg, err_type = validator[:]
-#         else:
-#             raise ValueError('tuple in validator definition should have length 1, 2, or 3. Found: %s' % validator)
-#
-#     # support several cases for the validation function signature
-#     # `f(val)`, `f(obj, val)` or `f(obj, field, val)`
-#     nb_args = len(getfullargspec(validation_func)[0])
-#     if nb_args == 0:
-#         raise ValueError("validation function should accept 1, 2, or 3 arguments at least. `f(val)`, `f(obj, val)` or "
-#                          "`f(obj, field, val)`")
-#     elif nb_args == 1:
-#         # underlying validator from valid8 handling the error-related part
-#         raiser = failure_raiser(validation_func, help_msg=help_msg, failure_type=err_type)
-#
-#         # function that we'll call
-#         def validate(obj, field, val):
-#             raiser(val)
-#
-#     else:
-#         # the validation function has two or three (or more but optional) arguments.
-#         # valid8 requires only 1. Reconciliate the two using context managers
-#         class val_func_with_2_args:
-#             """ Represents a function """
-#             __slots__ = 'obj', 'f'
-#
-#             def __init__(self, f):
-#                 self.f = f
-#
-#             def work_on(self, obj):
-#                 self.obj = obj
-#                 return self
-#
-#             def __enter__(self):
-#                 pass
-#
-#             def __exit__(self, exc_type, exc_val, exc_tb):
-#                 self.obj = None
-#
-#             def __call__(self, val):
-#                 # call user-provided validation function f
-#                 return self.f(self.obj, val)
-#
-#         if nb_args == 2:
-#             checker = val_func_with_2_args(validation_func)
-#
-#             # underlying validator from valid8 handling the error-related part
-#             raiser = failure_raiser(checker, help_msg=help_msg, failure_type=err_type)
-#
-#             # final validation function
-#             def validate(obj, field, val):
-#                 with checker.work_on(obj):
-#                     raiser(val)
-#
-#         elif nb_args >= 3:
-#             class val_func_with_3_args(val_func_with_2_args):
-#                 __slots__ = 'field'
-#
-#                 def work_on(self, obj, field):
-#                     self.obj = obj
-#                     self.field = field
-#                     return self
-#
-#                 def __call__(self, val):
-#                     return self.f(self.obj, self.field, val)
-#
-#             checker = val_func_with_3_args(validation_func)
-#
-#             # underlying validator from valid8 handling the error-related part
-#             raiser = failure_raiser(checker, help_msg=help_msg, failure_type=err_type)
-#
-#             # final validation function
-#             def validate(obj, field, val):
-#                 with checker.work_on(obj, field):
-#                     raiser(val)
-#
-#     # pycharm does not see it but yes all cases are covered
-#     validate.__name__ = validation_func.__name__
-#     return validate
+#         # explicit list of fields
+#         # Note: we can not return it directly because the name might not be available yet ! TODO even in python 3.6?
+#         # return create_init_function(init_fun, fields)
+#         return InjectedInitDescriptor(init_fun)
+
+
+def create_init_function(init_fun,
+                         fields  # type: Iterable[Field]
+                         ):
+    """
+    Creates the new init function that will replace `init_fun`.
+
+    :param init_fun:
+    :param fields:
+    :return:
+    """
+    # read the existing signature of __init__
+    init_sig = signature(init_fun)
+    params = list(init_sig.parameters.values())
+
+    # find the index of the 'fields' parameter
+    for i, p in enumerate(params):
+        if p.name == 'fields':
+            # found
+            break
+    else:
+        # 'fields' not found: raise an error
+        try:
+            name = init_fun.__qualname__
+        except AttributeError:
+            name = init_fun.__name__
+        raise ValueError("Error applying `@inject_fields` on `%s%s`: "
+                         "no 'fields' argument is available in the signature." % (name, init_sig))
+
+    # remove the fields parameter
+    del params[i]
+
+    # inject in the same position, all fields that should be included
+    # Note: preserve order as much as possible, but automatically place all mandatory fields first so that the
+    # signature is valid.
+    field_names = []
+    last_mandatory_idx = i
+    for _field in reversed(fields):
+        # Is this field optional ?
+        if _field.is_mandatory:
+            # mandatory
+            where_to_insert = i
+            last_mandatory_idx += 1
+            default = Parameter.empty
+        elif _field.is_default_factory:
+            # optional with a default value factory: place a specific symbol in the signature to indicate it
+            default = USE_FACTORY
+            where_to_insert = last_mandatory_idx
+        else:
+            # optional with a default value
+            default = _field.default
+            where_to_insert = last_mandatory_idx
+
+        # Are there annotations on the field ?
+        annotation = _field.annotation if _field.annotation is not EMPTY else Parameter.empty
+
+        # remember the list of field names for later use
+        field_names.append(_field.name)
+
+        # finally inject the new parameter in the signature
+        new_param = Parameter(_field.name, kind=Parameter.POSITIONAL_OR_KEYWORD, default=default, annotation=annotation)
+        params.insert(where_to_insert, new_param)
+
+    # finally replace the signature with the newly created one
+    new_sig = init_sig.replace(parameters=params)
+
+    # and create the new init method
+    @wraps(init_fun, new_sig=new_sig)
+    def init_fun_mod(*args, **kwargs):
+        """
+        The `__init__` method generated for you when you use `@inject_fields` on your `__init__`
+        """
+        # 1. remove all field values received from the outer signature
+        _fields = dict()
+        for f_name in field_names:
+            _fields[f_name] = kwargs.pop(f_name)
+
+        # 2. inject our special variable
+        kwargs['fields'] = FieldsForInit(**_fields)
+
+        # 3. call your __init__ method
+        return init_fun(*args, **kwargs)
+
+    return init_fun_mod
+
+
+class FieldsForInit(object):
+    """
+    The object that is injected in the users' `__init__` method as the `fields` argument,
+    when it has been decorated with `@inject_fields`.
+
+    All field values received from the generated `__init__` are available in `self.field_values`, and
+    a `init()` method allows users to perform the initialization per se.
+    """
+    __slots__ = 'field_values'
+
+    def __init__(self, **init_field_values):
+        self.field_values = init_field_values
+
+    def init(self, obj):
+        """
+        Initializes all fields on the provided object
+        :param obj:
+        :return:
+        """
+        for field_name, field_value in self.field_values.items():
+            if field_value is not USE_FACTORY:
+                # init the field with the provided value or the injected default value
+                setattr(obj, field_name, field_value)
+            else:
+                # init the field with its factory
+                getattr(obj, field_name, field_value)
+
+
+def collect_all_fields(cls,
+                       include_inherited=True,
+                       auto_set_names=False):
+    """
+    Utility method to collect all fields defined in a class, including all inherited or not.
+    If `auto_set_names` is set to True, all field names will be updated. This can be convenient under python 3.5-
+    where the `__setname__` callback did not exist.
+
+    :param cls:
+    :param auto_set_names:
+    :param include_inherited:
+    :return: a list of fields
+    """
+    result = []
+    if include_inherited:
+        where = dir(cls)
+    else:
+        where = vars(cls)
+
+    for member_name in where:
+        if not member_name.startswith('__'):
+            try:
+                member = getattr(cls, member_name)
+                if isinstance(member, Field):
+                    if auto_set_names:
+                        # take this opportunity to set the name
+                        member.name = member_name
+                    result.append(member)
+            except ClassFieldAccessError as e:
+                # we know it is a field :)
+                if auto_set_names:
+                    # take this opportunity to set the name
+                    e.field.name = member_name
+                result.append(e.field)
+
+    return result
+
+
+def fix_field_names(cls):
+    """
+    Fixes all field names at once on the given class
+    :param cls:
+    :return:
+    """
+    for member_name, member in vars(cls).items():
+        if not member_name.startswith('__'):
+            try:
+                member = getattr(cls, member_name)
+                if isinstance(member, Field):
+                    member.name = member_name
+            except ClassFieldAccessError as e:
+                e.field.name = member_name
+
+
+def fix_field_name(cls, field):
+    """
+    Fixes the given field name on the given class
+    :param cls:
+    :param field:
+    :return:
+    """
+    for member_name, member in vars(cls).items():
+        if not member_name.startswith('__'):
+            if member is field:
+                field.name = member_name
+                break
