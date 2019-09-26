@@ -325,7 +325,7 @@ function filter_table(elem) {
     not_found_message.hidden = !all_rows_hidden;
 }
 </script>
-    <p>Report generated on 24-Sep-2019 at 16:45:23</p>
+    <p>Report generated on 26-Sep-2019 at 12:55:20</p>
     <h2>Environment</h2>
     <table id="environment">
       <tr>
@@ -335,8 +335,8 @@ function filter_table(elem) {
         <td>Python</td>
         <td>3.5.6</td></tr></table>
     <h2>Summary</h2>
-    <p>13 tests ran in 0.51 seconds. </p>
-    <p>(Un)check the boxes to filter the results.</p><input checked="true" data-test-result="passed" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="passed">13 passed</span> <input checked="true" data-test-result="skipped" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="skipped">2 skipped</span> <input checked="true" data-test-result="failed" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="failed">0 failed</span> <input checked="true" data-test-result="error" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="error">0 errors</span> <input checked="true" data-test-result="xfailed" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xfailed">0 expected failures</span> <input checked="true" data-test-result="xpassed" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span> <input checked="true" data-test-result="rerun" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="rerun">0 rerun</span> 
+    <p>13 tests ran in 0.56 seconds. </p>
+    <p>(Un)check the boxes to filter the results.</p><input checked="true" data-test-result="passed" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="passed">13 passed</span> <input checked="true" data-test-result="skipped" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="skipped">3 skipped</span> <input checked="true" data-test-result="failed" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="failed">0 failed</span> <input checked="true" data-test-result="error" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="error">0 errors</span> <input checked="true" data-test-result="xfailed" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xfailed">0 expected failures</span> <input checked="true" data-test-result="xpassed" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span> <input checked="true" data-test-result="rerun" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="rerun">0 rerun</span> 
     <h2>Results</h2>
     <table id="results-table">
       <thead id="results-table-head">
@@ -356,10 +356,19 @@ function filter_table(elem) {
         <tr>
           <td class="extra" colspan="5">
             <div class="log">(&#x27;&lt;doctest pyfields.core.field[1]&gt;&#x27;, 2, &#x27;Skipped: this doctest does not work on python &lt;3.6 beacause `name` is mandatory&#x27;)<br/></div></td></tr></tbody>
+      <tbody class="skipped results-table-row">
+        <tr>
+          <td class="col-result">Skipped</td>
+          <td class="col-name">pyfields/core.py::pyfields.core.inject_fields</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="5">
+            <div class="log">(&#x27;&lt;doctest pyfields.core.inject_fields[1]&gt;&#x27;, 2, &#x27;Skipped: doctest skipped&#x27;)<br/></div></td></tr></tbody>
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">pyfields/tests/test_core_fields.py::test_field[type_=default_factory-read_first=False]</td>
+          <td class="col-name">pyfields/tests/test_core.py::test_field[type_=default_factory-read_first=False]</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
@@ -368,7 +377,7 @@ function filter_table(elem) {
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">pyfields/tests/test_core_fields.py::test_field[type_=default_factory-read_first=True]</td>
+          <td class="col-name">pyfields/tests/test_core.py::test_field[type_=default_factory-read_first=True]</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
@@ -377,7 +386,7 @@ function filter_table(elem) {
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">pyfields/tests/test_core_fields.py::test_field[type_=default-read_first=False]</td>
+          <td class="col-name">pyfields/tests/test_core.py::test_field[type_=default-read_first=False]</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
@@ -386,7 +395,7 @@ function filter_table(elem) {
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">pyfields/tests/test_core_fields.py::test_field[type_=default-read_first=True]</td>
+          <td class="col-name">pyfields/tests/test_core.py::test_field[type_=default-read_first=True]</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
@@ -395,7 +404,7 @@ function filter_table(elem) {
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">pyfields/tests/test_core_fields.py::test_field[type_=mandatory-read_first=False]</td>
+          <td class="col-name">pyfields/tests/test_core.py::test_field[type_=mandatory-read_first=False]</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
@@ -404,7 +413,7 @@ function filter_table(elem) {
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">pyfields/tests/test_core_fields.py::test_field[type_=mandatory-read_first=True]</td>
+          <td class="col-name">pyfields/tests/test_core.py::test_field[type_=mandatory-read_first=True]</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
@@ -413,7 +422,7 @@ function filter_table(elem) {
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">pyfields/tests/test_core_fields.py::test_type</td>
+          <td class="col-name">pyfields/tests/test_core.py::test_type</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
@@ -422,25 +431,16 @@ function filter_table(elem) {
       <tbody class="skipped results-table-row">
         <tr>
           <td class="col-result">Skipped</td>
-          <td class="col-name">pyfields/tests/test_core_fields.py::test_type_from_pep484_annotations::setup</td>
+          <td class="col-name">pyfields/tests/test_core.py::test_type_from_pep484_annotations::setup</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="5">
-            <div class="log">(&#x27;pyfields/tests/test_core_fields.py&#x27;, 70, &#x27;Skipped: class member annotations are not allowed before python 3.6&#x27;)<br/></div></td></tr></tbody>
+            <div class="log">(&#x27;pyfields/tests/test_core.py&#x27;, 70, &#x27;Skipped: class member annotations are not allowed before python 3.6&#x27;)<br/></div></td></tr></tbody>
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">pyfields/tests/test_core_fields.py::test_field_validators[case_nb=1]</td>
-          <td class="col-duration">0.00</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="5">
-            <div class="empty log">No log output captured.</div></td></tr></tbody>
-      <tbody class="passed results-table-row">
-        <tr>
-          <td class="col-result">Passed</td>
-          <td class="col-name">pyfields/tests/test_core_fields.py::test_field_validators[case_nb=2]</td>
+          <td class="col-name">pyfields/tests/test_core.py::test_field_validators[case_nb=1]</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
@@ -449,7 +449,7 @@ function filter_table(elem) {
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">pyfields/tests/test_core_fields.py::test_field_validators[case_nb=3]</td>
+          <td class="col-name">pyfields/tests/test_core.py::test_field_validators[case_nb=2]</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
@@ -458,7 +458,7 @@ function filter_table(elem) {
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">pyfields/tests/test_core_fields.py::test_field_validators[case_nb=4]</td>
+          <td class="col-name">pyfields/tests/test_core.py::test_field_validators[case_nb=3]</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
@@ -467,7 +467,7 @@ function filter_table(elem) {
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">pyfields/tests/test_core_fields.py::test_field_validators[case_nb=5]</td>
+          <td class="col-name">pyfields/tests/test_core.py::test_field_validators[case_nb=4]</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
@@ -476,7 +476,16 @@ function filter_table(elem) {
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">pyfields/tests/test_core_fields.py::test_validator_not_compliant_with_native_field</td>
+          <td class="col-name">pyfields/tests/test_core.py::test_field_validators[case_nb=5]</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="5">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">pyfields/tests/test_core.py::test_validator_not_compliant_with_native_field</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
