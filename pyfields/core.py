@@ -39,8 +39,7 @@ class MandatoryFieldInitError(Exception):
         self.obj= obj
 
     def __str__(self):
-        return "Mandatory field '%s' was not set before first access on " \
-               "object '%s'." % (self.field_name, self.obj)
+        return "Mandatory field '%s' has not been initialized yet on instance %s." % (self.field_name, self.obj)
 
 
 # a few symbols used in `fields`
