@@ -325,7 +325,7 @@ function filter_table(elem) {
     not_found_message.hidden = !all_rows_hidden;
 }
 </script>
-    <p>Report generated on 27-Sep-2019 at 11:01:22</p>
+    <p>Report generated on 27-Sep-2019 at 16:16:45</p>
     <h2>Environment</h2>
     <table id="environment">
       <tr>
@@ -335,8 +335,8 @@ function filter_table(elem) {
         <td>Python</td>
         <td>3.5.6</td></tr></table>
     <h2>Summary</h2>
-    <p>20 tests ran in 0.64 seconds. </p>
-    <p>(Un)check the boxes to filter the results.</p><input checked="true" data-test-result="passed" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="passed">20 passed</span> <input checked="true" data-test-result="skipped" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="skipped">9 skipped</span> <input checked="true" data-test-result="failed" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="failed">0 failed</span> <input checked="true" data-test-result="error" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="error">0 errors</span> <input checked="true" data-test-result="xfailed" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xfailed">0 expected failures</span> <input checked="true" data-test-result="xpassed" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span> <input checked="true" data-test-result="rerun" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="rerun">0 rerun</span> 
+    <p>25 tests ran in 0.68 seconds. </p>
+    <p>(Un)check the boxes to filter the results.</p><input checked="true" data-test-result="passed" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="passed">25 passed</span> <input checked="true" data-test-result="skipped" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="skipped">10 skipped</span> <input checked="true" data-test-result="failed" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="failed">0 failed</span> <input checked="true" data-test-result="error" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="error">0 errors</span> <input checked="true" data-test-result="xfailed" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xfailed">0 expected failures</span> <input checked="true" data-test-result="xpassed" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span> <input checked="true" data-test-result="rerun" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="rerun">0 rerun</span> 
     <h2>Results</h2>
     <table id="results-table">
       <thead id="results-table-head">
@@ -359,12 +359,21 @@ function filter_table(elem) {
       <tbody class="skipped results-table-row">
         <tr>
           <td class="col-result">Skipped</td>
-          <td class="col-name">pyfields/init_makers.py::pyfields.init_makers.inject_fields</td>
+          <td class="col-name">pyfields/init_makers.py::pyfields.init_makers.make_init</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="5">
-            <div class="log">(&#x27;&lt;doctest pyfields.init_makers.inject_fields[1]&gt;&#x27;, 2, &#x27;Skipped: doctest skipped&#x27;)<br/></div></td></tr></tbody>
+            <div class="log">(&#x27;&lt;doctest pyfields.init_makers.make_init[1]&gt;&#x27;, 2, &#x27;Skipped: doctest skipped&#x27;)<br/></div></td></tr></tbody>
+      <tbody class="skipped results-table-row">
+        <tr>
+          <td class="col-result">Skipped</td>
+          <td class="col-name">pyfields/init_makers.py::pyfields.init_makers.with_fields</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="5">
+            <div class="log">(&#x27;&lt;doctest pyfields.init_makers.with_fields[1]&gt;&#x27;, 2, &#x27;Skipped: doctest skipped&#x27;)<br/></div></td></tr></tbody>
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
@@ -494,7 +503,7 @@ function filter_table(elem) {
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">pyfields/tests/test_core.py::test_init_all_methods[py36_style_type_hints=False-explicit_list=False-init_type=inject_fields]</td>
+          <td class="col-name">pyfields/tests/test_core.py::test_init_all_methods[py36_style_type_hints=False-explicit_list=False-init_type=with_fields]</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
@@ -523,7 +532,7 @@ post init man !
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">pyfields/tests/test_core.py::test_init_all_methods[py36_style_type_hints=False-explicit_list=True-init_type=inject_fields]</td>
+          <td class="col-name">pyfields/tests/test_core.py::test_init_all_methods[py36_style_type_hints=False-explicit_list=True-init_type=with_fields]</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
@@ -552,7 +561,7 @@ post init man !
       <tbody class="skipped results-table-row">
         <tr>
           <td class="col-result">Skipped</td>
-          <td class="col-name">pyfields/tests/test_core.py::test_init_all_methods[py36_style_type_hints=True-explicit_list=False-init_type=inject_fields]</td>
+          <td class="col-name">pyfields/tests/test_core.py::test_init_all_methods[py36_style_type_hints=True-explicit_list=False-init_type=with_fields]</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
@@ -579,7 +588,7 @@ post init man !
       <tbody class="skipped results-table-row">
         <tr>
           <td class="col-result">Skipped</td>
-          <td class="col-name">pyfields/tests/test_core.py::test_init_all_methods[py36_style_type_hints=True-explicit_list=True-init_type=inject_fields]</td>
+          <td class="col-name">pyfields/tests/test_core.py::test_init_all_methods[py36_style_type_hints=True-explicit_list=True-init_type=with_fields]</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
@@ -613,4 +622,101 @@ post init man !
           <td class="extra" colspan="5">
             <div class="log">----------------------------- Captured stdout call -----------------------------<br/>post init man !
 post init man !
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">pyfields/tests/test_readme.py::test_readme_lazy_fields</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="5">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>white
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">pyfields/tests/test_readme.py::test_readme_make_init_full_defaults</td>
+          <td class="col-duration">0.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="5">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>Help on class Wall in module pyfields.tests.test_readme:
+
+class Wall(builtins.object)
+ |  Methods defined here:
+ |  
+ |  __init__(self, height, color=&apos;white&apos;)
+ |      The `__init__` method generated for you when you use `make_init`
+ |  
+ |  color
+ |      A field that is replaced with a native python attribute on first read or write access.
+ |      Faster but provides not much flexibility (no validator, no type check, no converter)
+ |  
+ |  height
+ |      A field that is replaced with a native python attribute on first read or write access.
+ |      Faster but provides not much flexibility (no validator, no type check, no converter)
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors defined here:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+Help on class Wall in module pyfields.tests.test_readme:
+
+class Wall(builtins.object)
+ |  Methods defined here:
+ |  
+ |  __init__(self, height, color=&apos;white&apos;)
+ |      The `__init__` method generated for you when you use `make_init`
+ |  
+ |  color
+ |      A field that is replaced with a native python attribute on first read or write access.
+ |      Faster but provides not much flexibility (no validator, no type check, no converter)
+ |  
+ |  height
+ |      A field that is replaced with a native python attribute on first read or write access.
+ |      Faster but provides not much flexibility (no validator, no type check, no converter)
+ |  
+ |  ----------------------------------------------------------------------
+ |  Data descriptors defined here:
+ |  
+ |  __dict__
+ |      dictionary for instance variables (if defined)
+ |  
+ |  __weakref__
+ |      list of weak references to the object (if defined)
+
+</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">pyfields/tests/test_readme.py::test_readme_make_init_with_explicit_list</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="5">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">pyfields/tests/test_readme.py::test_readme_make_init_with_inheritance</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="5">
+            <div class="empty log">No log output captured.</div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">pyfields/tests/test_readme.py::test_readme_make_init_callback</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="5">
+            <div class="log">----------------------------- Captured stdout call -----------------------------<br/>post init ! height=1, color=white, msg=hey
 </div></td></tr></tbody></table></body></html>
