@@ -24,8 +24,9 @@ from makefun import wraps, with_signature
 from pyfields.core import collect_all_fields, PY36, USE_FACTORY, EMPTY, Field
 
 
-def inject_fields(*fields  # type: Field
-                  ):
+
+def with_fields(*fields  # type: Field
+                ):
     """
     A decorator for `__init__` methods, to make them automatically expose arguments corresponding to all `*fields`.
     It can be used with or without arguments. If the list of fields is empty, it means "all fields from the class".
@@ -43,7 +44,7 @@ def inject_fields(*fields  # type: Field
     ...     height = field(doc="Height of the wall in mm.")
     ...     color = field(default='white', doc="Color of the wall.")
     ...
-    ...     @inject_fields(height, color)
+    ...     @with_fields(height, color)
     ...     def __init__(self, fields):
     ...         # initialize all fields received
     ...         fields.init(self)
@@ -73,7 +74,7 @@ def inject_fields(*fields  # type: Field
 
 class InjectedInitDescriptor(object):
     """
-    A class member descriptor for the __init__ method that we create with `@inject_fields`.
+    A class member descriptor for the __init__ method that we create with `@with_fields`.
     The first time people access `cls.__init__`, the actual method will be created and injected in the class.
     This descriptor will then disappear and the class will behave normally.
 
@@ -134,7 +135,7 @@ create_injected_init_possibly_with_descriptor = InjectedInitDescriptor
 class InjectedInitFieldsArg(object):
     """
     The object that is injected in the users' `__init__` method as the `fields` argument,
-    when it has been decorated with `@inject_fields`.
+    when it has been decorated with `@with_fields`.
 
     All field values received from the generated `__init__` are available in `self.field_values`, and
     a `init()` method allows users to perform the initialization per se.
@@ -184,7 +185,7 @@ def create_injected_init(init_fun,
             name = init_fun.__qualname__
         except AttributeError:
             name = init_fun.__name__
-        raise ValueError("Error applying `@inject_fields` on `%s%s`: "
+        raise ValueError("Error applying `@with_fields` on `%s%s`: "
                          "no 'fields' argument is available in the signature." % (name, init_sig))
 
     # remove the fields parameter
@@ -200,7 +201,7 @@ def create_injected_init(init_fun,
     @wraps(init_fun, new_sig=new_sig, func_name='__init__')
     def init_fun_mod(*args, **kwargs):
         """
-        The `__init__` method generated for you when you use `@inject_fields` on your `__init__`
+        The `__init__` method generated for you when you use `@with_fields` on your `__init__`
         """
         # 1. remove all field values received from the outer signature
         _fields = dict()

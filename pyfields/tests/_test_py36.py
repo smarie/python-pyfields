@@ -6,7 +6,7 @@
 #
 import pytest
 
-from pyfields import field, inject_fields, MandatoryFieldInitError, make_init
+from pyfields import field, with_fields, MandatoryFieldInitError, make_init
 
 
 def _test_class_annotations():
@@ -18,13 +18,13 @@ def _test_class_annotations():
 
 
 def _test_readme_constructor(explicit_fields_list, init_type):
-    if init_type == 'inject_fields':
+    if init_type == 'with_fields':
         if explicit_fields_list:
             class Wall:
                 height: int = field(doc="Height of the wall in mm.")
                 color: str = field(default='white', doc="Color of the wall.")
 
-                @inject_fields(height, color)
+                @with_fields(height, color)
                 def __init__(self, fields):
                     with pytest.raises(MandatoryFieldInitError):
                         self.height
@@ -36,7 +36,7 @@ def _test_readme_constructor(explicit_fields_list, init_type):
                 height: int = field(doc="Height of the wall in mm.")
                 color: str = field(default='white', doc="Color of the wall.")
 
-                @inject_fields
+                @with_fields
                 def __init__(self, fields):
                     with pytest.raises(MandatoryFieldInitError):
                         self.height

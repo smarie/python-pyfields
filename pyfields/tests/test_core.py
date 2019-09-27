@@ -13,7 +13,7 @@ from valid8 import ValidationError,ValidationFailure
 from valid8.base import InvalidValue
 from valid8.validation_lib import non_empty, Empty
 
-from pyfields import field, MandatoryFieldInitError, UnsupportedOnNativeFieldError, inject_fields, make_init
+from pyfields import field, MandatoryFieldInitError, UnsupportedOnNativeFieldError, with_fields, make_init
 
 
 @pytest.mark.parametrize('read_first', [False, True], ids="read_first={}".format)
@@ -192,11 +192,11 @@ def test_validator_not_compliant_with_native_field():
             f = field(validators=lambda x: True, native=True)
 
 
-@pytest.mark.parametrize("init_type", ['inject_fields', 'make_init', 'make_init_with_postinit'], ids="init_type={}".format)
+@pytest.mark.parametrize("init_type", ['with_fields', 'make_init', 'make_init_with_postinit'], ids="init_type={}".format)
 @pytest.mark.parametrize("explicit_fields_list", [False, True], ids="explicit_list={}".format)
 @pytest.mark.parametrize("py36_style_type_hints", [False, True], ids="py36_style_type_hints={}".format)
 def test_init_all_methods(py36_style_type_hints, explicit_fields_list, init_type):
-    """Test of @inject_fields with selected fields """
+    """Test of @with_fields with selected fields """
     if py36_style_type_hints:
         if sys.version_info < (3, 6):
             pytest.skip()
@@ -206,13 +206,13 @@ def test_init_all_methods(py36_style_type_hints, explicit_fields_list, init_type
             from ._test_py36 import _test_readme_constructor
             Wall = _test_readme_constructor(explicit_fields_list, init_type)
     else:
-        if init_type == 'inject_fields':
+        if init_type == 'with_fields':
             if explicit_fields_list:
                 class Wall(object):
                     height = field(doc="Height of the wall in mm.")          # type: int
                     color = field(default='white', doc="Color of the wall.")  # type: str
 
-                    @inject_fields(height, color)
+                    @with_fields(height, color)
                     def __init__(self, fields):
                         with pytest.raises(MandatoryFieldInitError):
                             self.height
@@ -224,7 +224,7 @@ def test_init_all_methods(py36_style_type_hints, explicit_fields_list, init_type
                     height = field(doc="Height of the wall in mm.")  # type: int
                     color = field(default='white', doc="Color of the wall.")  # type: str
 
-                    @inject_fields
+                    @with_fields
                     def __init__(self, fields):
                         with pytest.raises(MandatoryFieldInitError):
                             self.height
