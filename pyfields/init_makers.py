@@ -1,7 +1,7 @@
 #  Authors: Sylvain Marie <sylvain.marie@se.com>
 #
 #  Copyright (c) Schneider Electric Industries, 2019. All right reserved.
-
+import sys
 from inspect import isfunction
 from itertools import islice
 
@@ -14,7 +14,7 @@ except ImportError:
 try:  # python 3.5+
     from typing import Optional, Set, List, Callable, Dict, Type, Any, TypeVar, Union, Iterable, Tuple, Mapping
     from valid8.common_syntax import ValidationFuncs
-    use_type_hints = True
+    use_typing = sys.version_info > (3, 0)
 except ImportError:
     use_type_hints = False
 
