@@ -253,7 +253,7 @@ def test_init_all_methods(py36_style_type_hints, explicit_fields_list, init_type
                         self.height
                         print("post init man !")
 
-                    __init__ = make_init(height, post_init, color)
+                    __init__ = make_init(height, color, post_init_fun=post_init)
             else:
                 class Wall(object):
                     height = field(doc="Height of the wall in mm.")  # type: int
@@ -262,7 +262,7 @@ def test_init_all_methods(py36_style_type_hints, explicit_fields_list, init_type
                         self.height
                         print("post init man !")
 
-                    __init__ = make_init(post_init)
+                    __init__ = make_init(post_init_fun=post_init)
         else:
             raise ValueError(init_type)
 
@@ -284,7 +284,7 @@ def test_init_partial_fields():
             self.height
             print("post init man !")
 
-        __init__ = make_init(height, post_init)
+        __init__ = make_init(height, post_init_fun=post_init)
 
     #
     # assert str(signature(Wall.__init__)) == "(self, height, foo='bar')"

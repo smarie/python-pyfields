@@ -63,7 +63,7 @@ def _test_readme_constructor(explicit_fields_list, init_type):
                 def post_init(self, foo: str = 'bar'):
                     self.height
                     print("post init man !")
-                __init__ = make_init(height, post_init, color)
+                __init__ = make_init(height, color, post_init_fun=post_init)
         else:
             class Wall(object):
                 height: int = field(doc="Height of the wall in mm.")
@@ -73,7 +73,7 @@ def _test_readme_constructor(explicit_fields_list, init_type):
                     self.height
                     print("post init man !")
 
-                __init__ = make_init(post_init)
+                __init__ = make_init(post_init_fun=post_init)
     else:
         raise ValueError(init_type)
 

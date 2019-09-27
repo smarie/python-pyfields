@@ -338,20 +338,25 @@ class ClassFieldAccessError(Exception):
 
 class NativeField(Field):
     """
-    Implements fields that are replaced with a native python one on first read or write access.
+    A field that is replaced with a native python attribute on first read or write access.
     Faster but provides not much flexibility (no validator, no type check, no converter)
     """
     def __get__(self, obj, obj_type):
         # type: (...) -> T
 
+        # do this first, because a field might be referenced from its class the first time it will be used
+        # for example if in `make_init` we use a field defined in another class, that was not yet accessed on instance.
+        if not PY36 and self.name is None:
+            fix_field_name(obj_type, self)
+
         if obj is None:
             # class-level call ?
             # TODO put back when https://youtrack.jetbrains.com/issue/PY-38151 is solved
             # return self
+            # even this does not work
+            # exec("o = self", globals(), locals())
+            # return locals()['o']
             raise ClassFieldAccessError(self)
-
-        if not PY36 and self.name is None:
-            fix_field_name(obj_type, self)
 
         # Check if the field is already set in the object __dict__
         value = obj.__dict__.get(self.name, _unset)
@@ -544,15 +549,18 @@ class DescriptorField(Field):
 
     def __get__(self, obj, obj_type):
         # type: (...) -> T
+
+        # do this first, because a field might be referenced from its class the first time it will be used
+        # for example if in `make_init` we use a field defined in another class, that was not yet accessed on instance.
+        if not PY36 and self.name is None:
+            # lazy-fix the name
+            fix_field_name(obj_type, self)
+
         if obj is None:
             # class-level call ?
             # TODO put back when https://youtrack.jetbrains.com/issue/PY-38151 is solved
             # return self
             raise ClassFieldAccessError(self)
-
-        if not PY36 and self.name is None:
-            # lazy-fix the name
-            fix_field_name(obj_type, self)
 
         privatename = '_' + self.name
 
@@ -579,15 +587,18 @@ class DescriptorField(Field):
                 obj,
                 value  # type: T
                 ):
+
+        # do this first, because a field might be referenced from its class the first time it will be used
+        # for example if in `make_init` we use a field defined in another class, that was not yet accessed on instance.
+        if not PY36 and self.name is None:
+            # lazy-fix the name
+            fix_field_name(obj.__class__, self)
+
         if obj is None:
             # class-level call ?
             # TODO put back when https://youtrack.jetbrains.com/issue/PY-38151 is solved
             # return self
             raise ClassFieldAccessError(self)
-
-        if not PY36 and self.name is None:
-            # lazy-fix the name
-            fix_field_name(obj.__class__, self)
 
         # speedup for vars used several time
         t = self.type
@@ -706,3 +717,32 @@ def fix_field_name(cls, field):
             if member is field:
                 field.name = member_name
                 break
+
+
+def pop_kwargs(kwargs,
+               names_with_defaults,  # type: List[Tuple[str, Any]]
+               allow_others=False
+               ):
+    """
+    Internal utility method to extract optional arguments from kwargs.
+
+    :param kwargs:
+    :param names_with_defaults:
+    :param allow_others: if False (default) then an error will be raised if kwargs still contains something at the end.
+    :return:
+    """
+    all_arguments = []
+    for name, default_ in names_with_defaults:
+        try:
+            val = kwargs.pop(name)
+        except KeyError:
+            val = default_
+        all_arguments.append(val)
+
+    if not allow_others and len(kwargs) > 0:
+        raise ValueError("Unsupported arguments: %s" % kwargs)
+
+    if len(names_with_defaults) == 1:
+        return all_arguments[0]
+    else:
+        return all_arguments

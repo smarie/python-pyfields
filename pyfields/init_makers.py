@@ -21,8 +21,10 @@ except ImportError:
 
 from makefun import wraps, with_signature
 
-from pyfields.core import collect_all_fields, PY36, USE_FACTORY, EMPTY, Field
+from pyfields.core import collect_all_fields, PY36, USE_FACTORY, EMPTY, Field, pop_kwargs
 
+
+PY35 = sys.version_info >= (3, 5)
 
 
 def with_fields(*fields  # type: Field
@@ -218,36 +220,94 @@ def create_injected_init(init_fun,
 
 
 # --------- make_init
+# Python 3+: load the 'more explicit api' if possible
+if PY35 and use_type_hints:
+    new_sig = """(*fields: Field,
+                  post_init_fun: Callable = None, 
+                  post_init_args_before: bool = True
+              ):"""
+else:
+    new_sig = None
 
-def make_init(*fields):
+
+@with_signature(new_sig)
+def make_init(*fields,   # type: Field
+              **kwargs
+              ):
     """
+    Creates a constructor based on the provided fields.
+
+    If `fields` is empty, all fields from the class will be used in order of appearance, then the
+    ancestors (following the mro)
+
+    >>> import sys, pytest
+    >>> if sys.version_info < (3, 6):
+    ...     pytest.skip('doctest skipped')
+
+    >>> from pyfields import field
+    ...
+    >>> class Wall:
+    ...     height = field(doc="Height of the wall in mm.")
+    ...     color = field(default='white', doc="Color of the wall.")
+    ...     __init__ = make_init()
+    >>> w = Wall(1, color='blue')
+    >>> vars(w)
+    {'color': 'blue', 'height': 1}
+
+   `fields` can contain fields that do not belong to this class. They can come from ancestors or not (although
+   it is recommended for readability)
+
+    >>> from pyfields import field
+    ...
+    >>> class Wall:
+    ...     height = field(doc="Height of the wall in mm.")
+    ...     color = field(default='white', doc="Color of the wall.")
+    ...     __init__ = make_init(height)
+    >>> w = Wall(1, color='blue')
+    Traceback (most recent call last):
+    ...
+    TypeError: __init__() got an unexpected keyword argument 'color'
+
+    If a `post_init_fun` is provided, it should be a function with `self` as first argument. This function will be
+    executed after all declared fields have been initialized. The signature of the resulting `__init__` function
+    created will be constructed by blending all mandatory/optional fields with the mandatory/optional args in the
+    `post_init_fun` signature. The ones from the `post_init_fun` will appear first except if `post_init_args_before`
+    is set to `False`
+
+    TODO ex
 
     :param fields:
+    :param post_init_fun:
+    :param post_init_args_before:
     :return:
     """
+    # python <3.5 compliance: pop the kwargs following the varargs
+    post_init_fun, post_init_args_before = pop_kwargs(kwargs, [('post_init_fun', None),
+                                                           ('post_init_args_before', True)], allow_others=False)
+
     # convert to list so that we can pop
     fields = list(fields)
-    post_init_fun = None
-    post_init_fun_idx = -1
 
-    # find the init function in the list if any
-    i = 0
-    end = len(fields)
-    while i < end:
-        if isfunction(fields[i]):
-            if post_init_fun is not None:
-                raise ValueError("`make_init` only supports that you provide a single init function")
-
-            # extract it from the list
-            post_init_fun = fields.pop(i)
-            post_init_fun_idx = i
-            end -= 1
-        else:
-            i += 1
-
-    if post_init_fun_idx == 0 and end == 0:
-        post_init_fun_idx = -1
-    return MadeInitDescriptor(fields, post_init_fun, post_init_fun_idx)
+    # post_init_fun_idx = -1
+    #
+    # # find the init function in the list if any
+    # i = 0
+    # end = len(fields)
+    # while i < end:
+    #     if isfunction(fields[i]):
+    #         if post_init_fun is not None:
+    #             raise ValueError("`make_init` only supports that you provide a single init function")
+    #
+    #         # extract it from the list
+    #         post_init_fun = fields.pop(i)
+    #         post_init_fun_idx = i
+    #         end -= 1
+    #     else:
+    #         i += 1
+    #
+    # if post_init_fun_idx == 0 and end == 0:
+    #     post_init_fun_idx = -1
+    return MadeInitDescriptor(fields, post_init_fun, post_init_args_before=post_init_args_before)
 
 
 class MadeInitDescriptor(object):
@@ -258,12 +318,12 @@ class MadeInitDescriptor(object):
 
     Inspired by https://stackoverflow.com/a/3412743/7262247
     """
-    __slots__ = 'fields', 'post_init_fun', 'post_init_fun_idx'
+    __slots__ = 'fields', 'post_init_fun', 'post_init_args_before'
 
-    def __init__(self, fields, post_init_fun=None, post_init_fun_idx=-1):
+    def __init__(self, fields, post_init_fun=None, post_init_args_before=True):
         self.fields = fields
         self.post_init_fun = post_init_fun
-        self.post_init_fun_idx = post_init_fun_idx
+        self.post_init_args_before = post_init_args_before
 
     # not useful and may slow things down anyway
     # def __set_name__(self, owner, name):
@@ -277,10 +337,11 @@ class MadeInitDescriptor(object):
             if fields is None or len(fields) == 0:
                 fields = collect_all_fields(objtype, auto_set_names=not PY36)
             elif not PY36:
-                # take this opportunity to apply all field names
-                collect_all_fields(objtype, include_inherited=False, auto_set_names=True)
+                # take this opportunity to apply all field names including inherited
+                # TODO set back inherited = False when the bug with class-level access is solved -> make_init will be ok then
+                collect_all_fields(objtype, include_inherited=True, auto_set_names=True)
 
-            new_init = create_init(fields, self.post_init_fun, self.post_init_fun_idx)
+            new_init = create_init(fields, post_init_fun=self.post_init_fun, post_init_args_before=self.post_init_args_before)
 
             # replace it forever in the class
             setattr(objtype, '__init__', new_init)
@@ -289,23 +350,22 @@ class MadeInitDescriptor(object):
             return new_init.__get__(obj, objtype)
 
 
-def create_init(fields,               # type: Iterable[Field]
-                post_init_fun=None,   # type: Callable[[...], Any]
-                post_init_fun_idx=-1  # type: int
+def create_init(fields,                 # type: Iterable[Field]
+                post_init_fun=None,     # type: Callable[[...], Any]
+                post_init_args_before=True  # type: bool
                 ):
     """
     Creates the new init function that will replace `init_fun`.
 
     :param fields:
     :param post_init_fun:
-    :param post_init_fun_idx:
+    :param post_init_args_before:
     :return:
     """
     params = [Parameter('self', kind=Parameter.POSITIONAL_OR_KEYWORD)]
 
     if post_init_fun is None:
         # A/ no function provided
-        assert post_init_fun_idx < 0
         field_names, _ = _insert_fields_at_position(fields, params, 1)
 
         # create the signature to expose
@@ -340,30 +400,37 @@ def create_init(fields,               # type: Iterable[Field]
         # B/ function provided - extract its signature
         post_init_sig = signature(post_init_fun)
 
-        if post_init_fun_idx >= 0:
-            # First take all fields that should appear BEFORE the init function signature
-            field_names, _ = _insert_fields_at_position(fields[:post_init_fun_idx], params, 1)
+        # if post_init_fun_idx >= 0:
+        #     # CUSTOM position of the provided init function parameters within the fields parameters
+        #     # First take all fields that should appear BEFORE the init function signature
+        #     field_names, _ = _insert_fields_at_position(fields[:post_init_fun_idx], params, 1)
+        #
+        #     # Insert all parameters from the postinit fun except 'self'
+        #     params += islice(post_init_sig.parameters.values(), 1, None)  # remove the 'self' argument
+        #
+        #     # Then all the remaining fields
+        #     _insert_fields_at_position(fields[post_init_fun_idx:], params, len(params), field_names)
+        # else:
 
-            # Insert all parameters from the postinit fun except 'self'
-            params += islice(post_init_sig.parameters.values(), 1, None)  # remove the 'self' argument
+        # "all fields" + the function = "intelligent mix"
+        field_names, _idx = _insert_fields_at_position(fields, params, 1)
 
-            # Then all the remaining fields
-            _insert_fields_at_position(fields[post_init_fun_idx:], params, len(params), field_names)
+        # Insert all parameters from the postinit fun except 'self'
+        if post_init_args_before:
+            mandatory_insert_idx, optional_insert_idx = 1, _idx
         else:
-            # "intelligent mix"
-            field_names, optional_insert_idx = _insert_fields_at_position(fields, params, 1)
-            mandatory_insert_idx = 1
+            mandatory_insert_idx, optional_insert_idx = _idx, len(params)
 
-            # Insert all parameters from the postinit fun except 'self'
-            for p in islice(post_init_sig.parameters.values(), 1, None):  # remove the 'self' argument
-                if p.default is p.empty:
-                    # mandatory
-                    params.insert(mandatory_insert_idx, p)
-                    mandatory_insert_idx += 1
-                else:
-                    # optional
-                    params.insert(optional_insert_idx, p)
-                    optional_insert_idx += 1
+        for p in islice(post_init_sig.parameters.values(), 1, None):  # remove the 'self' argument
+            if p.default is p.empty:
+                # mandatory
+                params.insert(mandatory_insert_idx, p)
+                mandatory_insert_idx += 1
+                optional_insert_idx += 1
+            else:
+                # optional
+                params.insert(optional_insert_idx, p)
+                optional_insert_idx += 1
 
         # replace the signature with the newly created one
         new_sig = post_init_sig.replace(parameters=params)
