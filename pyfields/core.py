@@ -40,6 +40,21 @@ if PY36:
 # else:
 #     KEYWORD_ONLY_IF_POSSIBLE = Parameter.POSITIONAL_OR_KEYWORD
 
+try:
+    object.__qualname__
+except AttributeError:
+    # old python without __qualname__
+    import re
+    RE_CLASS_NAME = re.compile("<class '(.*)'>")
+
+    def qualname(cls):
+        cls_str = str(cls)
+        match = RE_CLASS_NAME.match(cls_str)
+        if match:
+            return match.groups()[0]
+        else:
+            return cls_str
+
 
 class MandatoryFieldInitError(Exception):
     """
@@ -131,18 +146,56 @@ class Field(object):
         # annotation
         self.annotation = annotation
 
-    def __set_name__(self, owner,
-                     name  # type: str
-                     ):
-        # called at class creation time
-        self.owner_cls = owner
+    def set_as_cls_member(self,
+                          owner_cls,
+                          name,
+                          owner_cls_type_hints
+                          ):
+        """
+        Used in __set_name__ and in `collect_fields` and `fix_field[s]` to update a field with all information
+        available concerning how it is attached to the class.
 
+         - its owner class
+         - the name under which it is known in that class
+         - the type hints (python 3.6)
+
+        :param owner_cls:
+        :param name:
+        :param owner_cls_type_hints:
+        :return:
+        """
+        # set the owner class
+        self.owner_cls = owner_cls
+
+        # check if the name provided as argument differ from the one provided
         if self.name is not None:
             if self.name != name:
                 raise ValueError("field name '%s' in class '%s' does not correspond to explicitly declared name '%s' "
-                                 "in field constructor" % (name, owner.__class__, self.name))
+                                 "in field constructor" % (name, owner_cls, self.name))
+            # already set correctly
         else:
+            # set it
             self.name = name
+
+        if owner_cls_type_hints is not None:
+            t = owner_cls_type_hints.get(name)
+            if t is not None:
+                if self.annotation is EMPTY:
+                    # only use annotation if not manually overridden
+                    self.annotation = t
+                if isinstance(self, DescriptorField) and self.type is ANY_TYPE:
+                    # only use type hint if not manually overridden
+                    # noinspection PyAttributeOutsideInit
+                    self.type = t
+
+    def __set_name__(self,
+                     owner,  # type: Type[Any]
+                     name    # type: str
+                     ):
+        if owner is not None:
+            # fill all the information about how it is attached to the class
+            cls_type_hints = get_type_hints(owner)
+            self.set_as_cls_member(owner, name, cls_type_hints)
 
     @property
     def qualname(self):
@@ -152,7 +205,8 @@ class Field(object):
             try:
                 owner_qualname = self.owner_cls.__qualname__
             except AttributeError:
-                owner_qualname = str(self.owner_cls)
+                # python 2: no __qualname__
+                owner_qualname = qualname(self.owner_cls)
         else:
             owner_qualname = "<unknown_cls>"
 
@@ -279,7 +333,7 @@ def field(type=ANY_TYPE,         # type: Type[T]
         validation function definitions. See `valid8` "simple syntax" for details
     :param doc: documentation for the field. This is mostly for class readability purposes for now.
     :param name: in python < 3.6 this is mandatory if you do not use any other decorator on the class (such as
-        `@with_fields`). If provided, it should be the same name than the one used used in the class field definition
+        `@inject_fields`). If provided, it should be the same name than the one used used in the class field definition
         (i.e. you should define the field as '<name> = field(name=<name>)').
     :param native: a boolean that can be turned to `False` to force a field to be a descriptor field, or to
         `True` to force it to be a native field. Native fields are faster but can not support type and value validation
@@ -311,7 +365,8 @@ def field(type=ANY_TYPE,         # type: Type[T]
         return DescriptorField(type=type, default=default, default_factory=default_factory, validators=validators,
                                doc=doc, name=name)
     else:
-        return NativeField(default=default, default_factory=default_factory, doc=doc, name=name)
+        annotation = type if type is not ANY_TYPE else EMPTY
+        return NativeField(annotation=annotation, default=default, default_factory=default_factory, doc=doc, name=name)
 
 
 class UnsupportedOnNativeFieldError(Exception):
@@ -347,7 +402,8 @@ class NativeField(Field):
         # do this first, because a field might be referenced from its class the first time it will be used
         # for example if in `make_init` we use a field defined in another class, that was not yet accessed on instance.
         if not PY36 and self.name is None:
-            fix_field_name(obj_type, self)
+            # __set_name__ was not called yet. lazy-fix the name and type hints
+            fix_field(obj_type, self)
 
         if obj is None:
             # class-level call ?
@@ -527,8 +583,10 @@ class DescriptorField(Field):
         """See help(field) for details"""
         super(DescriptorField, self).__init__(default=default, default_factory=default_factory, doc=doc, name=name)
 
-        # type
+        # type and annotation
         self.type = type
+        if type is not ANY_TYPE:
+            self.annotation = type
 
         # validators
         if validators is not None:
@@ -553,8 +611,8 @@ class DescriptorField(Field):
         # do this first, because a field might be referenced from its class the first time it will be used
         # for example if in `make_init` we use a field defined in another class, that was not yet accessed on instance.
         if not PY36 and self.name is None:
-            # lazy-fix the name
-            fix_field_name(obj_type, self)
+            # __set_name__ was not called yet. lazy-fix the name and type hints
+            fix_field(obj_type, self)
 
         if obj is None:
             # class-level call ?
@@ -591,8 +649,8 @@ class DescriptorField(Field):
         # do this first, because a field might be referenced from its class the first time it will be used
         # for example if in `make_init` we use a field defined in another class, that was not yet accessed on instance.
         if not PY36 and self.name is None:
-            # lazy-fix the name
-            fix_field_name(obj.__class__, self)
+            # __set_name__ was not called yet. lazy-fix the name and type hints
+            fix_field(obj.__class__, self)
 
         if obj is None:
             # class-level call ?
@@ -605,13 +663,10 @@ class DescriptorField(Field):
         privatename = "_" + self.name
 
         # check the type
-        if t is ANY_TYPE and self.owner_cls is not None and PY36:
-            t = get_type_hints(self.owner_cls).get(self.name)
-            # TODO actually the type checking part should be handled properly.
-
+        # TODO anything specific to do when 'typing' type hints are used ?
         if t is not ANY_TYPE:
             if not isinstance(value, t):
-                # representing the object might fail, protect ourselves
+                # representing the object as str might fail, protect ourselves
                 # noinspection PyBroadException
                 try:
                     val_repr = str(value)
@@ -641,14 +696,15 @@ class DescriptorField(Field):
 
 def collect_all_fields(cls,
                        include_inherited=True,
-                       auto_set_names=False):
+                       auto_fix_fields=False
+                       ):
     """
     Utility method to collect all fields defined in a class, including all inherited or not.
     If `auto_set_names` is set to True, all field names will be updated. This can be convenient under python 3.5-
     where the `__setname__` callback did not exist.
 
     :param cls:
-    :param auto_set_names:
+    :param auto_fix_fields:
     :param include_inherited:
     :return: a list of fields
     """
@@ -658,20 +714,25 @@ def collect_all_fields(cls,
     else:
         where = vars(cls)
 
+    if auto_fix_fields and PY36:
+        cls_type_hints = get_type_hints(cls)
+    else:
+        cls_type_hints = None
+
     for member_name in where:
         if not member_name.startswith('__'):
             try:
                 member = getattr(cls, member_name)
                 if isinstance(member, Field):
-                    if auto_set_names:
-                        # take this opportunity to set the name
-                        member.name = member_name
+                    if auto_fix_fields:
+                        # take this opportunity to set the name and type hints
+                        member.set_as_cls_member(cls, member_name, cls_type_hints)
                     result.append(member)
             except ClassFieldAccessError as e:
                 # we know it is a field :)
-                if auto_set_names:
+                if auto_fix_fields:
                     # take this opportunity to set the name
-                    e.field.name = member_name
+                    e.field.set_as_cls_member(cls, member_name, cls_type_hints)
                 result.append(e.field)
 
     return result
@@ -689,33 +750,56 @@ def ordereddir(cls):
             yield k
 
 
-def fix_field_names(cls):
+def fix_fields(cls,                 # type: Type[Any]
+               fix_type_hints=PY36  # type: bool
+               ):
     """
-    Fixes all field names at once on the given class
+    Fixes all field names and type annotations at once on the given class
+
     :param cls:
+    :param fix_type_hints:
     :return:
     """
+    if fix_type_hints:
+        cls_type_hints = get_type_hints(cls)
+    else:
+        cls_type_hints = None
+
     for member_name, member in vars(cls).items():
         if not member_name.startswith('__'):
             try:
                 member = getattr(cls, member_name)
                 if isinstance(member, Field):
-                    member.name = member_name
+                    # do the same than in __set_name__
+                    member.set_as_cls_member(cls, member_name, cls_type_hints)
+
             except ClassFieldAccessError as e:
                 e.field.name = member_name
 
 
-def fix_field_name(cls, field):
+def fix_field(cls,                 # type: Type[Any]
+              field,               # type: Field
+              fix_type_hints=PY36  # type: bool
+              ):
     """
-    Fixes the given field name on the given class
+    Fixes the given field name and type annotation on the given class
+
     :param cls:
     :param field:
+    :param fix_type_hints:
     :return:
     """
+    if fix_type_hints:
+        cls_type_hints = get_type_hints(cls)
+    else:
+        cls_type_hints = None
+
     for member_name, member in vars(cls).items():
         if not member_name.startswith('__'):
             if member is field:
-                field.name = member_name
+                # do the same than in __set_name__
+                field.set_as_cls_member(cls, member_name, cls_type_hints)
+                # found: no need to look further
                 break
 
 

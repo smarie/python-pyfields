@@ -5,7 +5,7 @@ import pytest
 import dataclasses as dc
 from attr import attrs, attrib
 
-from pyfields import field, with_fields
+from pyfields import field, inject_fields
 
 
 def _create_class_creator(type):
@@ -15,7 +15,7 @@ def _create_class_creator(type):
                 height = field(doc="Height of the wall in mm.")  # type: int
                 color = field(default='white', doc="Color of the wall.")  # type: str
 
-                @with_fields
+                @inject_fields
                 def __init__(self, fields):
                     fields.init(self)
             return Wall

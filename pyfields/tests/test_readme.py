@@ -1,5 +1,10 @@
+import sys
+import timeit
+from decimal import Decimal
+from math import log, ceil
+
 import pytest
-from pyfields import field, MandatoryFieldInitError, with_fields, make_init
+from pyfields import field, MandatoryFieldInitError, inject_fields, make_init, init_fields
 
 
 def test_readme_lazy_fields():
@@ -25,11 +30,46 @@ def test_readme_lazy_fields():
 
     # mandatory field
     with pytest.raises(MandatoryFieldInitError) as exc_info:
-        w.height
+        print(w.height)
     assert str(exc_info.value).startswith("Mandatory field 'height' has not been initialized yet on instance <")
 
     w.height = 12
     assert vars(w) == {'color': 'white', 'height': 12}
+
+
+def test_readme_native_descriptors():
+    class Foo:
+        a = field()
+        b = field(native=False)
+
+    # TODO change when issue with class level access is fixed
+    a_name = "test_readme_native_descriptors.<locals>.Foo.a" if sys.version_info >= (3, 6) else "<unknown_cls>.None"
+    b_name = "test_readme_native_descriptors.<locals>.Foo.b" if sys.version_info >= (3, 6) else "<unknown_cls>.None"
+    assert repr(Foo.__dict__['a']) == "<NativeField: %s>" % a_name
+    assert repr(Foo.__dict__['b']) == "<DescriptorField: %s>" % b_name
+
+    f = Foo()
+    def set_a():
+        f.a = 12
+    def set_b():
+        f.b = 12
+    def set_c():
+        f.c = 12
+    t_field_native = timeit.Timer(set_a).timeit()
+    t_field_desc = timeit.Timer(set_b).timeit()
+    t_native = timeit.Timer(set_c).timeit()
+
+    # make sure that the access time for native field and native are identical
+    assert abs(t_field_native - t_native) / t_native <= 0.1
+    # assert abs(round(t_field_native * 10) - round(t_native * 10)) <= 1
+
+
+# def decompose(number):
+#     """ decompose a number in mantissa and exponent in scientific notation. from https://stackoverflow.com/a/45359185/7262247"""
+#     (sign, digits, exponent) = Decimal(number).as_tuple()
+#     fexp = len(digits) + exponent - 1
+#     fman = Decimal(number).scaleb(-fexp).normalize()
+#     return fman, fexp
 
 
 def test_readme_make_init_full_defaults():
@@ -41,10 +81,8 @@ def test_readme_make_init_full_defaults():
     # create an instance
     help(Wall)
     with pytest.raises(TypeError) as exc_info:
-        w = Wall()
+        Wall()
     assert str(exc_info.value).startswith("__init__()")
-
-    help(Wall)
 
     w = Wall(2)
     assert vars(w) == {'color': 'white', 'height': 2}
@@ -99,6 +137,33 @@ def test_readme_make_init_callback():
         # only `height` and `foo` will be in the constructor
         __init__ = make_init(height, post_init_fun=post_init)
 
-
     w = Wall(1, 'hey')
+    assert vars(w) == {'color': 'white', 'height': 1, 'non_field_attr': 'hey'}
 
+
+def test_readme_init_fields():
+    class Wall:
+        height = field(doc="Height of the wall in mm.")  # type: int
+        color = field(default='white', doc="Color of the wall.")  # type: str
+
+        @init_fields
+        def __init__(self, msg='hello'):
+            """
+            After initialization, some print message is done
+            :param msg: the message details to add
+            :return:
+            """
+            print("post init ! height=%s, color=%s, msg=%s" % (self.height, self.color, msg))
+            self.non_field_attr = msg
+
+    # create an instance
+    help(Wall.__init__)
+    with pytest.raises(TypeError) as exc_info:
+        Wall()
+    assert str(exc_info.value).startswith("__init__()")
+
+    w = Wall(2)
+    assert vars(w) == {'color': 'white', 'height': 2, 'non_field_attr': 'hello'}
+
+    w = Wall(msg='hey', color='blue', height=12)
+    assert vars(w) == {'color': 'blue', 'height': 12, 'non_field_attr': 'hey'}
