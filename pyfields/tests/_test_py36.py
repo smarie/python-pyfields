@@ -40,6 +40,14 @@ def _test_readme_value_validation(colors):
     return Wall
 
 
+def test_value_validation_advanced(validate_width):
+    class Wall(object):
+        height: int = field(doc="Height of the wall in mm.")
+        width: str = field(validators=validate_width,
+                           doc="Width of the wall in mm.")
+    return Wall
+
+
 def _test_readme_constructor(explicit_fields_list, init_type, native):
     if init_type == 'inject_fields':
         if explicit_fields_list:

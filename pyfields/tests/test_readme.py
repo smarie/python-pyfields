@@ -3,7 +3,7 @@ import sys
 import timeit
 
 import pytest
-from valid8 import ValidationError
+from valid8 import ValidationError, ValidationFailure
 
 from pyfields import field, MandatoryFieldInitError, make_init, init_fields
 
@@ -100,6 +100,41 @@ def test_value_validation(py36_style_type_hints):
         w.color = 'magenta'
     assert "NotInAllowedValues: x in ('blue', 'red', 'white') does not hold for x=magenta. Wrong value: 'magenta'." \
            in str(exc_info.value)
+
+
+@pytest.mark.parametrize("py36_style_type_hints", [False, True], ids="py36_style_type_hints={}".format)
+def test_value_validation_advanced(py36_style_type_hints):
+
+    class InvalidWidth(ValidationFailure):
+        help_msg = 'should be a multiple of the height ({height})'
+
+    def validate_width(obj, width):
+        if width % obj.height != 0:
+            raise InvalidWidth(width, height=obj.height)
+
+    if py36_style_type_hints:
+        if sys.version_info < (3, 6):
+            pytest.skip()
+            Wall = None
+        else:
+            # import the test that uses python  3.6 type annotations
+            from ._test_py36 import test_value_validation_advanced
+            Wall = test_value_validation_advanced(validate_width)
+    else:
+        class Wall(object):
+            height = field(type_hint=int,
+                           doc="Height of the wall in mm.")
+            width = field(type_hint=str,
+                          validators=validate_width,
+                          doc="Width of the wall in mm.")
+
+    w = Wall()
+    w.height = 100
+    w.width = 200
+
+    with pytest.raises(ValidationError) as exc_info:
+        w.width = 201
+    assert "InvalidWidth: should be a multiple of the height (100). Wrong value: 201." in str(exc_info.value)
 
 
 def test_readme_native_descriptors():

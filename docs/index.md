@@ -165,21 +165,33 @@ valid8.entry_points.ValidationError[ValueError]:
 >>> w.color = 'magenta'
 valid8.entry_points.ValidationError[ValueError]: 
     Error validating [<...>.Wall.color=magenta]. 
-    NotInAllowedValues: x in {'blue', 'red', 'white'} does not hold for x=magenta. 
-    Wrong value: 'magenta'.
+    NotInAllowedValues: x in {'blue', 'red', 'white'} does not hold 
+    for x=magenta. Wrong value: 'magenta'.
 ```
 
 See `valid8` documentation for details about the [syntax](https://smarie.github.io/python-valid8/validation_funcs/c_simple_syntax/) and available [validation lib](https://smarie.github.io/python-valid8/validation_funcs/b_base_validation_lib/).
 
-In addition to the above syntax, `pyfields` support that you add validators to a field after creation, using the `@field.validator` decorator:
-
-*todo*
+**todo** In addition to the above syntax, `pyfields` support that you add validators to a field after creation, using the `@field.validator` decorator:
 
 Finally, for advanced validation scenarios you might with your validation callables to receive a bit of context. `pyfields` supports that the callables accept one, two or three arguments for this (where `valid8` supports only 1): `f(val)`, `f(obj, val)`, and `f(obj, field, val)`.
 
 For example we can define walls where the width is a multiple of the length:
 
-*todo*
+```python
+from valid8 import ValidationFailure
+
+class InvalidWidth(ValidationFailure):
+    help_msg = 'should be a multiple of the height ({height})'
+
+def validate_width(obj, width):
+    if width % obj.height != 0:
+        raise InvalidWidth(width, height=obj.height)
+
+class Wall(object):
+    height: int = field(doc="Height of the wall in mm.")
+    width: str = field(validators=validate_width,
+                       doc="Width of the wall in mm.")
+```
 
 #### Converters
 
