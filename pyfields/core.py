@@ -112,7 +112,7 @@ class Field(object):
     """
     Base class for fields
     """
-    __slots__ = 'is_mandatory', 'default', 'is_default_factory', 'name', 'annotation', 'doc', 'owner_cls'
+    __slots__ = '__weakref__', 'is_mandatory', 'default', 'is_default_factory', 'name', 'annotation', 'doc', 'owner_cls'
 
     def __init__(self,
                  default=EMPTY,         # type: T
@@ -396,6 +396,8 @@ class NativeField(Field):
     A field that is replaced with a native python attribute on first read or write access.
     Faster but provides not much flexibility (no validator, no type check, no converter)
     """
+    __slots__ = ()
+
     def __get__(self, obj, obj_type):
         # type: (...) -> T
 
@@ -469,7 +471,7 @@ class FieldValidator(Validator):
     """
     Represents a `Validator` responsible to validate a `field`
     """
-    __slots__ = 'validated_field',
+    __slots__ = '__weakref__', 'validated_field'
 
     @with_signature(new_sig)
     def __init__(self,
