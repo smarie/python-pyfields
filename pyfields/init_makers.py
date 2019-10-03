@@ -35,7 +35,7 @@ def init_fields(*fields,   # type: Union[Field, Any]
     method is modified so that it can receive values for these fields:
 
     >>> import sys, pytest
-    >>> if sys.version_info < (3, 6): pytest.skip('doctest skipped')
+    >>> if sys.version_info < (3, 7): pytest.skip('doctest skipped')  # 3.6 help() is different on travis
 
     >>> from pyfields import field
     >>> class Wall:
