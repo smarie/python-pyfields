@@ -76,7 +76,6 @@ USE_FACTORY = sentinel.create('use_factory')
 _unset = sentinel.create('_unset')
 if use_type_hints:
     T = TypeVar('T')
-    ANY_TYPE = Any
     ValidationFunc = Union[Callable[[Any], Any],
                            Callable[[Any, Any], Any],
                            Callable[[Any, Any, Any], Any]
@@ -104,20 +103,17 @@ if use_type_hints:
     elements defining a validators as the key."""
     # TODO we could reuse valid8's type hints... when they accept to be parametrized with the callables signatures
 
-else:
-    ANY_TYPE = sentinel.create('ANY_TYPE')
-
 
 class Field(object):
     """
     Base class for fields
     """
-    __slots__ = '__weakref__', 'is_mandatory', 'default', 'is_default_factory', 'name', 'annotation', 'doc', 'owner_cls'
+    __slots__ = '__weakref__', 'is_mandatory', 'default', 'is_default_factory', 'name', 'type_hint', 'doc', 'owner_cls'
 
     def __init__(self,
                  default=EMPTY,         # type: T
                  default_factory=None,  # type: Callable[[], T]
-                 annotation=EMPTY,      #
+                 type_hint=EMPTY,       # type: Any
                  doc=None,              # type: str
                  name=None              # type: str
                  ):
@@ -143,8 +139,11 @@ class Field(object):
         # doc
         self.doc = dedent(doc) if doc is not None else None
 
-        # annotation
-        self.annotation = annotation
+        # type hints
+        if type_hint is not EMPTY and type_hint is not None:
+            self.type_hint = type_hint
+        else:
+            self.type_hint = EMPTY
 
     def set_as_cls_member(self,
                           owner_cls,
@@ -179,14 +178,9 @@ class Field(object):
 
         if owner_cls_type_hints is not None:
             t = owner_cls_type_hints.get(name)
-            if t is not None:
-                if self.annotation is EMPTY:
-                    # only use annotation if not manually overridden
-                    self.annotation = t
-                if isinstance(self, DescriptorField) and self.type is ANY_TYPE:
-                    # only use type hint if not manually overridden
-                    # noinspection PyAttributeOutsideInit
-                    self.type = t
+            if t is not None and self.type_hint is EMPTY:
+                # only use type hint if not manually overridden
+                self.type_hint = t
 
     def __set_name__(self,
                      owner,  # type: Type[Any]
@@ -216,7 +210,8 @@ class Field(object):
         return "<%s: %s>" % (self.__class__.__name__, self.qualname)
 
 
-def field(type=ANY_TYPE,         # type: Type[T]
+def field(type_hint=None,        # type: Type[T]
+          check_type=False,      # type: bool
           default=EMPTY,         # type: T
           default_factory=None,  # type: Callable[[], T]
           validators=None,       # type: Validators
@@ -246,13 +241,16 @@ def field(type=ANY_TYPE,         # type: Type[T]
     ------
     Type hints for fields can be provided using the standard python typing mechanisms (type comments for python < 3.6
     and class member type hints for python >= 3.6). Types declared this way will not be checked at runtime, they are
-    just hints for the IDE.
+    just hints for the IDE. You can also specify a `type_hint` explicitly to override the type hints gathered from the
+    other means indicated above. The corresponding type hint is automatically declared by `field` so your IDE will know
+    about it. Specifying a `type_hint` explicitly is mostly useful if you are running python < 3.6 and wish to use type
+    validation, see below.
 
-    Instead, you can specify a `type` to declare that type should be checked. In that case the type will be validated
-    everytime a new value is provided, and a `TypeError` will be raised if invalid. The corresponding type hint is
-    automatically declared by `field` so your IDE will know about it, no need to use additional type hints.
-
-    If you wish to specify a type hint without validating it, you should specify `native=True`.
+    By default `check_type` is `False`. This means that the abovementioned `type_hint` is just a hint. If you set
+    `check_type=True` the type declared in the type hint will be validated, and a `TypeError` will be raised if
+    provided values are invalid. Important: if you are running python < 3.6 you have to set the type hint explicitly
+    using `type_hint` if you wish to set `check_type=True`, otherwise you will get an exception. Indeed type comments
+    can not be collected by the code.
 
     Documentation
     -------------
@@ -262,14 +260,13 @@ def field(type=ANY_TYPE,         # type: Type[T]
     -------
 
     >>> import sys, pytest
-    >>> if sys.version_info < (3, 6):
-    ...     pytest.skip('this doctest does not work on python <3.6 beacause `name` is mandatory')
+    >>> if sys.version_info < (3, 6): pytest.skip('skipped on python <3.6')
     ...
     >>> class Foo(object):
     ...     od = field(default='bar', doc="This is an optional field with a default value")
     ...     odf = field(default_factory=list, doc="This is an optional with a default value factory")
     ...     m = field(doc="This is a mandatory field")
-    ...     mt = field(type=int, doc="This is a typed mandatory field")
+    ...     mt: int = field(check_type=True, doc="This is a type-checked mandatory field")
     ...
     >>> o = Foo()
     >>> o.od   # read access with default value
@@ -292,6 +289,10 @@ def field(type=ANY_TYPE,         # type: Type[T]
         ...
     pyfields.core.MandatoryFieldInitError: Mandatory field 'm' has not been initialized yet on instance...
     >>> o.mt = 1
+    >>> o.mt = '1'
+    Traceback (most recent call last):
+        ...
+    TypeError: Invalid value type ...
 
     Limitations
     -----------
@@ -320,9 +321,12 @@ def field(type=ANY_TYPE,         # type: Type[T]
      - https://stackoverflow.com/questions/42023852/how-can-i-get-the-attribute-name-when-working-with-descriptor-protocol-in-python
      - attrs / dataclasses
 
-    :param type: an optional type for the field. If one is provided, it will be checked by default. The field will
-        therefore not be a simple (fast) field any more but will be a descriptor (slower) field. You can disable the
-        check by forcing `native=True`
+    :param type_hint: an optional explicit type hint for the field, to override the type hint defined by PEP484
+        especially on old python versions because type comments can not be captured. By default the type hint is just a
+        hint and does not contribute to validation. To enable type validation, set `check_type` to `True`.
+    :param check_type: by default (`check_type=False`), the type of a field, provided using PEP484 type hints or
+        an explicit `type_hint`, is not validated when you assign a new value to it. You can activate type validation
+        by setting `check_type=True`. In that case the field will become a descriptor field.
     :param default: a default value for the field. Providing a `default` makes the field "optional". `default` value
         is not copied on new instances, if you wish a new copy to be created you should provide a `default_factory`
         instead. Only one of `default` or `default_factory` should be provided.
@@ -335,38 +339,37 @@ def field(type=ANY_TYPE,         # type: Type[T]
     :param name: in python < 3.6 this is mandatory if you do not use any other decorator on the class (such as
         `@inject_fields`). If provided, it should be the same name than the one used used in the class field definition
         (i.e. you should define the field as '<name> = field(name=<name>)').
-    :param native: a boolean that can be turned to `False` to force a field to be a descriptor field, or to
-        `True` to force it to be a native field. Native fields are faster but can not support type and value validation
-         not conversions or callbacks. `None` (default) automatically sets `native=True` if no `validators` nor
-         `type` nor `converters` are provided ; and `native=False` otherwise. In general you should not set this
-         manually except if (1) you provide `type` but do not wish the type to be enforced ; in which case you would set
-         `native=True`. (2) your class does not have `__dict__` (instead it has `__slots__`) ; in which case you would
-         set `native=False`.
+    :param native: a boolean that can be turned to `False` to force a field to be a descriptor field, or to `True` to
+        force it to be a native field. Native fields are faster but can not support type and value validation
+        nor conversions or callbacks. `None` (default) automatically sets `native=True` if no `validators` nor
+        `check_type=True` nor `converters` are provided ; and `native=False` otherwise. In general you should not
+        set this option manually except for experiments.
     :return:
     """
-    # check the conditions when we can not go with a fast native field
-    if native is not None:
+    # Should we create a Native or a Descriptor field ?
+    if native is None:
+        # default: choose automatically according to user-provided options
+        create_descriptor = check_type or (validators is not None)  # todo or converters is not None
+    else:
+        # explicit user choice
         if native:
-            # explicit `native=False`
-            if validators is not None:
+            # explicit `native=True`.
+            if check_type or (validators is not None):    # todo or converters is not None
                 raise UnsupportedOnNativeFieldError("`native=False` can not be set if a `validators` or "
-                                                    "`converters` is provided")
+                                                    "`converters` is provided or if `check_type` is `True`")
             else:
-                # IMPORTANT: `type *can* still be provided but will not be validated`
-                needs_descriptor = False
+                create_descriptor = False
         else:
-            # explicit `native=True`
-            needs_descriptor = True
-    else:
-        needs_descriptor = (type is not ANY_TYPE) or (validators is not None) or native
+            # explicit `native=False`. Force-use a descriptor
+            create_descriptor = True
 
-    # finally create the correct descriptor type
-    if needs_descriptor:
-        return DescriptorField(type=type, default=default, default_factory=default_factory, validators=validators,
-                               doc=doc, name=name)
+    # Create the correct type of field
+    if create_descriptor:
+        return DescriptorField(type_hint=type_hint, default=default, default_factory=default_factory,
+                               check_type=check_type, validators=validators, doc=doc, name=name)
     else:
-        annotation = type if type is not ANY_TYPE else EMPTY
-        return NativeField(annotation=annotation, default=default, default_factory=default_factory, doc=doc, name=name)
+        return NativeField(type_hint=type_hint, default=default, default_factory=default_factory,
+                           doc=doc, name=name)
 
 
 class UnsupportedOnNativeFieldError(Exception):
@@ -572,34 +575,38 @@ class DescriptorField(Field):
     """
     General-purpose implementation for fields that require type-checking or validation or converter
     """
-    __slots__ = 'type', 'validator'
+    __slots__ = 'validator', 'check_type'
 
     def __init__(self,
-                 type=ANY_TYPE,         # type: Type[T]
+                 type_hint=None,        # type: Type[T]
                  default=EMPTY,         # type: T
                  default_factory=None,  # type: Callable[[], T]
+                 check_type=False,   # type: bool
                  validators=None,       # type: Validators
                  doc=None,              # type: str
                  name=None              # type: str
                  ):
         """See help(field) for details"""
-        super(DescriptorField, self).__init__(default=default, default_factory=default_factory, doc=doc, name=name)
+        super(DescriptorField, self).__init__(type_hint=type_hint, default=default, default_factory=default_factory,
+                                              doc=doc, name=name)
 
-        # type and annotation
-        self.type = type
-        if type is not ANY_TYPE:
-            self.annotation = type
+        # type validation
+        self.check_type = check_type
 
         # validators
         if validators is not None:
             try:  # dict ?
                 validators.keys()
             except (AttributeError, FunctionDefinitionError):
-                try:  # iterable
-                    iter(validators)
-                except (TypeError, FunctionDefinitionError):
-                    # single
+                if isinstance(validators, tuple):
+                    # single tuple
                     validators = (validators, )
+                else:
+                    try:  # iterable
+                        iter(validators)
+                    except (TypeError, FunctionDefinitionError):
+                        # single
+                        validators = (validators, )
             else:
                 # dict
                 validators = (validators,)
@@ -661,12 +668,18 @@ class DescriptorField(Field):
             raise ClassFieldAccessError(self)
 
         # speedup for vars used several time
-        t = self.type
+        t = self.type_hint
         privatename = "_" + self.name
 
         # check the type
-        # TODO anything specific to do when 'typing' type hints are used ?
-        if t is not ANY_TYPE:
+        if self.check_type:
+            if t is EMPTY:
+                raise ValueError("`check_type` is enabled on field '%s' but no type hint is available. Please provide"
+                                 "type hints or set `field.check_type` to `False`. Note that python code is not able to"
+                                 " read type comments so if you wish to be compliant with python < 3.6 you'll have to"
+                                 "set the type hint explicitly in `field.type_hint` instead")
+
+            # TODO anything specific rather than `isinstance` to do when 'typing' type hints are used ?
             if not isinstance(value, t):
                 # representing the object as str might fail, protect ourselves
                 # noinspection PyBroadException
@@ -756,7 +769,7 @@ def fix_fields(cls,                 # type: Type[Any]
                fix_type_hints=PY36  # type: bool
                ):
     """
-    Fixes all field names and type annotations at once on the given class
+    Fixes all field names and type hints at once on the given class
 
     :param cls:
     :param fix_type_hints:
@@ -784,7 +797,7 @@ def fix_field(cls,                 # type: Type[Any]
               fix_type_hints=PY36  # type: bool
               ):
     """
-    Fixes the given field name and type annotation on the given class
+    Fixes the given field name and type hint on the given class
 
     :param cls:
     :param field:

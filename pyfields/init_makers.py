@@ -468,7 +468,7 @@ def _insert_fields_at_position(fields_to_insert,
             where_to_insert = last_mandatory_idx
 
         # Are there annotations on the field ?
-        annotation = _field.annotation if _field.annotation is not EMPTY else Parameter.empty
+        annotation = _field.type_hint if _field.type_hint is not EMPTY else Parameter.empty
 
         # remember the list of field names for later use
         field_names.append(_field.name)

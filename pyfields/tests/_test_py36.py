@@ -11,7 +11,7 @@ from pyfields import field, inject_fields, MandatoryFieldInitError, make_init
 
 def _test_class_annotations():
     class Foo:
-        field_with_native_forced_to_false: int = field(native=False)
+        field_with_validate_type: int = field(check_type=True)
         field_with_defaults: str = field()
 
     return Foo

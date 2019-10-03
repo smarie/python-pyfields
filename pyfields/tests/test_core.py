@@ -53,10 +53,10 @@ def test_field(read_first, type_):
 
 
 def test_type():
-    """ Tests that when `type` is provided, it works as expected """
+    """ Tests that when `type_hint` is provided and `validate_type` is explicitly set, it works as expected """
 
     class Foo(object):
-        f = field(type=str)
+        f = field(type_hint=str, check_type=True)
 
     o = Foo()
     o.f = 'hello'
@@ -78,9 +78,9 @@ def test_type_from_pep484_annotations():
     foo = Foo()
 
     # test that the field that is non-native has type checking active
-    foo.field_with_native_forced_to_false = 2
+    foo.field_with_validate_type = 2
     with pytest.raises(TypeError) as exc_info:
-        foo.field_with_native_forced_to_false = 'hello'
+        foo.field_with_validate_type = 'hello'
     assert str(exc_info.value).startswith("Invalid value type provided for ")
 
     # by default the type is not checked
@@ -100,18 +100,18 @@ def test_field_validators(case_nb):
 
     class Foo2(object):
         # one single validator
-        f = field(default="hey", type=str, validators=non_empty)
+        f = field(default="hey", type_hint=str, validators=non_empty)
 
         # one single validator in a list
-        g = field(type=str, validators=[non_empty])
+        g = field(type_hint=str, validators=[non_empty])
 
         # one single validator accepting three arguments (obj, field, val)
-        gg = field(type=str, validators=lambda obj, field, val: obj.f in val)
+        gg = field(type_hint=str, validators=lambda obj, field, val: obj.f in val)
 
         # several validators in a dict. keys and values can contain elements of definition in any order
-        h = field(type=str, validators=OrderedDict([("h should be non empty", (non_empty, EmptyFailure)),
-                                                    ("h should contain field f", (lambda obj, val: obj.f in val)),
-                                                    ("h should contain 'a'", (lambda val: 'a' in val))]))
+        h = field(type_hint=str, validators=OrderedDict([("h should be non empty", (non_empty, EmptyFailure)),
+                                                         ("h should contain field f", (lambda obj, val: obj.f in val)),
+                                                         ("h should contain 'a'", (lambda val: 'a' in val))]))
 
     if sys.version_info < (3, 0):
         # qualname does not exist, we use str(cls)
@@ -154,12 +154,12 @@ def test_field_validators(case_nb):
         if case_nb == 4:
             # override the definition for Foo2.h
             # several validators in a list. Tuples should start with the function
-            Foo2.h = field(name='h', type=str, validators=[(non_empty, "h should be non empty", EmptyFailure),
-                                                           non_empty,
-                                                           (lambda obj, val: obj.f in val, "h should contain field f"),
-                                                           (lambda val: 'a' in val, "h should contain 'a'"),
-                                                           (non_empty, EmptyFailure),
-                                                           ])
+            Foo2.h = field(name='h', type_hint=str, validators=[(non_empty, "h should be non empty", EmptyFailure),
+                                                                non_empty,
+                                                                (lambda obj, val: obj.f in val, "h should contain field f"),
+                                                                (lambda val: 'a' in val, "h should contain 'a'"),
+                                                                (non_empty, EmptyFailure),
+                                                                ])
 
         # o.h should be a non-empty string containing 'a' and containing o.f
         with pytest.raises(ValidationError) as exc_info:
@@ -288,12 +288,8 @@ def test_init_all_methods(py36_style_type_hints, explicit_fields_list, init_type
     color_field = Wall.__dict__['color']
 
     if py36_style_type_hints:
-        assert height_field.annotation is int
-        assert color_field.annotation is str
-
-        if not native:
-            assert height_field.type is int
-            assert color_field.type is str
+        assert height_field.type_hint is int
+        assert color_field.type_hint is str
 
         # todo check signature of generated constructor
 
