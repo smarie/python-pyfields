@@ -72,7 +72,7 @@ def test_readme_native_descriptors():
     print("%0.2f (normal python) ; %0.2f (native field) ; %0.2f (descriptor field)" % (tc, ta, tb))
 
     # make sure that the access time for native field and native are identical
-    assert abs(ta - tc) / tc <= 0.1
+    assert abs(ta - tc) / max(ta, tc) <= 0.1
     # assert abs(round(t_field_native * 10) - round(t_native * 10)) <= 1
 
 
