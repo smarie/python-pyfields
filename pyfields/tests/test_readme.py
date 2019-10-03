@@ -134,7 +134,7 @@ def test_readme_native_descriptors():
     # for reproducibility on travis, we have to get rid of the first init
     if runs_on_travis():
         print("increasing tolerance on travis.")
-        assert ta / tc <= 1.3
+        assert ta / tc <= 1.5
     else:
         assert ta / tc <= 1.1
     # assert abs(round(t_field_native * 10) - round(t_native * 10)) <= 1
