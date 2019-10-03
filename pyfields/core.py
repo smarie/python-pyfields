@@ -700,15 +700,12 @@ class DescriptorField(Field):
 
             # TODO anything specific rather than `isinstance` to do when 'typing' type hints are used ?
             if not isinstance(value, t):
-                # representing the object as str might fail, protect ourselves
+                # representing the object might fail, protect ourselves
                 # noinspection PyBroadException
                 try:
-                    val_repr = str(value)
-                except:
-                    try:
-                        val_repr = repr(value)
-                    except Exception as e:
-                        val_repr = "<error while trying to represent object: %s>" % e
+                    val_repr = repr(value)
+                except Exception as e:
+                    val_repr = "<error while trying to represent object: %s>" % e
 
                 raise TypeError("Invalid value type provided for '%s.%s'. "
                                 "Value should be of type '%s'. "

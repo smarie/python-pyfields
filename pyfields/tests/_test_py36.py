@@ -17,6 +17,29 @@ def _test_class_annotations():
     return Foo
 
 
+def _test_readme_type_validation():
+    class Wall(object):
+        height: int = field(check_type=True, doc="Height of the wall in mm.")
+        color: str = field(check_type=True, default='white', doc="Color of the wall.")
+
+    return Wall
+
+
+def _test_readme_value_validation(colors):
+    from mini_lambda import x
+    from valid8.validation_lib import is_in
+
+    class Wall(object):
+        height: int = field(validators={'should be a positive number': x > 0,
+                                        'should be a multiple of 100': x % 100 == 0},
+                            doc="Height of the wall in mm.")
+        color: str = field(validators=is_in(colors),
+                           default='white',
+                           doc="Color of the wall.")
+
+    return Wall
+
+
 def _test_readme_constructor(explicit_fields_list, init_type, native):
     if init_type == 'inject_fields':
         if explicit_fields_list:

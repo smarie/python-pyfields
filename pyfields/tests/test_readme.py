@@ -3,6 +3,8 @@ import sys
 import timeit
 
 import pytest
+from valid8 import ValidationError
+
 from pyfields import field, MandatoryFieldInitError, make_init, init_fields
 
 
@@ -38,6 +40,66 @@ def test_readme_lazy_fields():
 
     w.height = 12
     assert vars(w) == {'color': 'white', 'height': 12}
+
+
+@pytest.mark.parametrize("py36_style_type_hints", [False, True], ids="py36_style_type_hints={}".format)
+def test_type_validation(py36_style_type_hints):
+    if py36_style_type_hints:
+        if sys.version_info < (3, 6):
+            pytest.skip()
+            Wall = None
+        else:
+            # import the test that uses python  3.6 type annotations
+            from ._test_py36 import _test_readme_type_validation
+            Wall = _test_readme_type_validation()
+    else:
+        class Wall(object):
+            height = field(type_hint=int, check_type=True, doc="Height of the wall in mm.")
+            color = field(type_hint=str, check_type=True, default='white', doc="Color of the wall.")
+
+    w = Wall()
+    w.height = 1
+    with pytest.raises(TypeError):
+        w.height = "1"
+
+
+@pytest.mark.parametrize("py36_style_type_hints", [False, True], ids="py36_style_type_hints={}".format)
+def test_value_validation(py36_style_type_hints):
+    colors = ('blue', 'red', 'white')
+
+    if py36_style_type_hints:
+        if sys.version_info < (3, 6):
+            pytest.skip()
+            Wall = None
+        else:
+            # import the test that uses python  3.6 type annotations
+            from ._test_py36 import _test_readme_value_validation
+            Wall = _test_readme_value_validation(colors)
+
+    from mini_lambda import x
+    from valid8.validation_lib import is_in
+
+    class Wall(object):
+        height = field(type_hint=int,
+                       validators={'should be a positive number': x > 0,
+                                   'should be a multiple of 100': x % 100 == 0},
+                       doc="Height of the wall in mm.")
+        color = field(type_hint=str,
+                      validators=is_in(colors),
+                      default='white', doc="Color of the wall.")
+
+    w = Wall()
+    w.height = 100
+    with pytest.raises(ValidationError) as exc_info:
+        w.height = 1
+    assert "Successes: ['x > 0'] / Failures: {" \
+           "'x % 100 == 0': 'InvalidValue: should be a multiple of 100. Returned False.'" \
+           "}." in str(exc_info.value)
+
+    with pytest.raises(ValidationError) as exc_info:
+        w.color = 'magenta'
+    assert "NotInAllowedValues: x in ('blue', 'red', 'white') does not hold for x=magenta. Wrong value: 'magenta'." \
+           in str(exc_info.value)
 
 
 def test_readme_native_descriptors():
