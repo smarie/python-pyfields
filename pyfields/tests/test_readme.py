@@ -49,23 +49,30 @@ def test_readme_native_descriptors():
     assert repr(Foo.__dict__['b']) == "<DescriptorField: %s>" % b_name
 
     f = Foo()
-    def set_a():
-        f.a = 12
-    def set_b():
-        f.b = 12
-    def set_c():
-        f.c = 12
-    t_field_native = timeit.Timer(set_a).timeit()
-    t_field_desc = timeit.Timer(set_b).timeit()
-    t_native = timeit.Timer(set_c).timeit()
+
+    def set_a(): f.a = 12
+
+    def set_b(): f.b = 12
+
+    def set_c(): f.c = 12
+
+    # for reproducibility on travis, we have to get rid of the first init
+    f.a = 12
+
+    ta = timeit.Timer(set_a).timeit()
+    tb = timeit.Timer(set_b).timeit()
+    tc = timeit.Timer(set_c).timeit()
+
+    print("Average time (ns) setting the field:")
+    print("%0.2f (normal python) ; %0.2f (native field) ; %0.2f (descriptor field)" % (tc, ta, tb))
 
     # make sure that the access time for native field and native are identical
-    assert abs(t_field_native - t_native) / t_native <= 0.1
+    assert abs(ta - tc) / tc <= 0.05
     # assert abs(round(t_field_native * 10) - round(t_native * 10)) <= 1
 
 
 # def decompose(number):
-#     """ decompose a number in mantissa and exponent in scientific notation. from https://stackoverflow.com/a/45359185/7262247"""
+#     """ decompose a number in scientific notation. from https://stackoverflow.com/a/45359185/7262247"""
 #     (sign, digits, exponent) = Decimal(number).as_tuple()
 #     fexp = len(digits) + exponent - 1
 #     fman = Decimal(number).scaleb(-fexp).normalize()
