@@ -736,17 +736,31 @@
 <span class="o">&gt;&gt;&gt;</span> <span class="nv">w</span>.<span class="nv">color</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="s">magenta</span><span class="s1">&#39;</span>
 <span class="nv">valid8</span>.<span class="nv">entry_points</span>.<span class="nv">ValidationError</span>[<span class="nv">ValueError</span>]: 
     <span class="nv">Error</span> <span class="nv">validating</span> [<span class="o">&lt;</span>...<span class="o">&gt;</span>.<span class="nv">Wall</span>.<span class="nv">color</span><span class="o">=</span><span class="nv">magenta</span>]. 
-    <span class="nv">NotInAllowedValues</span>: <span class="nv">x</span> <span class="nv">in</span> {<span class="s1">&#39;</span><span class="s">blue</span><span class="s1">&#39;</span>, <span class="s1">&#39;</span><span class="s">red</span><span class="s1">&#39;</span>, <span class="s1">&#39;</span><span class="s">white</span><span class="s1">&#39;</span>} <span class="nv">does</span> <span class="nv">not</span> <span class="nv">hold</span> <span class="k">for</span> <span class="nv">x</span><span class="o">=</span><span class="nv">magenta</span>. 
-    <span class="nv">Wrong</span> <span class="nv">value</span>: <span class="s1">&#39;</span><span class="s">magenta</span><span class="s1">&#39;</span>.
+    <span class="nv">NotInAllowedValues</span>: <span class="nv">x</span> <span class="nv">in</span> {<span class="s1">&#39;</span><span class="s">blue</span><span class="s1">&#39;</span>, <span class="s1">&#39;</span><span class="s">red</span><span class="s1">&#39;</span>, <span class="s1">&#39;</span><span class="s">white</span><span class="s1">&#39;</span>} <span class="nv">does</span> <span class="nv">not</span> <span class="nv">hold</span> 
+    <span class="k">for</span> <span class="nv">x</span><span class="o">=</span><span class="nv">magenta</span>. <span class="nv">Wrong</span> <span class="nv">value</span>: <span class="s1">&#39;</span><span class="s">magenta</span><span class="s1">&#39;</span>.
 </pre></div>
 
 
 <p>See <code>valid8</code> documentation for details about the <a href="https://smarie.github.io/python-valid8/validation_funcs/c_simple_syntax/">syntax</a> and available <a href="https://smarie.github.io/python-valid8/validation_funcs/b_base_validation_lib/">validation lib</a>.</p>
-<p>In addition to the above syntax, <code>pyfields</code> support that you add validators to a field after creation, using the <code>@field.validator</code> decorator:</p>
-<p><em>todo</em></p>
+<p><strong>todo</strong> In addition to the above syntax, <code>pyfields</code> support that you add validators to a field after creation, using the <code>@field.validator</code> decorator:</p>
 <p>Finally, for advanced validation scenarios you might with your validation callables to receive a bit of context. <code>pyfields</code> supports that the callables accept one, two or three arguments for this (where <code>valid8</code> supports only 1): <code>f(val)</code>, <code>f(obj, val)</code>, and <code>f(obj, field, val)</code>.</p>
 <p>For example we can define walls where the width is a multiple of the length:</p>
-<p><em>todo</em></p>
+<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">valid8</span> <span class="kn">import</span> <span class="n">ValidationFailure</span>
+
+<span class="k">class</span> <span class="nc">InvalidWidth</span><span class="p">(</span><span class="n">ValidationFailure</span><span class="p">):</span>
+    <span class="n">help_msg</span> <span class="o">=</span> <span class="s1">&#39;should be a multiple of the height ({height})&#39;</span>
+
+<span class="k">def</span> <span class="nf">validate_width</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">width</span> <span class="o">%</span> <span class="n">obj</span><span class="o">.</span><span class="n">height</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">InvalidWidth</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Wall</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">validators</span><span class="o">=</span><span class="n">validate_width</span><span class="p">,</span>
+                       <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Width of the wall in mm.&quot;</span><span class="p">)</span>
+</pre></div>
+
+
 <h4 id="converters">Converters<a class="headerlink" href="#converters" title="Permanent link">&para;</a></h4>
 <p><em>todo</em></p>
 <h4 id="native-vs-descriptor-fields">Native vs. Descriptor fields<a class="headerlink" href="#native-vs-descriptor-fields" title="Permanent link">&para;</a></h4>
