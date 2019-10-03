@@ -277,22 +277,15 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#021-bugfix" class="md-nav__link">
-    0.2.1 - bugfix
+  <a href="#050-first-public-version" class="md-nav__link">
+    0.5.0 - First public version
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#020-field-improvements" class="md-nav__link">
-    0.2.0 - field improvements
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#010-first-public-version" class="md-nav__link">
-    0.1.0 - First public version
+  <a href="#010-unpublished-first-draft" class="md-nav__link">
+    0.1.0 - unpublished first draft
   </a>
   
 </li>
@@ -329,22 +322,15 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#021-bugfix" class="md-nav__link">
-    0.2.1 - bugfix
+  <a href="#050-first-public-version" class="md-nav__link">
+    0.5.0 - First public version
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#020-field-improvements" class="md-nav__link">
-    0.2.0 - field improvements
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#010-first-public-version" class="md-nav__link">
-    0.1.0 - First public version
+  <a href="#010-unpublished-first-draft" class="md-nav__link">
+    0.1.0 - unpublished first draft
   </a>
   
 </li>
@@ -369,24 +355,57 @@
                 
                 
                 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
-<h3 id="021-bugfix">0.2.1 - bugfix<a class="headerlink" href="#021-bugfix" title="Permanent link">&para;</a></h3>
-<p>Fixed <a href="https://github.com/smarie/python-pyfields/issues/4">#4</a>.</p>
-<h3 id="020-field-improvements">0.2.0 - <code>field</code> improvements<a class="headerlink" href="#020-field-improvements" title="Permanent link">&para;</a></h3>
+<h3 id="050-first-public-version">0.5.0 - First public version<a class="headerlink" href="#050-first-public-version" title="Permanent link">&para;</a></h3>
+<p><strong>fields</strong></p>
 <ul>
 <li>
-<p>New <code>type</code> argument in <code>field</code> to declare the type of a field. If provided, the descriptor will <em>not</em> be replaced with a native field, and the type will be checked on every value modification. A <code>TypeError</code> will be raised if type does not comply. Type hints are correctly defined so that IDEs can pick them. Fixes <a href="https://github.com/smarie/python-pyfields/issues/3">#3</a></p>
+<p><code>field()</code> method to easily define class fields without necessarily defining a <code>__init__</code>.</p>
 </li>
 <li>
-<p>New <code>use_descriptor</code> argument in <code>field</code> to force use a descriptor instead of a native field.</p>
+<p>"native" fields are created by default, or if <code>native=True</code> is set. A <code>NativeField</code> is a non-data descriptor that replaces itself automatically with a native python attribute after the first read, to get the same performance level on later access. </p>
+</li>
+<li>
+<p>"descriptor" fields are created when type or value validation is required, or if <code>native=False</code> is set. A <code>DescriptorField</code> uses the standard python descriptor protocol so that type and value can be validated on all future access without messing with the <code>__setattr__</code> method.</p>
+</li>
+<li>
+<p>support for <code>type_hint</code> declaration to declare the type of a field. If <code>validate_type</code> provided, the descriptor will <em>not</em> be replaced with a native field, and the type will be checked on every value modification. A <code>TypeError</code> will be raised if type does not comply. Type hints are correctly defined so that IDEs can pick them. Fixes <a href="https://github.com/smarie/python-pyfields/issues/10">#10</a></p>
+</li>
+<li>
+<p>support for <code>validators</code> relying on <code>valid8</code>. Validators can receive <code>(val)</code>, <code>(obj, val)</code> or <code>(obj, field, val)</code> to support validation based on several fields. The only requirement is to return <code>True</code> or <code>None</code> in case of success. Fixes <a href="https://github.com/smarie/python-pyfields/issues/3">#3</a></p>
 </li>
 </ul>
-<h3 id="010-first-public-version">0.1.0 - First public version<a class="headerlink" href="#010-first-public-version" title="Permanent link">&para;</a></h3>
-<p><strong>Mix-in basics</strong>:</p>
+<p><strong>init</strong></p>
 <ul>
-<li><code>field</code> class to easily define class fields in a mixin without defining a <code>__init__</code>.</li>
-<li><code>@apply_mixins</code> decorator to apply mixins to a class without inheritance, by copying members (="monkeypatching")</li>
-<li>Light documentation</li>
+<li>
+<p><code>make_init</code> method to create an entire <code>__init__</code> method with control of which fields are injected, and with possibility to blend a post-init callback in. Fixes <a href="https://github.com/smarie/python-pyfields/issues/14">#14</a>.</p>
+</li>
+<li>
+<p><code>@init_fields</code> decorator to auto-init fields before your <code>__init__</code> method.</p>
+</li>
+<li>
+<p><code>@inject_fields</code> decorator to easily inject <code>fields</code> in an init method and perform the assignment precisely when users want (for easy debugging). Fixes <a href="https://github.com/smarie/python-pyfields/issues/13">#13</a></p>
+</li>
 </ul>
+<p><strong>misc</strong></p>
+<ul>
+<li>
+<p><code>__weakref__</code> added in all relevant classes. Fixes <a href="https://github.com/smarie/python-pyfields/issues/21">#21</a></p>
+</li>
+<li>
+<p>Now using stubs <a href="https://github.com/smarie/python-pyfields/issues/17">#17</a></p>
+</li>
+<li>
+<p>Fixed bug <a href="https://github.com/smarie/python-pyfields/issues/11">#11</a>.</p>
+</li>
+<li>
+<p>Fixed <code>ValueError</code> with mini-lambda &lt; 2.2. Fixed <a href="https://github.com/smarie/python-pyfields/issues/22">#22</a></p>
+</li>
+<li>
+<p>Because of a <a href="https://youtrack.jetbrains.com/issue/PY-38151">limitation in PyCharm type hints</a> we had to remove support for class-level field access. This created <a href="https://github.com/smarie/python-pyfields/issues/12">#12</a> which will be fixed as soon as PyCharm issue is fixed.</p>
+</li>
+</ul>
+<h3 id="010-unpublished-first-draft">0.1.0 - unpublished first draft<a class="headerlink" href="#010-unpublished-first-draft" title="Permanent link">&para;</a></h3>
+<p>Extracted from <a href="https://smarie.github.io/python-mixture/"><code>mixture</code></a>.</p>
                 
                   
                 
