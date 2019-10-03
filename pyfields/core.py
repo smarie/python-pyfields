@@ -6,6 +6,9 @@ import sys
 from textwrap import dedent
 
 from inspect import getmro
+
+from valid8.utils.signature_tools import IsBuiltInError
+
 try:
     from inspect import signature, Parameter
 except ImportError:
@@ -15,7 +18,7 @@ from makefun import with_signature
 import sentinel
 
 from valid8 import Validator, failure_raiser, ValidationError
-from valid8.base import getfullargspec as v8_getfullargspec, get_callable_name
+from valid8.base import getfullargspec as v8_getfullargspec, get_callable_name, is_mini_lambda
 from valid8.common_syntax import FunctionDefinitionError
 
 try:  # python 3.5+
@@ -517,17 +520,33 @@ class FieldValidator(Validator):
             :param kw_context_args: contextual arguments for failures to raise
             :return:
             """
+            if is_mini_lambda(validation_callable):
+                validation_callable = validation_callable.as_function()
+
             # support several cases for the validation function signature
             # `f(val)`, `f(obj, val)` or `f(obj, field, val)`
             # the validation function has two or three (or more but optional) arguments.
             # valid8 requires only 1.
+            try:
+                args, varargs, varkwargs, defaults = v8_getfullargspec(validation_callable, skip_bound_arg=True)[0:4]
 
-            nb_args = len(v8_getfullargspec(validation_callable, skip_bound_arg=True)[0])
-            if nb_args == 0:
+                nb_args = len(args) if args is not None else 0
+                nbvarargs = 1 if varargs is not None else 0
+                # nbkwargs = 1 if varkwargs is not None else 0
+                # nbdefaults = len(defaults) if defaults is not None else 0
+            except IsBuiltInError:
+                # built-ins: TypeError: <built-in function isinstance> is not a Python function
+                # assume signature with a single positional argument
+                nb_args = 1
+                nbvarargs = 0
+                # nbkwargs = 0
+                # nbdefaults = 0
+
+            if nb_args == 0 and nbvarargs == 0:
                 raise ValueError(
                     "validation function should accept 1, 2, or 3 arguments at least. `f(val)`, `f(obj, val)` or "
                     "`f(obj, field, val)`")
-            elif nb_args == 1:
+            elif nb_args == 1 or (nb_args == 0 and nbvarargs >= 1):  # varargs default to one argument (compliance with old mini lambda)
                 # `f(val)`
                 def new_validation_callable(val, **ctx):
                     return validation_callable(val)
