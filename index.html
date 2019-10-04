@@ -271,6 +271,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#default-value-factory" class="md-nav__link">
+    Default value factory
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#type-validation" class="md-nav__link">
     Type validation
   </a>
@@ -321,6 +328,26 @@
           <li class="md-nav__item">
   <a href="#b-init_fields" class="md-nav__link">
     b - @init_fields
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-misc" class="md-nav__link">
+    3. Misc.
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#slots" class="md-nav__link">
+    Slots
   </a>
   
 </li>
@@ -467,6 +494,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#default-value-factory" class="md-nav__link">
+    Default value factory
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#type-validation" class="md-nav__link">
     Type validation
   </a>
@@ -517,6 +551,26 @@
           <li class="md-nav__item">
   <a href="#b-init_fields" class="md-nav__link">
     b - @init_fields
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-misc" class="md-nav__link">
+    3. Misc.
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#slots" class="md-nav__link">
+    Slots
   </a>
   
 </li>
@@ -676,9 +730,47 @@
 
 <p>Your IDE (e.g. PyCharm) should recognize the name and type of the field, so you can already refer to it easily in other code using autocompletion:</p>
 <p><img alt="pycharm_autocomplete1.png" src="imgs/autocomplete1.png" /></p>
+<h4 id="default-value-factory">Default value factory<a class="headerlink" href="#default-value-factory" title="Permanent link">&para;</a></h4>
+<p>We have seen above how to define an optional field by providing a default value. The behaviour with default values is the same than python's default: the same value is used for all objects. Therefore if your default value is a mutable object (e.g. a list) you should not use this mechanism, otherwise the same value will be shared by all instances that use the default:</p>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">BadPocket</span><span class="p">:</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">[])</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">BadPocket</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;thing&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">items</span>
+<span class="p">[</span><span class="s1">&#39;thing&#39;</span><span class="p">]</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">g</span> <span class="o">=</span> <span class="n">BadPocket</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">g</span><span class="o">.</span><span class="n">items</span>
+<span class="p">[</span><span class="s1">&#39;thing&#39;</span><span class="p">]</span>   <span class="c1"># &lt;--- this is not right ! </span>
+</pre></div>
+
+
+<p>To cover this use case and many others, you can use a "default value factory". A default value factory is a callable with a single argument: the object instance. It will be called everytime a default value is needed for a field on an object. You can either provide your own in the constructor:</p>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Pocket</span><span class="p">:</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span> <span class="n">obj</span><span class="p">:</span> <span class="p">[])</span>
+</pre></div>
+
+
+<p>or use the provided <code>@&lt;field&gt;.default_factory</code> decorator:</p>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Pocket</span><span class="p">:</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+
+    <span class="nd">@items.default_factory</span>
+    <span class="k">def</span> <span class="nf">default_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[]</span>
+</pre></div>
+
+
+<p>Finally, you can use the following built-in helper functions to cover most common cases:</p>
+<ul>
+<li><code>copy_value(&lt;value&gt;)</code> returns a factory that will create copies of the value</li>
+<li><code>copy_field(&lt;field_or_name&gt;)</code> returns a factory that will create copies of the given object field</li>
+<li><code>copy_attr(&lt;attr_name&gt;)</code> returns a factory that will create copies of the given object attribute (not necessary a field)</li>
+</ul>
 <h4 id="type-validation">Type validation<a class="headerlink" href="#type-validation" title="Permanent link">&para;</a></h4>
 <p>You can add type validation to a field by setting <code>check_type=True</code>.</p>
-<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Wall</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">check_type</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
     <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">check_type</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Color of the wall.&quot;</span><span class="p">)</span>
 </pre></div>
@@ -713,7 +805,7 @@
 
 <span class="n">colors</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;red&#39;</span><span class="p">}</span>
 
-<span class="k">class</span> <span class="nc">Wall</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">validators</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;should be a positive number&#39;</span><span class="p">:</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
                                     <span class="s1">&#39;should be a multiple of 100&#39;</span><span class="p">:</span> <span class="n">x</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">},</span> 
                         <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
@@ -754,7 +846,7 @@
     <span class="k">if</span> <span class="n">width</span> <span class="o">%</span> <span class="n">obj</span><span class="o">.</span><span class="n">height</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">InvalidWidth</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
 
-<span class="k">class</span> <span class="nc">Wall</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
     <span class="n">width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">validators</span><span class="o">=</span><span class="n">validate_width</span><span class="p">,</span>
                        <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Width of the wall in mm.&quot;</span><span class="p">)</span>
@@ -925,6 +1017,17 @@
 
 
 <p>Note on the order of arguments in the resulting <code>__init__</code> signature: as you can see, <code>msg</code> appears between <code>height</code> and <code>color</code> in the signature. This corresponds to the </p>
+<h3 id="3-misc">3. Misc.<a class="headerlink" href="#3-misc" title="Permanent link">&para;</a></h3>
+<h4 id="slots">Slots<a class="headerlink" href="#slots" title="Permanent link">&para;</a></h4>
+<p>You can use <code>pyfields</code> if your class has <code>__slots__</code>. You will simply have to use an underscore in the slot name corresponding to a field: <code>_&lt;field_name&gt;</code>. For example:</p>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">WithSlots</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;_a&#39;</span><span class="p">,)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+</pre></div>
+
+
+<p>Since from <a href="https://docs.python.org/3/reference/datamodel.html#slots">python documentation</a>, <em>"class attributes cannot be used to set default values for instance variables defined by <code>__slots__</code>"</em>, <strong>native fields are not supported with <code>__slots__</code></strong>. If you run python <code>3.6</code> or greater, <code>field</code> will automatically detect that a field is used on a class with <code>__slots__</code> and will replace the native field with a descriptor field. However with older python versions this is not always possible, so it is recommended that you explicitly state <code>native=False</code>.</p>
+<p>Note that if your class is a dual class (meaning that it declares a slot named <code>__dict__</code>), then <strong>native fields are supported</strong> and you do not have anything special to do (not even declaring a slot for the field).</p>
 <h2 id="main-features-benefits">Main features / benefits<a class="headerlink" href="#main-features-benefits" title="Permanent link">&para;</a></h2>
 <p><strong>TODO</strong></p>
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
