@@ -42,7 +42,8 @@ def test_readme_lazy_fields():
     assert vars(w) == {'color': 'white', 'height': 12}
 
 
-def test_default_factory():
+@pytest.mark.parametrize("use_decorator", [False, True], ids="use_decorator={}".format)
+def test_default_factory(use_decorator):
 
     class BadPocket(object):
         items = field(default=[])
@@ -52,27 +53,22 @@ def test_default_factory():
     g = BadPocket()
     assert g.items == ['thing']
 
-    class Pocket(object):
-        items = field(default_factory=lambda obj: [])
+    if use_decorator:
+        class Pocket:
+            items = field()
+
+            @items.default_factory
+            def default_items(self):
+                return []
+    else:
+        class Pocket(object):
+            items = field(default_factory=lambda obj: [])
 
     p = Pocket()
     g = Pocket()
     p.items.append('thing')
     assert p.items == ['thing']
     assert g.items == []
-
-
-    class Pocket(object):
-        items = field(default_factory=lambda obj: [])
-
-
-    class Wall(object):
-        height = field(doc="Height of the wall in mm.")           # type: int
-        color = field(default='white', doc="Color of the wall.")  # type: str
-        secondary_color = field(default_factory=copy_field(color), doc="Color of the wall.")  # type: str
-
-    w = Wall()
-    w.height
 
 
 @pytest.mark.parametrize("py36_style_type_hints", [False, True], ids="py36_style_type_hints={}".format)
