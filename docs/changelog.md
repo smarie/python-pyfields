@@ -1,5 +1,17 @@
 # Changelog
 
+### 0.6.0 - default factories and slots
+
+**default value factories**
+
+ - `default_factory` callables now receive one argument: the object instance. Fixes [#6](https://github.com/smarie/python-pyfields/issues/6)
+ - New decorator `@<field>.default_factory` to define a default value factory. Fixed [#27](https://github.com/smarie/python-pyfields/issues/27)
+ - New `copy_value`, `copy_field` and `copy_attr` helper functions to create default value factories. Fixed [#26](https://github.com/smarie/python-pyfields/issues/26)
+
+**support for slots**
+
+ - `field` now automatically detects when a native field is attached to a class with slots and no `__dict__` is present. In that case, the native field is replaced with a descriptor field. Fixed [#20](https://github.com/smarie/python-pyfields/issues/20).
+
 ### 0.5.0 - First public version
 
 **fields**
