@@ -212,6 +212,17 @@ class Field(object):
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self.qualname)
 
+    def default_factory(self, f):
+        """
+        decorator to register the decorated function as the default factory of a field.
+        any previously registered default factory will be overridden
+        :return:
+        """
+        self.default = f
+        self.is_default_factory = True
+        self.is_mandatory = False
+        return f
+
 
 def field(type_hint=None,        # type: Type[T]
           check_type=False,      # type: bool
