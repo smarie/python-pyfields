@@ -23,7 +23,7 @@ def test_field(read_first, type_):
 
     if type_ == 'default_factory':
         class Tweety:
-            afraid = field(default_factory=lambda: False)
+            afraid = field(default_factory=lambda obj: False)
     elif type_ == 'default':
         class Tweety:
             afraid = field(default=False)

@@ -267,7 +267,7 @@ def field(type_hint=None,        # type: Type[T]
     ...
     >>> class Foo(object):
     ...     od = field(default='bar', doc="This is an optional field with a default value")
-    ...     odf = field(default_factory=list, doc="This is an optional with a default value factory")
+    ...     odf = field(default_factory=lambda obj: [], doc="This is an optional with a default value factory")
     ...     m = field(doc="This is a mandatory field")
     ...     mt: int = field(check_type=True, doc="This is a type-checked mandatory field")
     ...
@@ -432,7 +432,7 @@ class NativeField(Field):
 
             # optional: get default
             if self.is_default_factory:
-                value = self.default()
+                value = self.default(obj)
             else:
                 value = self.default
 
@@ -660,7 +660,7 @@ class DescriptorField(Field):
 
             # optional: get default
             if self.is_default_factory:
-                value = self.default()
+                value = self.default(obj)
             else:
                 value = self.default
 
