@@ -13,7 +13,8 @@ from valid8 import ValidationError, ValidationFailure
 from valid8.base import InvalidValue
 from valid8.validation_lib import non_empty, Empty
 
-from pyfields import field, MandatoryFieldInitError, UnsupportedOnNativeFieldError, inject_fields, make_init
+from pyfields import field, MandatoryFieldInitError, UnsupportedOnNativeFieldError, inject_fields, make_init, \
+    copy_value, copy_field
 
 
 @pytest.mark.parametrize('read_first', [False, True], ids="read_first={}".format)
@@ -50,6 +51,40 @@ def test_field(read_first, type_):
     # set
     t.afraid = True
     assert t.afraid
+
+
+def test_default_factory():
+    """"""
+    class Foo(object):
+        a = field(default_factory=copy_value([]))
+        b = field(default_factory=copy_field('z'))
+        c = field()
+
+        @c.default_factory
+        def c_default(self):
+            return self.a + ['yes']
+
+        z = field()
+
+    f = Foo()
+    g = Foo()
+    assert f.a == []
+    assert g.a == []
+    g.a.append(1)
+    assert g.a == [1]
+    assert f.a == []
+    # we can not initialize b since it requires a copy of uninitialized z
+    with pytest.raises(MandatoryFieldInitError) as exc_info:
+        print(f.b)
+    assert str(exc_info.value).startswith("Mandatory field 'z' has not been initialized yet")
+    # if we initialize z we can now safely make a copy
+    f.z = 12
+    assert f.b == 12
+    f.z += 1
+    assert f.z == 13
+    assert f.b == 12
+
+    assert g.c == [1, 'yes']
 
 
 def test_type():
