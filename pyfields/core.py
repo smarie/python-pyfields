@@ -179,10 +179,11 @@ class Field(object):
             # set it
             self.name = name
 
-        if owner_cls_type_hints is not None:
+        # if not already manually overridden, get the type hints if there are some in the owner class annotations
+        if self.type_hint is EMPTY and owner_cls_type_hints is not None:
             t = owner_cls_type_hints.get(name)
-            if t is not None and self.type_hint is EMPTY:
-                # only use type hint if not manually overridden
+            if t is not None:
+                # only use type hint if not empty
                 self.type_hint = t
 
     def __set_name__(self,
