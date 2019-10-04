@@ -101,12 +101,55 @@ Your IDE (e.g. PyCharm) should recognize the name and type of the field, so you 
 
 ![pycharm_autocomplete1.png](imgs/autocomplete1.png)
 
+#### Default value factory
+
+We have seen above how to define an optional field by providing a default value. The behaviour with default values is the same than python's default: the same value is used for all objects. Therefore if your default value is a mutable object (e.g. a list) you should not use this mechanism, otherwise the same value will be shared by all instances that use the default:
+
+```python
+class BadPocket:
+    items = field(default=[])
+
+>>> p = BadPocket()
+>>> p.items.append('thing')
+>>> p.items
+['thing']
+
+>>> g = BadPocket()
+>>> g.items
+['thing']   # <--- this is not right ! 
+```
+
+To cover this use case and many others, you can use a "default value factory". A default value factory is a callable with a single argument: the object instance. It will be called everytime a default value is needed for a field on an object. You can either provide your own in the constructor:
+
+```python
+class Pocket:
+    items = field(default_factory=lambda obj: [])
+```
+
+or use the provided `@<field>.default_factory` decorator:
+
+```python
+class Pocket:
+    items = field()
+
+    @items.default_factory
+    def default_items(self):
+        return []
+```
+
+Finally, you can use the following built-in helper functions to cover most common cases:
+
+ - `copy_value(<value>)` returns a factory that will create copies of the value
+ - `copy_field(<field_or_name>)` returns a factory that will create copies of the given object field
+ - `copy_attr(<attr_name>)` returns a factory that will create copies of the given object attribute (not necessary a field)
+
+
 #### Type validation
 
 You can add type validation to a field by setting `check_type=True`.
 
 ```python
-class Wall(object):
+class Wall:
     height: int = field(check_type=True, doc="Height of the wall in mm.")
     color: str = field(check_type=True, default='white', doc="Color of the wall.")
 ```
@@ -141,7 +184,7 @@ from valid8.validation_lib import is_in
 
 colors = {'white', 'blue', 'red'}
 
-class Wall(object):
+class Wall:
     height: int = field(validators={'should be a positive number': x > 0,
                                     'should be a multiple of 100': x % 100 == 0}, 
                         doc="Height of the wall in mm.")
@@ -187,7 +230,7 @@ def validate_width(obj, width):
     if width % obj.height != 0:
         raise InvalidWidth(width, height=obj.height)
 
-class Wall(object):
+class Wall:
     height: int = field(doc="Height of the wall in mm.")
     width: str = field(validators=validate_width,
                        doc="Width of the wall in mm.")
