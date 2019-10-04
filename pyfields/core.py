@@ -186,6 +186,15 @@ class Field(object):
                 # only use type hint if not empty
                 self.type_hint = t
 
+        # detect classes with slots
+        if not isinstance(self, DescriptorField) and '__slots__' in vars(owner_cls) \
+                and '__dict__' not in owner_cls.__slots__:
+            # raise TypeError("Native fields can not be used on classes with `__slots__`. Please use `native=False`")
+            # create a descriptor field instead of this native field
+            new_field = DescriptorField.create_from_field(self)
+            # register it on the class
+            setattr(owner_cls, name, new_field)
+
     def __set_name__(self,
                      owner,  # type: Type[Any]
                      name    # type: str
@@ -608,11 +617,36 @@ class DescriptorField(Field):
     """
     __slots__ = 'validator', 'check_type'
 
+    @classmethod
+    def create_from_field(cls,
+                          other_field  # type: Field
+                          ):
+        # type: (...) -> DescriptorField
+        """
+        Creates a descriptor field by copying the information from the given other field, typically a native field
+
+        :param other_field:
+        :return:
+        """
+        if other_field.is_default_factory:
+            default = EMPTY
+            default_factory = other_field.default
+        else:
+            default_factory = None
+            default = other_field.default
+
+        new_field = DescriptorField(type_hint=other_field.type_hint, default=default, default_factory=default_factory,
+                                    doc=other_field.doc, name=other_field.name)
+
+        # copy the owner class info too
+        new_field.owner_cls = other_field.owner_cls
+        return new_field
+
     def __init__(self,
                  type_hint=None,        # type: Type[T]
                  default=EMPTY,         # type: T
                  default_factory=None,  # type: Callable[[], T]
-                 check_type=False,   # type: bool
+                 check_type=False,      # type: bool
                  validators=None,       # type: Validators
                  doc=None,              # type: str
                  name=None              # type: str

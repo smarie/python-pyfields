@@ -53,6 +53,54 @@ def test_field(read_first, type_):
     assert t.afraid
 
 
+def test_slots():
+    """tests that fields are replaced with descriptor fields automatically when used on a class with `__slots__`"""
+    class WithSlots(object):
+        __slots__ = ('_a',)
+        a = field()
+
+    if sys.version_info < (3, 0):
+        # qualname does not exist, we use str(cls)
+        a_fixed_name = "pyfields.tests.test_core.WithSlots.a"
+    else:
+        a_fixed_name = "test_slots.<locals>.WithSlots.a"
+
+    a_unknown_name = "<unknown_cls>.None"
+
+    if sys.version_info >= (3, 6):
+        # change is done immediately
+        assert repr(WithSlots.__dict__['a']) == "<DescriptorField: %s>" % a_fixed_name
+    else:
+        # change will be done after first access
+        assert repr(WithSlots.__dict__['a']) == "<NativeField: %s>" % a_unknown_name
+
+    w = WithSlots()
+
+    if sys.version_info < (3, 6):
+        # Really not ideal you have to do something
+        try:
+            w.a
+        except:
+            pass
+
+    w.a = 1
+    assert w.a == 1
+
+    assert repr(WithSlots.__dict__['a']) == "<DescriptorField: %s>" % a_fixed_name
+
+
+def test_slots2():
+    class WithSlots(object):
+        __slots__ = ('__dict__',)
+        a = field()
+
+    if sys.version_info >= (3, 6):
+        a_name = "test_slots2.<locals>.WithSlots.a"
+    else:
+        a_name = "<unknown_cls>.None"
+    assert repr(WithSlots.__dict__['a']) == "<NativeField: %s>" % a_name
+
+
 def test_default_factory():
     """"""
     class Foo(object):
