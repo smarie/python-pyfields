@@ -428,6 +428,22 @@ post init ! height=1, color=white, msg=hey
 Note on the order of arguments in the resulting `__init__` signature: as you can see, `msg` appears between `height` and `color` in the signature. This corresponds to the 
 
 
+### 3. Misc.
+
+#### Slots
+
+You can use `pyfields` if your class has `__slots__`. You will simply have to use an underscore in the slot name corresponding to a field: `_<field_name>`. For example:
+
+```python
+class WithSlots(object):
+    __slots__ = ('_a',)
+    a = field()
+```
+
+Since from [python documentation](https://docs.python.org/3/reference/datamodel.html#slots), *"class attributes cannot be used to set default values for instance variables defined by `__slots__`"*, **native fields are not supported with `__slots__`**. If you run python `3.6` or greater, `field` will automatically detect that a field is used on a class with `__slots__` and will replace the native field with a descriptor field. However with older python versions this is not always possible, so it is recommended that you explicitly state `native=False`.
+
+Note that if your class is a dual class (meaning that it declares a slot named `__dict__`), then **native fields are supported** and you do not have anything special to do (not even declaring a slot for the field).
+
 ## Main features / benefits
 
 **TODO**
