@@ -154,12 +154,19 @@ class Field(object):
                           owner_cls_type_hints
                           ):
         """
-        Used in __set_name__ and in `collect_fields` and `fix_field[s]` to update a field with all information
-        available concerning how it is attached to the class.
+        Updates a field with all information available concerning how it is attached to the class.
 
          - its owner class
          - the name under which it is known in that class
          - the type hints (python 3.6)
+
+        In python 3.6+ this is called directly at class creation time through the `__set_name__` callback.
+
+        In older python versions this is called whenever we have the opportunity :(, through `collect_fields`,
+        `fix_fields` and `fix_field`. We currently use the following strategies in python 2 and 3.5-:
+
+         - When users create a init method, `collect_fields` will be called when the init method is first accessed
+         - When users GET a native field, or GET or SET a descriptor field, `fix_field` will be called.
 
         :param owner_cls:
         :param name:
