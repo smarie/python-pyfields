@@ -502,9 +502,9 @@ def field(type_hint=None,        # type: Type[T]
     :param validators: a validation function definition, sequence of validation function definitions, or dictionary of
         validation function definitions. See `valid8` "simple syntax" for details
     :param doc: documentation for the field. This is mostly for class readability purposes for now.
-    :param name: in python < 3.6 this is mandatory if you do not use any other decorator on the class (such as
-        `@inject_fields`). If provided, it should be the same name than the one used used in the class field definition
-        (i.e. you should define the field as '<name> = field(name=<name>)').
+    :param name: in python < 3.6 this is mandatory if you do not use any other decorator or constructor creation on the
+        class (such as `make_init`). If provided, it should be the same name than the one used used in the class field
+        definition (i.e. you should define the field as `<name> = field(name=<name>)`).
     :param native: a boolean that can be turned to `False` to force a field to be a descriptor field, or to `True` to
         force it to be a native field. Native fields are faster but can not support type and value validation
         nor conversions or callbacks. `None` (default) automatically sets `native=True` if no `validators` nor
