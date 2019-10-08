@@ -4,7 +4,7 @@
 
 **PEP484 type hints support**
 
- - Now type hints relying on PEP484 are correctly checked using whatever is available (`typeguard`, `pytypes`). If nothing is available a fallback implementation is provided, basically flattening `Union`s and replacing `TypeVar`s before doing `is_instance`. Fixes [#7](https://github.com/smarie/python-pyfields/issues/7)
+ - Now type hints relying on the `typing` module (PEP484) are correctly checked using whatever 3d party type checking library is available (`typeguard` is first looked for, then `pytypes` as a fallback). If none of these providers are available, a fallback implementation is provided, basically flattening `Union`s and replacing `TypeVar`s before doing `is_instance`. It is not guaranteed to support all `typing` subtelties. Fixes [#7](https://github.com/smarie/python-pyfields/issues/7)
 
 
 ### 0.7.0 - more ways to define validators

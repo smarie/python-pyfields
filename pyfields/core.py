@@ -424,6 +424,11 @@ def field(type_hint=None,        # type: Type[T]
     using `type_hint` if you wish to set `check_type=True`, otherwise you will get an exception. Indeed type comments
     can not be collected by the code.
 
+    Type hints relying on the `typing` module (PEP484) are correctly checked using whatever 3d party type checking
+    library is available (`typeguard` is first looked for, then `pytypes` as a fallback). If none of these providers
+    are available, a fallback implementation is provided, basically flattening `Union`s and replacing `TypeVar`s before
+    doing `is_instance`. It is not guaranteed to support all `typing` subtelties.
+
     Documentation
     -------------
     A docstring can be provided for code readability.
