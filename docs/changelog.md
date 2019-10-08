@@ -1,5 +1,13 @@
 # Changelog
 
+### 0.7.0 - more ways to define validators
+
+**validators**
+
+ - New decorator `@<field>.validator` to add a validator to a field. Fixed [#9](https://github.com/smarie/python-pyfields/issues/9). 
+ - Native fields are automatically transformed into descriptor fields when validators are added this way. Fixes [#1](https://github.com/smarie/python-pyfields/issues/1).
+
+
 ### 0.6.0 - default factories and slots
 
 **default value factories**
