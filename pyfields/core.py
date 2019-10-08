@@ -381,7 +381,7 @@ class Field(object):
                 self.pending_validators.append(validator)
 
 
-def field(type_hint=None,        # type: Type[T]
+def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
           check_type=False,      # type: bool
           default=EMPTY,         # type: T
           default_factory=None,  # type: Callable[[], T]
