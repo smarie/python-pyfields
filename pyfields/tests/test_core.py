@@ -269,6 +269,56 @@ def test_field_validators(case_nb):
         o.h = 'hey ya'
 
 
+@pytest.mark.parametrize("explicit", [False, True], ids="explicit={}".format)
+def test_field_validators_decorator(explicit):
+    """Tests that the @<field>.decorator works correctly"""
+
+    if explicit:
+        native = False
+    else:
+        native = None
+        if sys.version_info < (3, 6):
+            with pytest.raises(UnsupportedOnNativeFieldError):
+                class Foo(object):
+                    f = field(native=native)
+                    @f.validator
+                    def validate_f(self, val):
+                        return val % 3 == 0
+            return
+
+    class Foo(object):
+        f = field(native=native)
+
+        @f.validator
+        def f_should_be_a_multiple_of_3(self, f_val):
+            return f_val % 3 == 0
+
+        @f.validator(help_msg="not a large enough value")
+        def f_should_be_larger_than_g(self, f_val):
+            return f_val > self.g
+
+    foo = Foo()
+    foo.g = 0
+    with pytest.raises(ValidationError) as exc_info:
+        foo.f = 2
+    # assert str(exc_info.value) == "Error validating [%s=2]. " \
+    #                               "InvalidValue: Function [f_should_be_a_multiple_of_3] returned [False] for value 2." \
+    #        % Foo.__dict__['f'].qualname
+    assert str(exc_info.value) == "Error validating [%s=2]. At least one validation function failed for value 2. " \
+                                  "Successes: ['f_should_be_larger_than_g'] / " \
+                                  "Failures: {'f_should_be_a_multiple_of_3': 'Returned False.'}." \
+           % Foo.__dict__['f'].qualname
+    foo.f = 3
+    foo.g = 3
+    with pytest.raises(ValidationError) as exc_info:
+        foo.f = 3
+    assert str(exc_info.value) == "Error validating [%s=3]. At least one validation function failed for value 3. " \
+                                  "Successes: ['f_should_be_a_multiple_of_3'] / " \
+                                  "Failures: {'f_should_be_larger_than_g': " \
+                                  "'InvalidValue: not a large enough value. Returned False.'}." \
+           % Foo.__dict__['f'].qualname
+
+
 def test_validator_not_compliant_with_native_field():
     """tests that `native=True` can not be set when a validator is provided"""
     with pytest.raises(UnsupportedOnNativeFieldError):

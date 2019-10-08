@@ -7,8 +7,6 @@ from textwrap import dedent
 
 from inspect import getmro
 
-from valid8.utils.signature_tools import IsBuiltInError
-
 try:
     from inspect import signature, Parameter
 except ImportError:
@@ -17,9 +15,12 @@ except ImportError:
 from makefun import with_signature
 import sentinel
 
-from valid8 import Validator, failure_raiser, ValidationError
+from valid8 import Validator, failure_raiser, ValidationError, ValidationFailure
 from valid8.base import getfullargspec as v8_getfullargspec, get_callable_name, is_mini_lambda
-from valid8.common_syntax import FunctionDefinitionError
+from valid8.common_syntax import FunctionDefinitionError, make_validation_func_callables
+from valid8.composition import _and_
+from valid8.entry_points import _add_none_handler
+from valid8.utils.signature_tools import IsBuiltInError
 
 try:  # python 3.5+
     from typing import Optional, Set, List, Callable, Dict, Type, Any, TypeVar, Union, Iterable, Tuple, Mapping
@@ -111,7 +112,8 @@ class Field(object):
     """
     Base class for fields
     """
-    __slots__ = '__weakref__', 'is_mandatory', 'default', 'is_default_factory', 'name', 'type_hint', 'doc', 'owner_cls'
+    __slots__ = '__weakref__', 'is_mandatory', 'default', 'is_default_factory', 'name', 'type_hint', 'doc', \
+                'owner_cls', 'pending_validators'
 
     def __init__(self,
                  default=EMPTY,         # type: T
@@ -147,6 +149,9 @@ class Field(object):
             self.type_hint = type_hint
         else:
             self.type_hint = EMPTY
+
+        # pending validators
+        self.pending_validators = None
 
     def set_as_cls_member(self,
                           owner_cls,
@@ -193,13 +198,19 @@ class Field(object):
                 # only use type hint if not empty
                 self.type_hint = t
 
+        # detect a validator on a native field
+        if self.pending_validators is not None:
+            # create a descriptor field to replace this native field
+            new_field = DescriptorField.create_from_field(self, validators=self.pending_validators)
+            # register it on the class in place of self
+            setattr(self.owner_cls, self.name, new_field)
+
         # detect classes with slots
-        if not isinstance(self, DescriptorField) and '__slots__' in vars(owner_cls) \
+        elif not isinstance(self, DescriptorField) and '__slots__' in vars(owner_cls) \
                 and '__dict__' not in owner_cls.__slots__:
-            # raise TypeError("Native fields can not be used on classes with `__slots__`. Please use `native=False`")
-            # create a descriptor field instead of this native field
+            # create a descriptor field to replace of this native field
             new_field = DescriptorField.create_from_field(self)
-            # register it on the class
+            # register it on the class in place of self
             setattr(owner_cls, name, new_field)
 
     def __set_name__(self,
@@ -239,6 +250,85 @@ class Field(object):
         self.is_default_factory = True
         self.is_mandatory = False
         return f
+
+    def validator(self,
+                  help_msg=None,     # type: str
+                  failure_type=None  # type: Type[ValidationFailure]
+                  ):
+        """
+        A decorator to add a validator to a field.
+
+        >>> import sys, pytest
+        >>> if sys.version_info < (3, 6): pytest.skip('skipped on python <3.6')
+        ...
+        >>> class Foo(object):
+        ...     m = field()
+        ...     @m.validator
+        ...     def m_is_positive(self, m_value):
+        ...         return m_value > 0
+        ...
+        >>> o = Foo()
+        >>> o.m = 0  # doctest: +NORMALIZE_WHITESPACE
+        Traceback (most recent call last):
+        ...
+        valid8.entry_points.ValidationError[ValueError]: Error validating [Foo.m=0]. InvalidValue:
+            Function [m_is_positive] returned [False] for value 0.
+
+        :param help_msg:
+        :param failure_type:
+        :return:
+        """
+        if help_msg is not None and callable(help_msg) and failure_type is None:
+            # used without parenthesis @<field>.validator:  validation_callable := help_msg
+            self.add_validator(help_msg)
+            return help_msg
+        else:
+            # used with parenthesis @<field>.validator(...): return a decorator
+            def decorate_f(f):
+                # create the validator definition
+                if help_msg is None:
+                    if failure_type is None:
+                        validator = f
+                    else:
+                        validator = (f, failure_type)
+                else:
+                    if failure_type is None:
+                        validator = (f, help_msg)
+                    else:
+                        validator = (f, help_msg, failure_type)
+                self.add_validator(validator)
+                return f
+
+            return decorate_f
+
+    def add_validator(self,
+                      validator  # type: ValidatorDef
+                      ):
+        """
+        Adds a validator to the set of validators on that field.
+        This is the implementation for native fields
+
+        :param validator:
+        :return:
+        """
+        if self.owner_cls is not None:
+            # create a descriptor field instead of this native field
+            new_field = DescriptorField.create_from_field(self, validators=(validator, ))
+
+            # register it on the class
+            setattr(self.owner_cls, self.name, new_field)
+        else:
+            if not PY36:
+                raise UnsupportedOnNativeFieldError(
+                    "defining validators is not supported on native fields in python < 3.6."
+                    " Please set `native=False` on field '%s' to enable this feature."
+                    % (self,))
+
+            # mark as pending
+            if self.pending_validators is None:
+                self.pending_validators = [validator]
+            else:
+                self.pending_validators.append(validator)
 
 
 def field(type_hint=None,        # type: Type[T]
@@ -482,11 +572,6 @@ class NativeField(Field):
     #         # and we wont delete the class `field` anyway...
     #         pass
 
-    def validator(self):
-        raise UnsupportedOnNativeFieldError("defining validators is not supported on native fields. Please set "
-                                            "`native=True` on field '%s' to enable this feature."
-                                            % (self.name,))
-
 
 # Python 3+: load the 'more explicit api'
 if use_type_hints:
@@ -505,12 +590,12 @@ class FieldValidator(Validator):
     """
     Represents a `Validator` responsible to validate a `field`
     """
-    __slots__ = '__weakref__', 'validated_field'
+    __slots__ = '__weakref__', 'validated_field', 'base_validation_funcs'
 
     @with_signature(new_sig)
     def __init__(self,
                  validated_field,   # type: DescriptorField
-                 *args,
+                 *validation_func,
                  **kwargs
                  ):
         """
@@ -533,12 +618,32 @@ class FieldValidator(Validator):
         """
         # store this additional info about the function been validated
         self.validated_field = validated_field
-        super(FieldValidator, self).__init__(*args, **kwargs)
+
+        # remember validation funcs so that we can add more later
+        self.base_validation_funcs = validation_func
+
+        super(FieldValidator, self).__init__(*validation_func, **kwargs)
+
+    def add_validator(self,
+                      validation_func  # type: ValidatorDef
+                      ):
+        """
+        Adds the provided validation function to the existing list of validation functions
+        :param validation_func:
+        :return:
+        """
+        self.base_validation_funcs = self.base_validation_funcs + (validation_func, )
+
+        # do the same than in super.init, once again. TODO optimize ...
+        validation_funcs = make_validation_func_callables(*self.base_validation_funcs,
+                                                          callable_creator=self.get_callables_creator())
+        main_val_func = _and_(validation_funcs)
+        self.main_function = _add_none_handler(main_val_func, none_policy=self.none_policy)
 
     def get_callables_creator(self):
-        def make_validator_callable(validation_callable,  # type: ValidationCallableOrLambda
+        def make_validator_callable(validation_callable,  # type: ValidationFunc
                                     help_msg=None,        # type: str
-                                    failure_type=None,    # type: Type[Failure]
+                                    failure_type=None,    # type: Type[ValidationFailure]
                                     **kw_context_args):
             """
 
@@ -622,17 +727,19 @@ class DescriptorField(Field):
     """
     General-purpose implementation for fields that require type-checking or validation or converter
     """
-    __slots__ = 'validator', 'check_type'
+    __slots__ = 'root_validator', 'check_type'
 
     @classmethod
     def create_from_field(cls,
-                          other_field  # type: Field
+                          other_field,     # type: Field
+                          validators=None  # type: Iterable[ValidatorDef]
                           ):
         # type: (...) -> DescriptorField
         """
         Creates a descriptor field by copying the information from the given other field, typically a native field
 
         :param other_field:
+        :param validators: validators to add to the field definition
         :return:
         """
         if other_field.is_default_factory:
@@ -643,7 +750,7 @@ class DescriptorField(Field):
             default = other_field.default
 
         new_field = DescriptorField(type_hint=other_field.type_hint, default=default, default_factory=default_factory,
-                                    doc=other_field.doc, name=other_field.name)
+                                    doc=other_field.doc, name=other_field.name, validators=validators)
 
         # copy the owner class info too
         new_field.owner_cls = other_field.owner_cls
@@ -682,9 +789,23 @@ class DescriptorField(Field):
             else:
                 # dict
                 validators = (validators,)
-            self.validator = FieldValidator(self, *validators)
+            self.root_validator = FieldValidator(self, *validators)
         else:
-            self.validator = None
+            self.root_validator = None
+
+    def add_validator(self,
+                      validator  # type: ValidatorDef
+                      ):
+        """
+        Add a validation function to the set of validation functions.
+
+        :param validator:
+        :return:
+        """
+        if self.root_validator is None:
+            self.root_validator = FieldValidator(self, validator)
+        else:
+            self.root_validator.add_validator(validator)
 
     def __get__(self, obj, obj_type):
         # type: (...) -> T
@@ -767,8 +888,8 @@ class DescriptorField(Field):
                                    t.__name__, value.__class__.__name__, val_repr))
 
         # run the validators
-        if self.validator is not None:
-            self.validator.assert_valid(obj, value)
+        if self.root_validator is not None:
+            self.root_validator.assert_valid(obj, value)
 
         # set the new value
         setattr(obj, privatename, value)
