@@ -790,7 +790,8 @@
 <p>If you use python &lt; <code>3.6</code> and require type validation you should not use <a href="https://www.python.org/dev/peps/pep-0484/#type-comments">type comments</a> but rather use the <code>type_hint</code> argument in <code>field</code>. Indeed it is not possible for python code to access type comments without source code inspection.</p>
 </div>
 <h4 id="value-validation">Value validation<a class="headerlink" href="#value-validation" title="Permanent link">&para;</a></h4>
-<p>You can add value (and type) validation to a field by providing <code>validators</code>. <code>pyfields</code> relies on <code>valid8</code> for validation, so the supported syntax is the same:</p>
+<p>You can add value (and type) validation to a field by providing <code>validators</code>. <code>pyfields</code> relies on <code>valid8</code> for validation, so the basic definition of a validation function is the same: it should be a <code>&lt;callable&gt;</code> with signature <code>f(value)</code>, returning <code>True</code> or <code>None</code> in case of success. </p>
+<p>A validator consists in a base validation function, with an optional error message and an optional failure type. To specify all these elements, the supported syntax is the same than in <code>valid8</code>:</p>
 <ul>
 <li>
 <p>For a single validator, either provide a <code>&lt;callable&gt;</code> or a tuple <code>(&lt;callable&gt;, &lt;error_msg&gt;)</code>, <code>(&lt;callable&gt;, &lt;failure_type&gt;)</code> or <code>(&lt;callable&gt;, &lt;error_msg&gt;, &lt;failure_type&gt;)</code>. See <a href="https://smarie.github.io/python-valid8/validation_funcs/c_simple_syntax/#1-one-validation-function">here</a> for details.</p>
@@ -799,7 +800,7 @@
 <p>For several validators, either provide a list or a dictionary. See <a href="https://smarie.github.io/python-valid8/validation_funcs/c_simple_syntax/#2-several-validation-functions">here</a> for details.</p>
 </li>
 </ul>
-<p>For example:</p>
+<p>An example is probably better to picture this:</p>
 <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">mini_lambda</span> <span class="kn">import</span> <span class="n">x</span>
 <span class="kn">from</span> <span class="nn">valid8.validation_lib</span> <span class="kn">import</span> <span class="n">is_in</span>
 
@@ -833,9 +834,7 @@
 </pre></div>
 
 
-<p>See <code>valid8</code> documentation for details about the <a href="https://smarie.github.io/python-valid8/validation_funcs/c_simple_syntax/">syntax</a> and available <a href="https://smarie.github.io/python-valid8/validation_funcs/b_base_validation_lib/">validation lib</a>.</p>
-<p><strong>todo</strong> In addition to the above syntax, <code>pyfields</code> support that you add validators to a field after creation, using the <code>@field.validator</code> decorator:</p>
-<p>Finally, for advanced validation scenarios you might with your validation callables to receive a bit of context. <code>pyfields</code> supports that the callables accept one, two or three arguments for this (where <code>valid8</code> supports only 1): <code>f(val)</code>, <code>f(obj, val)</code>, and <code>f(obj, field, val)</code>.</p>
+<p>For advanced validation scenarios you might with your validation callables to receive a bit of context. <code>pyfields</code> supports that the callables accept one, two or three arguments for this (where <code>valid8</code> supports only 1): <code>f(val)</code>, <code>f(obj, val)</code>, and <code>f(obj, field, val)</code>.</p>
 <p>For example we can define walls where the width is a multiple of the length:</p>
 <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">valid8</span> <span class="kn">import</span> <span class="n">ValidationFailure</span>
 
@@ -853,6 +852,34 @@
 </pre></div>
 
 
+<p>Finally, in addition to the above syntax, <code>pyfields</code> support that you add validators to a field after creation, using the <code>@field.validator</code> decorator:</p>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Width of the wall in mm.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@width.validator</span>
+    <span class="k">def</span> <span class="nf">width_is_proportional_to_height</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width_value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">width_value</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidWidth</span><span class="p">(</span><span class="n">width_value</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+</pre></div>
+
+
+<p>As for all validators, the signature of the decorated function should be either <code>(value)</code>, <code>(obj/self, value)</code>, or <code>(obj/self, field, value)</code>.</p>
+<p>Several such decorators can be applied on the same function, so as to mutualize implementation. In that case you might wish to use the signature with 3 arguments so as to easily debug which field is being validated:</p>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Width of the wall in mm.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@height.validator</span>
+    <span class="nd">@width.validator</span>
+    <span class="k">def</span> <span class="nf">width_is_proportional_to_height</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width_value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">width_value</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidWidth</span><span class="p">(</span><span class="n">width_value</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+</pre></div>
+
+
+<p>See <code>API reference</code> for details on <a href="#ltfieldgtvalidator"><code>@&lt;field&gt;.validator</code></a>.</p>
+<p>See <code>valid8</code> documentation for details about the <a href="https://smarie.github.io/python-valid8/validation_funcs/c_simple_syntax/">syntax</a> and available <a href="https://smarie.github.io/python-valid8/validation_funcs/b_base_validation_lib/">validation lib</a>.</p>
 <h4 id="converters">Converters<a class="headerlink" href="#converters" title="Permanent link">&para;</a></h4>
 <p><em>todo</em></p>
 <h4 id="native-vs-descriptor-fields">Native vs. Descriptor fields<a class="headerlink" href="#native-vs-descriptor-fields" title="Permanent link">&para;</a></h4>
@@ -906,6 +933,10 @@
 <div class="admonition info">
 <p class="admonition-title">Why are native fields so fast ?</p>
 <p>Native fields are implemented as a <a href="https://docs.python.org/3.7/howto/descriptor.html">"non-data" python descriptor</a> that overrides itself on first access. So the first time the attribute is read, a small python method call extra cost is paid but the attribute is immediately replaced with a normal attribute inside the object <code>__dict__</code>. That way, subsequent calls use native python attribute access without overhead. This trick was inspired by <a href="https://tedboy.github.io/flask/generated/generated/werkzeug.cached_property.html">werkzeug's @cached_property</a>.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Adding validators or converters to native fields</p>
+<p>If you run python <code>3.6</code> or greater and add validators or converters <strong>after</strong> field creation (typically using decorators), <code>field</code> will automatically replace the native field with a descriptor field. However with older python versions this is not always possible, so it is recommended that you explicitly state <code>native=False</code>.</p>
 </div>
 <h3 id="2-adding-a-constructor">2. Adding a constructor<a class="headerlink" href="#2-adding-a-constructor" title="Permanent link">&para;</a></h3>
 <p><code>pyfields</code> provides you with several alternatives to add a constructor to a class equipped with fields. The reason why we do not follow the <a href="https://www.python.org/dev/peps/pep-0020/#the-zen-of-python">Zen of python</a> here (<em>"There should be one-- and preferably only one --obvious way to do it."</em>) is to recognize that different developers may have different coding style or philosophies, and to be as much as possible agnostic in front of these.</p>
