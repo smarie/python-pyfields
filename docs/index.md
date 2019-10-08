@@ -164,7 +164,7 @@ TypeError: Invalid value type provided for 'Wall.height'. \
   Value should be of type 'int'. Instead, received a 'str': '1'
 ```
 
-By default the type used for validation is the one provided in the annotation. If you use python < `3.6` or wish to override the annotation, you can explicitly fill the `type_hint` argument in `field()`. Note that PEP484 type comments are not taken into account - indeed it is not possible for python code to access type comments without source code inspection.
+By default the type used for validation is the one provided in the annotation. If you use python < `3.6` or wish to override the annotation, you can explicitly fill the `type_hint` argument in `field()`. It supports both a single type or an iterable of alternate types (e.g. `(int, str)`). Note that PEP484 type comments are not taken into account - indeed it is not possible for python code to access type comments without source code inspection.
 
 !!! success "PEP484 `typing` support"
     Now type hints relying on the `typing` module (PEP484) are correctly checked using whatever 3d party type checking library is available (`typeguard` is first looked for, then `pytypes` as a fallback). If none of these providers are available, a fallback implementation is provided, basically flattening `Union`s and replacing `TypeVar`s before doing `is_instance`. It is not guaranteed to support all `typing` subtelties.

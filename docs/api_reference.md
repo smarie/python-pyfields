@@ -31,7 +31,7 @@ By default fields are mandatory, which means that you must set them before readi
 
 **Typing**
 
-Type hints for fields can be provided using the standard python typing mechanisms (type comments for python < 3.6 and class member type hints for python >= 3.6). Types declared this way will not be checked at runtime, they are just hints for the IDE. You can also specify a `type_hint` explicitly to override the type hints gathered from the other means indicated above. The corresponding type hint is automatically declared by `field` so your IDE will know about it. Specifying a `type_hint` explicitly is mostly useful if you are running python < 3.6 and wish to use type validation, see below.
+Type hints for fields can be provided using the standard python typing mechanisms (type comments for python < 3.6 and class member type hints for python >= 3.6). Types declared this way will not be checked at runtime, they are just hints for the IDE. You can also specify a `type_hint` explicitly to override the type hints gathered from the other means indicated above. It supports both a single type or an iterable of alternate types (e.g. `(int, str)`). The corresponding type hint is automatically declared by `field` so your IDE will know about it. Specifying a `type_hint` explicitly is mostly useful if you are running python < 3.6 and wish to use type validation, see below.
 
 By default `check_type` is `False`. This means that the abovementioned `type_hint` is just a hint. If you set `check_type=True` the type declared in the type hint will be validated, and a `TypeError` will be raised if provided values are invalid. Important: if you are running python < 3.6 you have to set the type hint explicitly using `type_hint` if you wish to set `check_type=True`, otherwise you will get an exception. Indeed type comments can not be collected by the code.
 
@@ -100,7 +100,7 @@ This method was inspired by
 
 **Parameters**
 
- - `type_hint`: an optional explicit type hint for the field, to override the type hint defined by PEP484 especially on old python versions because type comments can not be captured. By default the type hint is just a hint and does not contribute to validation. To enable type validation, set `check_type` to `True`.
+ - `type_hint`: an optional explicit type hint for the field, to override the type hint defined by PEP484 especially on old python versions because type comments can not be captured. It supports both a single type or an iterable of alternate types (e.g. `(int, str)`). By default the type hint is just a hint and does not contribute to validation. To enable type validation, set `check_type` to `True`.
  - `check_type`: by default (`check_type=False`), the type of a field, provided using PEP484 type hints or an explicit `type_hint`, is not validated when you assign a new value to it. You can activate type validation by setting `check_type=True`. In that case the field will become a descriptor field.
  - `default`: a default value for the field. Providing a `default` makes the field "optional". `default` value is not copied on new instances, if you wish a new copy to be created you should provide a `default_factory` instead. Only one of `default` or `default_factory` should be provided.
  - `default_factory`: a factory that will be called (without arguments) to get the default value for that field, everytime one is needed. Providing a `default_factory` makes the field "optional". Only one of `default` or `default_factory` should be provided.
