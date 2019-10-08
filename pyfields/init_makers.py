@@ -37,7 +37,7 @@ def init_fields(*fields,   # type: Union[Field, Any]
     >>> import sys, pytest
     >>> if sys.version_info < (3, 7): pytest.skip('doctest skipped')  # 3.6 help() is different on travis
 
-    >>> from pyfields import field
+    >>> from pyfields import field, init_fields
     >>> class Wall:
     ...     height: int = field(doc="Height of the wall in mm.")
     ...     color: str = field(default='white', doc="Color of the wall.")
@@ -105,7 +105,7 @@ def inject_fields(*fields  # type: Union[Field, Any]
     >>> import sys, pytest
     >>> if sys.version_info < (3, 6): pytest.skip('doctest skipped')
 
-    >>> from pyfields import field
+    >>> from pyfields import field, inject_fields
     ...
     >>> class Wall(object):
     ...     height = field(doc="Height of the wall in mm.")
@@ -126,7 +126,9 @@ def inject_fields(*fields  # type: Union[Field, Any]
     >>> Wall(1)
     Wall<height=1, color='white'>
 
-    :param fields:
+    :param fields: list of fields to initialize before entering the decorated `__init__` method. For each of these
+        fields a corresponding argument will be added in the method's signature. If an empty list is provided, all
+        fields from the class will be used including inherited fields following the mro.
     :return:
     """
     if len(fields) == 1:
@@ -160,7 +162,7 @@ def make_init(*fields,  # type: Union[Field, Any]
     >>> import sys, pytest
     >>> if sys.version_info < (3, 6): pytest.skip('doctest skipped')
 
-    >>> from pyfields import field
+    >>> from pyfields import field, make_init
     ...
     >>> class Wall:
     ...     height = field(doc="Height of the wall in mm.")
@@ -171,8 +173,6 @@ def make_init(*fields,  # type: Union[Field, Any]
 
    If `fields` is not empty, only the listed fields will appear in the constructor and will be initialized upon init.
 
-    >>> from pyfields import field
-    ...
     >>> class Wall:
     ...     height = field(doc="Height of the wall in mm.")
     ...     color = field(default='white', doc="Color of the wall.")
@@ -217,10 +217,15 @@ def make_init(*fields,  # type: Union[Field, Any]
     post init ! height=1, color=white, msg=hey
     >>> assert vars(w) == {'height': 1, 'color': 'white', 'non_field_attr': 'hey'}
 
-    :param fields:
-    :param post_init_fun:
-    :param post_init_args_before:
-    :return:
+    :param fields: the fields to include in the generated constructor signature. If no field is provided, all fields
+        defined in the class will be included, as well as inherited ones following the mro.
+    :param post_init_fun: (default: `None`) an optional function to call once all fields have been initialized. This
+        function should have `self` as first argument. The rest of its signature will be blended with the fields in the
+        generated constructor signature.
+    :param post_init_args_before: boolean. Defines if the arguments from the `post_init_fun` should appear before
+        (default: `True`) or after (`False`) the fields in the generated signature. Of course in all cases, mandatory
+        arguments will appear after optional arguments, so as to ensure that the created signature is valid.
+    :return: a constructor method to be used as `__init__`
     """
     # python <3.5 compliance: pop the kwargs following the varargs
     post_init_fun, post_init_args_before = pop_kwargs(kwargs, [('post_init_fun', None),

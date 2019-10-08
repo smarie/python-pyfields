@@ -170,13 +170,15 @@ TypeError: Invalid value type provided for 'Wall.height'. \
 
 #### Value validation
 
-You can add value (and type) validation to a field by providing `validators`. `pyfields` relies on `valid8` for validation, so the supported syntax is the same:
+You can add value (and type) validation to a field by providing `validators`. `pyfields` relies on `valid8` for validation, so the basic definition of a validation function is the same: it should be a `<callable>` with signature `f(value)`, returning `True` or `None` in case of success. 
+
+A validator consists in a base validation function, with an optional error message and an optional failure type. To specify all these elements, the supported syntax is the same than in `valid8`:
 
  - For a single validator, either provide a `<callable>` or a tuple `(<callable>, <error_msg>)`, `(<callable>, <failure_type>)` or `(<callable>, <error_msg>, <failure_type>)`. See [here](https://smarie.github.io/python-valid8/validation_funcs/c_simple_syntax/#1-one-validation-function) for details.
  
  - For several validators, either provide a list or a dictionary. See [here](https://smarie.github.io/python-valid8/validation_funcs/c_simple_syntax/#2-several-validation-functions) for details.
 
-For example:
+An example is probably better to picture this:
 
 ```python
 from mini_lambda import x
@@ -212,11 +214,7 @@ valid8.entry_points.ValidationError[ValueError]:
     for x=magenta. Wrong value: 'magenta'.
 ```
 
-See `valid8` documentation for details about the [syntax](https://smarie.github.io/python-valid8/validation_funcs/c_simple_syntax/) and available [validation lib](https://smarie.github.io/python-valid8/validation_funcs/b_base_validation_lib/).
-
-**todo** In addition to the above syntax, `pyfields` support that you add validators to a field after creation, using the `@field.validator` decorator:
-
-Finally, for advanced validation scenarios you might with your validation callables to receive a bit of context. `pyfields` supports that the callables accept one, two or three arguments for this (where `valid8` supports only 1): `f(val)`, `f(obj, val)`, and `f(obj, field, val)`.
+For advanced validation scenarios you might with your validation callables to receive a bit of context. `pyfields` supports that the callables accept one, two or three arguments for this (where `valid8` supports only 1): `f(val)`, `f(obj, val)`, and `f(obj, field, val)`.
 
 For example we can define walls where the width is a multiple of the length:
 
@@ -235,6 +233,40 @@ class Wall:
     width: str = field(validators=validate_width,
                        doc="Width of the wall in mm.")
 ```
+
+Finally, in addition to the above syntax, `pyfields` support that you add validators to a field after creation, using the `@field.validator` decorator:
+
+```python
+class Wall:
+    height: int = field(doc="Height of the wall in mm.")
+    width: str = field(doc="Width of the wall in mm.")
+
+    @width.validator
+    def width_is_proportional_to_height(self, width_value):
+        if width_value % self.height != 0:
+            raise InvalidWidth(width_value, height=self.height)
+```
+
+As for all validators, the signature of the decorated function should be either `(value)`, `(obj/self, value)`, or `(obj/self, field, value)`.
+
+Several such decorators can be applied on the same function, so as to mutualize implementation. In that case you might wish to use the signature with 3 arguments so as to easily debug which field is being validated:
+
+```python
+class Wall:
+    height: int = field(doc="Height of the wall in mm.")
+    width: str = field(doc="Width of the wall in mm.")
+
+    @height.validator
+    @width.validator
+    def width_is_proportional_to_height(self, width_value):
+        if width_value % self.height != 0:
+            raise InvalidWidth(width_value, height=self.height)
+```
+
+See `API reference` for details on [`@<field>.validator`](#ltfieldgtvalidator).
+
+See `valid8` documentation for details about the [syntax](https://smarie.github.io/python-valid8/validation_funcs/c_simple_syntax/) and available [validation lib](https://smarie.github.io/python-valid8/validation_funcs/b_base_validation_lib/).
+
 
 #### Converters
 
@@ -298,6 +330,8 @@ Average time (ns) setting the field:
 !!! info "Why are native fields so fast ?"
     Native fields are implemented as a ["non-data" python descriptor](https://docs.python.org/3.7/howto/descriptor.html) that overrides itself on first access. So the first time the attribute is read, a small python method call extra cost is paid but the attribute is immediately replaced with a normal attribute inside the object `__dict__`. That way, subsequent calls use native python attribute access without overhead. This trick was inspired by [werkzeug's @cached_property](https://tedboy.github.io/flask/generated/generated/werkzeug.cached_property.html).
 
+!!! note "Adding validators or converters to native fields"
+    If you run python `3.6` or greater and add validators or converters **after** field creation (typically using decorators), `field` will automatically replace the native field with a descriptor field. However with older python versions this is not always possible, so it is recommended that you explicitly state `native=False`.
 
 ### 2. Adding a constructor
 

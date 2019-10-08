@@ -242,9 +242,28 @@ class Field(object):
 
     def default_factory(self, f):
         """
-        decorator to register the decorated function as the default factory of a field.
-        any previously registered default factory will be overridden
-        :return:
+        Decorator to register the decorated function as the default factory of a field. Any previously registered
+        default factory will be overridden.
+
+        The decorated function should accept a single argument `(obj/self)`, and should return a value to use as the
+        default.
+
+        >>> import sys, pytest
+        >>> if sys.version_info < (3, 6): pytest.skip("doctest skipped for python < 3.6")
+        ...
+        >>> class Pocket:
+        ...     items = field()
+        ...
+        ...     @items.default_factory
+        ...     def default_items(self):
+        ...         print("generating default value for %s" % self)
+        ...         return []
+        ...
+        >>> p = Pocket()
+        >>> p.items
+        generating default value for <pyfields.core.Pocket object ...
+        []
+
         """
         self.default = f
         self.is_default_factory = True
@@ -273,6 +292,31 @@ class Field(object):
         ...
         valid8.entry_points.ValidationError[ValueError]: Error validating [Foo.m=0]. InvalidValue:
             Function [m_is_positive] returned [False] for value 0.
+
+        The decorated function should have a signature of `(val)`, `(obj/self, val)`, or `(obj/self, field, val)`. It
+        should return `True` or `None` in case of success.
+
+        You can use several of these decorators on the same function so as to share implementation across multiple
+        fields:
+
+        >>> class Foo(object):
+        ...     m = field()
+        ...     m2 = field()
+        ...
+        ...     @m.validator
+        ...     @m2.validator
+        ...     def is_positive(self, field, value):
+        ...         print("validating %s" % field.qualname)
+        ...         return value > 0
+        ...
+        >>> o = Foo()
+        >>> o.m2 = 12
+        validating Foo.m2
+        >>> o.m = 0  # doctest: +NORMALIZE_WHITESPACE
+        Traceback (most recent call last):
+        ...
+        valid8.entry_points.ValidationError[ValueError]: Error validating [Foo.m=0]. InvalidValue:
+            Function [is_positive] returned [False] for value 0.
 
         :param help_msg:
         :param failure_type:
@@ -356,7 +400,8 @@ def field(type_hint=None,        # type: Type[T]
     `MandatoryFieldInitError` will be raised). You can define an optional field by providing a `default` value.
     This value will not be copied but used "as is" on all instances, following python's classical pattern for default
     values. If you wish to run specific code to instantiate the default value, you may provide a `default_factory`
-    callable instead. That callable should have no mandatory argument and should return the default value.
+    callable instead. That callable should have no mandatory argument and should return the default value. Alternately
+    you can use the `@<field>.default_factory` decorator.
 
     Typing
     ------
