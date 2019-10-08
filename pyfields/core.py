@@ -29,6 +29,12 @@ try:  # python 3.5+
 except ImportError:
     use_type_hints = False
 
+try:  # very minimal way to check if typing it available, for runtime type checking
+    from typing import Tuple
+    from .typing_utils import assert_is_of_type
+    TYPING_AVAILABLE = True
+except ImportError:
+    TYPING_AVAILABLE = False
 
 PY36 = sys.version_info >= (3, 6)
 if PY36:
@@ -917,8 +923,11 @@ class DescriptorField(Field):
                                  " read type comments so if you wish to be compliant with python < 3.6 you'll have to"
                                  "set the type hint explicitly in `field.type_hint` instead")
 
-            # TODO anything specific rather than `isinstance` to do when 'typing' type hints are used ?
-            if not isinstance(value, t):
+            if TYPING_AVAILABLE:
+                # take into account all the subtelties from `typing` module by relying on 3d party providers.
+                assert_is_of_type(self.qualname, value, t)
+
+            elif not isinstance(value, t):
                 # representing the object might fail, protect ourselves
                 # noinspection PyBroadException
                 try:
@@ -926,11 +935,14 @@ class DescriptorField(Field):
                 except Exception as e:
                     val_repr = "<error while trying to represent object: %s>" % e
 
-                raise TypeError("Invalid value type provided for '%s.%s'. "
-                                "Value should be of type '%s'. "
-                                "Instead, received a '%s': %s"
-                                % (obj.__class__.__name__, privatename[1:],
-                                   t.__name__, value.__class__.__name__, val_repr))
+                # detail error message
+                try:  # tuple or iterable of types ?
+                    submsg = "Value type should be one of (%s)" % ', '.join(("%s" % _t for _t in t))
+                except:  # single type
+                    submsg = "Value should be of type %s" % (t, )
+
+                raise TypeError("Invalid value type provided for '%s'. %s. Instead, received a '%s': %s"
+                                % (self.qualname, submsg, value.__class__.__name__, val_repr))
 
         # run the validators
         if self.root_validator is not None:

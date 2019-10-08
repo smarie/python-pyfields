@@ -146,9 +146,59 @@ def test_type():
     with pytest.raises(TypeError) as exc_info:
         o.f = 1
 
-    assert str(exc_info.value) == "Invalid value type provided for 'Foo.f'. " \
-                                  "Value should be of type 'str'. " \
-                                  "Instead, received a 'int': 1"
+    if sys.version_info < (3, 0):
+        qualname = 'pyfields.tests.test_core.Foo.f'
+    else:
+        qualname = 'test_type.<locals>.Foo.f'
+    assert str(exc_info.value) == "Invalid value type provided for '%s'. " \
+                                  "Value should be of type %s. " \
+                                  "Instead, received a 'int': 1" % (qualname, str)
+
+
+def test_type_multiple_tuple():
+    """ Tests that when `type_hint` is provided and `validate_type` is explicitly set, it works as expected """
+
+    class Foo(object):
+        f = field(type_hint=(str, int), check_type=True)
+
+    o = Foo()
+    o.f = 'hello'
+    o.f = 1
+    with pytest.raises(TypeError) as exc_info:
+        o.f = 1.1
+
+    # msg = Value type should be one of ('str', 'int')
+    msg = "Value should be of type (%s, %s)" % (str, int)
+    if sys.version_info < (3, 0):
+        qualname = 'pyfields.tests.test_core.Foo.f'
+    else:
+        qualname = 'test_type_multiple_tuple.<locals>.Foo.f'
+    assert str(exc_info.value) == "Invalid value type provided for '%s'. " \
+                                  "%s. " \
+                                  "Instead, received a 'float': 1.1" % (qualname, msg)
+
+
+def test_type_multiple_typing():
+    """ Tests that when `type_hint` is provided and `validate_type` is explicitly set, it works as expected """
+
+    from typing import Union
+
+    class Foo(object):
+        f = field(type_hint=Union[int, str], check_type=True)
+
+    o = Foo()
+    o.f = 'hello'
+    o.f = 1
+    with pytest.raises(TypeError) as exc_info:
+        o.f = 1.1
+
+    if sys.version_info < (3, 0):
+        qualname = 'pyfields.tests.test_core.Foo.f'
+    else:
+        qualname = 'test_type_multiple_typing.<locals>.Foo.f'
+    assert str(exc_info.value) == "Invalid value type provided for '%s'. " \
+                                  "Value should be of type typing.Union[int, str]. " \
+                                  "Instead, received a 'float': 1.1" % qualname
 
 
 @pytest.mark.skipif(sys.version_info < (3, 6), reason="class member annotations are not allowed before python 3.6")
