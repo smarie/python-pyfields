@@ -1,5 +1,12 @@
 # Changelog
 
+### 0.8.0 - PEP484 support
+
+**PEP484 type hints support**
+
+ - Now type hints relying on PEP484 are correctly checked using whatever is available (`typeguard`, `pytypes`). If nothing is available a fallback implementation is provided, basically flattening `Union`s and replacing `TypeVar`s before doing `is_instance`. Fixes [#7](https://github.com/smarie/python-pyfields/issues/7)
+
+
 ### 0.7.0 - more ways to define validators
 
 **validators**
