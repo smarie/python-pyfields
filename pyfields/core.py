@@ -4,45 +4,46 @@
 
 import sys
 from textwrap import dedent
-
 from inspect import getmro
 
 try:
     from inspect import signature, Parameter
 except ImportError:
+    # noinspection PyUnresolvedReferences,PyPackageRequirements
     from funcsigs import signature, Parameter
 
-from makefun import with_signature
 import sentinel
+from valid8 import ValidationFailure
 
-from valid8 import Validator, failure_raiser, ValidationError, ValidationFailure
-from valid8.base import getfullargspec as v8_getfullargspec, get_callable_name, is_mini_lambda
-from valid8.common_syntax import FunctionDefinitionError, make_validation_func_callables
-from valid8.composition import _and_
-from valid8.entry_points import _add_none_handler
-from valid8.utils.signature_tools import IsBuiltInError
+from pyfields.validate_n_convert import FieldValidator, make_converters_list
 
 try:  # python 3.5+
-    from typing import Optional, Set, List, Callable, Dict, Type, Any, TypeVar, Union, Iterable, Tuple, Mapping
-    from valid8.common_syntax import ValidationFuncs
+    # noinspection PyUnresolvedReferences
+    from typing import List, Callable, Type, Any, Union, Iterable, Tuple, TypeVar
     use_type_hints = sys.version_info > (3, 0)
+    if use_type_hints:
+        T = TypeVar('T')
+        # noinspection PyUnresolvedReferences
+        from pyfields.validate_n_convert import ValidatorDef, Validators, Converters
 except ImportError:
     use_type_hints = False
 
 try:  # very minimal way to check if typing it available, for runtime type checking
+    # noinspection PyUnresolvedReferences
     from typing import Tuple
+    # noinspection PyUnresolvedReferences
     from .typing_utils import assert_is_of_type
-    TYPING_AVAILABLE = True
+    USE_ADVANCED_TYPE_CHECKER = True
 except ImportError:
-    TYPING_AVAILABLE = False
+    USE_ADVANCED_TYPE_CHECKER = False
 
 PY36 = sys.version_info >= (3, 6)
 if PY36:
     try:
+        # noinspection PyUnresolvedReferences
         from typing import get_type_hints
     except ImportError:
         pass
-
 
 # PY35 = sys.version_info >= (3, 5)
 # if PY35:
@@ -74,7 +75,7 @@ class MandatoryFieldInitError(Exception):
 
     def __init__(self, field_name, obj):
         self.field_name = field_name
-        self.obj= obj
+        self.obj = obj
 
     def __str__(self):
         return "Mandatory field '%s' has not been initialized yet on instance %s." % (self.field_name, self.obj)
@@ -84,34 +85,6 @@ class MandatoryFieldInitError(Exception):
 EMPTY = sentinel.create('empty')
 USE_FACTORY = sentinel.create('use_factory')
 _unset = sentinel.create('_unset')
-if use_type_hints:
-    T = TypeVar('T')
-    ValidationFunc = Union[Callable[[Any], Any],
-                           Callable[[Any, Any], Any],
-                           Callable[[Any, Any, Any], Any]
-                           ]
-    """A validation function is a callable with signature (val), (obj, val) or (obj, field, val), returning `True` 
-    or `None` in case of success"""
-
-    ValidatorDef = Union[ValidationFunc,
-                         Tuple[ValidationFunc, str],
-                         Tuple[ValidationFunc, Type[Exception]],
-                         Tuple[ValidationFunc, str, Type[Exception]]
-                     ]
-    """A validator is a validation function together with optional error message and error type"""
-
-    ValidatorDefinitionElement = Union[str, Type[Exception], ValidationFunc]
-    """One of the elements that can define a validator"""
-
-    Validators = Union[ValidatorDef, Iterable[ValidatorDef],
-                       Mapping[ValidatorDefinitionElement,
-                               Union[ValidatorDefinitionElement,
-                                     Tuple[ValidatorDefinitionElement, ...]
-                      ]]]
-    """Several validators can be provided as a singleton, iterable, or dict-like. In that case the value can be a 
-    single variable or a tuple, and it will be combined with the key to form the validator. So you can use any of the 
-    elements defining a validators as the key."""
-    # TODO we could reuse valid8's type hints... when they accept to be parametrized with the callables signatures
 
 
 class Field(object):
@@ -386,6 +359,7 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
           default=EMPTY,         # type: T
           default_factory=None,  # type: Callable[[], T]
           validators=None,       # type: Validators
+          converters=None,       # type: Converters
           doc=None,              # type: str
           name=None,             # type: str
           native=None            # type: bool
@@ -395,7 +369,7 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
     Returns a class-level attribute definition. It allows developers to define an attribute without writing an
     `__init__` method. Typically useful for mixin classes.
 
-    Lazyness
+    Laziness
     --------
     The field will be lazily-defined, so if you create an instance of the class, the field will not have any value
     until it is first read or written.
@@ -414,11 +388,11 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
     Type hints for fields can be provided using the standard python typing mechanisms (type comments for python < 3.6
     and class member type hints for python >= 3.6). Types declared this way will not be checked at runtime, they are
     just hints for the IDE. You can also specify a `type_hint` explicitly to override the type hints gathered from the
-    other means indicated above. The corresponding type hint is automatically declared by `field` so your IDE will know
-    about it. Specifying a `type_hint` explicitly is mostly useful if you are running python < 3.6 and wish to use type
-    validation, see below.
+    other means indicated above. It supports both a single type or an iterable of alternate types (e.g. `(int, str)`).
+    The corresponding type hint is automatically declared by `field` so your IDE will know about it. Specifying a
+    `type_hint` explicitly is mostly useful if you are running python < 3.6 and wish to use type validation, see below.
 
-    By default `check_type` is `False`. This means that the abovementioned `type_hint` is just a hint. If you set
+    By default `check_type` is `False`. This means that the above mentioned `type_hint` is just a hint. If you set
     `check_type=True` the type declared in the type hint will be validated, and a `TypeError` will be raised if
     provided values are invalid. Important: if you are running python < 3.6 you have to set the type hint explicitly
     using `type_hint` if you wish to set `check_type=True`, otherwise you will get an exception. Indeed type comments
@@ -427,7 +401,15 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
     Type hints relying on the `typing` module (PEP484) are correctly checked using whatever 3d party type checking
     library is available (`typeguard` is first looked for, then `pytypes` as a fallback). If none of these providers
     are available, a fallback implementation is provided, basically flattening `Union`s and replacing `TypeVar`s before
-    doing `is_instance`. It is not guaranteed to support all `typing` subtelties.
+    doing `is_instance`. It is not guaranteed to support all `typing` subtleties.
+
+    Validation
+    ----------
+    TODO
+
+    Conversion
+    ----------
+    TODO
 
     Documentation
     -------------
@@ -479,7 +461,7 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
     --------------------
     `field` has two different ways to create your fields. One named `NativeField` is faster but does not permit type
     checking, validation, or converters; besides it does not work with classes using `__slots__`. It is used by default
-    everytime where it is possible, except if you use one of the abovementioned features. In that case a
+    everytime where it is possible, except if you use one of the above mentioned features. In that case a
     `DescriptorField` will transparently be created. You can force a `DescriptorField` to be created by setting
     `native=False`.
 
@@ -499,7 +481,8 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
      - attrs / dataclasses
 
     :param type_hint: an optional explicit type hint for the field, to override the type hint defined by PEP484
-        especially on old python versions because type comments can not be captured. By default the type hint is just a
+        especially on old python versions because type comments can not be captured. Both a single type or an iterable
+        of alternate types (e.g. `(int, str)`) are supported. By default the type hint is just a
         hint and does not contribute to validation. To enable type validation, set `check_type` to `True`.
     :param check_type: by default (`check_type=False`), the type of a field, provided using PEP484 type hints or
         an explicit `type_hint`, is not validated when you assign a new value to it. You can activate type validation
@@ -510,8 +493,10 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
     :param default_factory: a factory that will be called (without arguments) to get the default value for that
         field, everytime one is needed. Providing a `default_factory` makes the field "optional". Only one of `default`
         or `default_factory` should be provided.
-    :param validators: a validation function definition, sequence of validation function definitions, or dictionary of
+    :param validators: a validation function definition, sequence of validation function definitions, or dict-like of
         validation function definitions. See `valid8` "simple syntax" for details
+    :param converters: a sequence of (<type_def>, <converter>) pairs or a dict-like of such pairs. `<type_def>` should
+        either be a type, a tuple of types, or the '*' string indicating "any other case".
     :param doc: documentation for the field. This is mostly for class readability purposes for now.
     :param name: in python < 3.6 this is mandatory if you do not use any other decorator or constructor creation on the
         class (such as `make_init`). If provided, it should be the same name than the one used used in the class field
@@ -526,12 +511,12 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
     # Should we create a Native or a Descriptor field ?
     if native is None:
         # default: choose automatically according to user-provided options
-        create_descriptor = check_type or (validators is not None)  # todo or converters is not None
+        create_descriptor = check_type or (validators is not None) or (converters is not None)
     else:
         # explicit user choice
         if native:
             # explicit `native=True`.
-            if check_type or (validators is not None):    # todo or converters is not None
+            if check_type or (validators is not None) or (converters is not None):
                 raise UnsupportedOnNativeFieldError("`native=False` can not be set if a `validators` or "
                                                     "`converters` is provided or if `check_type` is `True`")
             else:
@@ -543,7 +528,8 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
     # Create the correct type of field
     if create_descriptor:
         return DescriptorField(type_hint=type_hint, default=default, default_factory=default_factory,
-                               check_type=check_type, validators=validators, doc=doc, name=name)
+                               check_type=check_type, validators=validators, converters=converters,
+                               doc=doc, name=name)
     else:
         return NativeField(type_hint=type_hint, default=default, default_factory=default_factory,
                            doc=doc, name=name)
@@ -563,6 +549,7 @@ class ClassFieldAccessError(Exception):
     """
     __slots__ = 'field',
 
+    # noinspection PyShadowingNames
     def __init__(self, field):
         self.field = field
 
@@ -629,161 +616,11 @@ class NativeField(Field):
     #         pass
 
 
-# Python 3+: load the 'more explicit api'
-if use_type_hints:
-    new_sig = """(self,
-                  validated_field: 'DescriptorField',
-                  *validation_func: ValidationFuncs,
-                  error_type: 'Type[ValidationError]' = None,
-                  help_msg: str = None,
-                  none_policy: int = None,
-                  **kw_context_args):"""
-else:
-    new_sig = None
-
-
-class FieldValidator(Validator):
-    """
-    Represents a `Validator` responsible to validate a `field`
-    """
-    __slots__ = '__weakref__', 'validated_field', 'base_validation_funcs'
-
-    @with_signature(new_sig)
-    def __init__(self,
-                 validated_field,   # type: DescriptorField
-                 *validation_func,
-                 **kwargs
-                 ):
-        """
-
-        :param validated_field: the field being validated.
-        :param validation_func: the base validation function or list of base validation functions to use. A callable, a
-            tuple(callable, help_msg_str), a tuple(callable, failure_type), tuple(callable, help_msg_str, failure_type)
-            or a list of several such elements.
-            Tuples indicate an implicit `failure_raiser`.
-            [mini_lambda](https://smarie.github.io/python-mini-lambda/) expressions can be used instead
-            of callables, they will be transformed to functions automatically.
-        :param error_type: a subclass of ValidationError to raise in case of validation failure. By default a
-            ValidationError will be raised with the provided help_msg
-        :param help_msg: an optional help message to be used in the raised error in case of validation failure.
-        :param none_policy: describes how None values should be handled. See `NonePolicy` for the various possibilities.
-            Default is `NonePolicy.VALIDATE`, meaning that None values will be treated exactly like other values and follow
-            the same validation process.
-        :param kw_context_args: optional contextual information to store in the exception, and that may be also used
-            to format the help message
-        """
-        # store this additional info about the function been validated
-        self.validated_field = validated_field
-
-        # remember validation funcs so that we can add more later
-        self.base_validation_funcs = validation_func
-
-        super(FieldValidator, self).__init__(*validation_func, **kwargs)
-
-    def add_validator(self,
-                      validation_func  # type: ValidatorDef
-                      ):
-        """
-        Adds the provided validation function to the existing list of validation functions
-        :param validation_func:
-        :return:
-        """
-        self.base_validation_funcs = self.base_validation_funcs + (validation_func, )
-
-        # do the same than in super.init, once again. TODO optimize ...
-        validation_funcs = make_validation_func_callables(*self.base_validation_funcs,
-                                                          callable_creator=self.get_callables_creator())
-        main_val_func = _and_(validation_funcs)
-        self.main_function = _add_none_handler(main_val_func, none_policy=self.none_policy)
-
-    def get_callables_creator(self):
-        def make_validator_callable(validation_callable,  # type: ValidationFunc
-                                    help_msg=None,        # type: str
-                                    failure_type=None,    # type: Type[ValidationFailure]
-                                    **kw_context_args):
-            """
-
-            :param validation_callable:
-            :param help_msg: custom help message for failures to raise
-            :param failure_type: type of failures to raise
-            :param kw_context_args: contextual arguments for failures to raise
-            :return:
-            """
-            if is_mini_lambda(validation_callable):
-                validation_callable = validation_callable.as_function()
-
-            # support several cases for the validation function signature
-            # `f(val)`, `f(obj, val)` or `f(obj, field, val)`
-            # the validation function has two or three (or more but optional) arguments.
-            # valid8 requires only 1.
-            try:
-                args, varargs, varkwargs, defaults = v8_getfullargspec(validation_callable, skip_bound_arg=True)[0:4]
-
-                nb_args = len(args) if args is not None else 0
-                nbvarargs = 1 if varargs is not None else 0
-                # nbkwargs = 1 if varkwargs is not None else 0
-                # nbdefaults = len(defaults) if defaults is not None else 0
-            except IsBuiltInError:
-                # built-ins: TypeError: <built-in function isinstance> is not a Python function
-                # assume signature with a single positional argument
-                nb_args = 1
-                nbvarargs = 0
-                # nbkwargs = 0
-                # nbdefaults = 0
-
-            if nb_args == 0 and nbvarargs == 0:
-                raise ValueError(
-                    "validation function should accept 1, 2, or 3 arguments at least. `f(val)`, `f(obj, val)` or "
-                    "`f(obj, field, val)`")
-            elif nb_args == 1 or (nb_args == 0 and nbvarargs >= 1):  # varargs default to one argument (compliance with old mini lambda)
-                # `f(val)`
-                def new_validation_callable(val, **ctx):
-                    return validation_callable(val)
-            elif nb_args == 2:
-                # `f(obj, val)`
-                def new_validation_callable(val, **ctx):
-                    return validation_callable(ctx['obj'], val)
-            else:
-                # `f(obj, field, val, *opt_args, **ctx)`
-                def new_validation_callable(val, **ctx):
-                    # note: field is available both from **ctx and self. Use the "fastest" way
-                    return validation_callable(ctx['obj'], self.validated_field, val)
-
-            # preserve the name
-            new_validation_callable.__name__ = get_callable_name(validation_callable)
-
-            return failure_raiser(new_validation_callable, help_msg=help_msg, failure_type=failure_type,
-                                  **kw_context_args)
-
-        return make_validator_callable
-
-    def get_additional_info_for_repr(self):
-        return 'validated_field=%s' % self.validated_field.qualname
-
-    def _get_name_for_errors(self,
-                             name  # type: str
-                             ):
-        """ override this so that qualname is only called if an error is raised, not before """
-        return self.validated_field.qualname
-
-    def assert_valid(self,
-                     obj,              # type: Any
-                     value,            # type: Any
-                     error_type=None,  # type: Type[ValidationError]
-                     help_msg=None,    # type: str
-                     **ctx):
-        # do not use qualname here so as to save time.
-        super(FieldValidator, self).assert_valid(self.validated_field.name, value,
-                                                 error_type=error_type, help_msg=help_msg,
-                                                 # context info contains obj and field
-                                                 obj=obj, field=self.validated_field, **ctx)
-
-
 class DescriptorField(Field):
     """
     General-purpose implementation for fields that require type-checking or validation or converter
     """
-    __slots__ = 'root_validator', 'check_type'
+    __slots__ = 'root_validator', 'check_type', 'converters'
 
     @classmethod
     def create_from_field(cls,
@@ -818,6 +655,7 @@ class DescriptorField(Field):
                  default_factory=None,  # type: Callable[[], T]
                  check_type=False,      # type: bool
                  validators=None,       # type: Validators
+                 converters=None,       # type: Converters
                  doc=None,              # type: str
                  name=None              # type: str
                  ):
@@ -830,24 +668,15 @@ class DescriptorField(Field):
 
         # validators
         if validators is not None:
-            try:  # dict ?
-                validators.keys()
-            except (AttributeError, FunctionDefinitionError):
-                if isinstance(validators, tuple):
-                    # single tuple
-                    validators = (validators, )
-                else:
-                    try:  # iterable
-                        iter(validators)
-                    except (TypeError, FunctionDefinitionError):
-                        # single
-                        validators = (validators, )
-            else:
-                # dict
-                validators = (validators,)
-            self.root_validator = FieldValidator(self, *validators)
+            self.root_validator = FieldValidator(self, validators)
         else:
             self.root_validator = None
+
+        # converters
+        if converters is not None:
+            self.converters = make_converters_list(converters)
+        else:
+            self.converters = None
 
     def add_validator(self,
                       validator  # type: ValidatorDef
@@ -878,10 +707,10 @@ class DescriptorField(Field):
             # return self
             raise ClassFieldAccessError(self)
 
-        privatename = '_' + self.name
+        private_name = '_' + self.name
 
         # Check if the field is already set in the object
-        value = getattr(obj, privatename, _unset)
+        value = getattr(obj, private_name, _unset)
 
         if value is _unset:
             # mandatory field: raise an error
@@ -895,7 +724,7 @@ class DescriptorField(Field):
                 value = self.default
 
             # nominal initialization on first read: we set the attribute in the object
-            setattr(obj, privatename, value)
+            setattr(obj, private_name, value)
 
         return value
 
@@ -916,9 +745,34 @@ class DescriptorField(Field):
             # return self
             raise ClassFieldAccessError(self)
 
+        if self.converters is not None:
+            # this is an inlined version of `trace_convert` with no capture of details
+            for converter in self.converters:
+                # noinspection PyBroadException
+                try:
+                    # does the converter accept this input ?
+                    accepted = converter.accepts(obj, self, value)
+                except Exception:
+                    # ignore all exceptions from converters
+                    continue
+                else:
+                    if accepted is None or accepted:
+                        # if so, let's try to convert
+                        try:
+                            converted_value = converter.convert(obj, self, value)
+                        except Exception:
+                            # ignore all exceptions from converters
+                            continue
+                        else:
+                            # successful conversion: use the converted value
+                            value = converted_value
+                            break
+                    else:
+                        continue
+
         # speedup for vars used several time
         t = self.type_hint
-        privatename = "_" + self.name
+        private_name = "_" + self.name
 
         # check the type
         if self.check_type:
@@ -928,8 +782,8 @@ class DescriptorField(Field):
                                  " read type comments so if you wish to be compliant with python < 3.6 you'll have to"
                                  "set the type hint explicitly in `field.type_hint` instead")
 
-            if TYPING_AVAILABLE:
-                # take into account all the subtelties from `typing` module by relying on 3d party providers.
+            if USE_ADVANCED_TYPE_CHECKER:
+                # take into account all the subtleties from `typing` module by relying on 3d party providers.
                 assert_is_of_type(self.qualname, value, t)
 
             elif not isinstance(value, t):
@@ -941,23 +795,26 @@ class DescriptorField(Field):
                     val_repr = "<error while trying to represent object: %s>" % e
 
                 # detail error message
-                try:  # tuple or iterable of types ?
-                    submsg = "Value type should be one of (%s)" % ', '.join(("%s" % _t for _t in t))
-                except:  # single type
-                    submsg = "Value should be of type %s" % (t, )
+                # noinspection PyBroadException
+                try:
+                    # tuple or iterable of types ?
+                    sub_msg = "Value type should be one of (%s)" % ', '.join(("%s" % _t for _t in t))
+                except:  # noqa E722
+                    # single type
+                    sub_msg = "Value should be of type %s" % (t, )
 
                 raise TypeError("Invalid value type provided for '%s'. %s. Instead, received a '%s': %s"
-                                % (self.qualname, submsg, value.__class__.__name__, val_repr))
+                                % (self.qualname, sub_msg, value.__class__.__name__, val_repr))
 
         # run the validators
         if self.root_validator is not None:
             self.root_validator.assert_valid(obj, value)
 
         # set the new value
-        setattr(obj, privatename, value)
+        setattr(obj, private_name, value)
 
     def __delete__(self, obj):
-        # privatename = "_" + self.name
+        # private_name = "_" + self.name
         delattr(obj, "_" + self.name)
 
 
@@ -977,7 +834,7 @@ def collect_all_fields(cls,
     """
     result = []
     if include_inherited:
-        where = ordereddir(cls)
+        where = ordered_dir(cls)
     else:
         where = vars(cls)
 
@@ -1005,7 +862,7 @@ def collect_all_fields(cls,
     return result
 
 
-def ordereddir(cls):
+def ordered_dir(cls):
     """
     since `dir` does not preserve order, lets have our own implementation
 
@@ -1044,6 +901,7 @@ def fix_fields(cls,                 # type: Type[Any]
                 e.field.name = member_name
 
 
+# noinspection PyShadowingNames
 def fix_field(cls,                 # type: Type[Any]
               field,               # type: Field
               fix_type_hints=PY36  # type: bool

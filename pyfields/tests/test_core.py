@@ -14,7 +14,7 @@ from valid8.base import InvalidValue
 from valid8.validation_lib import non_empty, Empty
 
 from pyfields import field, MandatoryFieldInitError, UnsupportedOnNativeFieldError, inject_fields, make_init, \
-    copy_value, copy_field
+    copy_value, copy_field, Converter, Field
 
 
 @pytest.mark.parametrize('read_first', [False, True], ids="read_first={}".format)
@@ -374,6 +374,110 @@ def test_validator_not_compliant_with_native_field():
     with pytest.raises(UnsupportedOnNativeFieldError):
         class Foo(object):
             f = field(validators=lambda x: True, native=True)
+
+
+@pytest.mark.parametrize("validator_return_none", [False, True], ids="validator_return_none={}".format)
+@pytest.mark.parametrize("nbargs", [1, 2, 3], ids="nbargs={}".format)
+@pytest.mark.parametrize("format", ['single_converter', 'single_fun',
+                                    '(v_fun, c_fun)', '(v_type, c_fun)', '(joker, c_fun)', '(None, c_fun)',
+                                    '{v_fun: c_fun}', '{v_type: c_fun}', '{joker: c_fun}', '{None: c_fun}'],
+                         ids="format={}".format)
+def test_converters(format, nbargs, validator_return_none):
+    """Various tests about converters definition format"""
+
+    from mini_lambda import x
+
+    if nbargs == 1:
+        def parse_nb(x):
+            return int(x)
+
+        def valid_str(x):
+            if validator_return_none:
+                return None if isinstance(x, str) else False
+            return isinstance(x, str)
+    elif nbargs == 2:
+        def parse_nb(obj, x):
+            assert obj.__class__.__name__ == 'Foo'
+            return int(x)
+
+        def valid_str(obj, x):
+            assert obj.__class__.__name__ == 'Foo'
+            if validator_return_none:
+                return None if isinstance(x, str) else False
+            return isinstance(x, str)
+    elif nbargs == 3:
+        def parse_nb(obj, field, x):
+            assert obj.__class__.__name__ == 'Foo'
+            assert isinstance(field, Field)
+            return int(x)
+
+        def valid_str(obj, field, x):
+            assert obj.__class__.__name__ == 'Foo'
+            assert isinstance(field, Field)
+            if validator_return_none:
+                return None if isinstance(x, str) else False
+            return isinstance(x, str)
+    else:
+        raise ValueError(nbargs)
+
+    if format == 'single_converter':
+        class ParseNb(Converter):
+            def convert(self, obj, field, x):
+                if nbargs == 1:
+                    return parse_nb(x)
+                elif nbargs == 2:
+                    return parse_nb(obj, x)
+                elif nbargs == 3:
+                    return parse_nb(obj, field, x)
+        convs = ParseNb()
+
+    elif format == 'single_fun':
+        convs = parse_nb
+
+    elif format == '(v_fun, c_fun)':
+        convs = (valid_str, parse_nb)
+
+    elif format == '(v_type, c_fun)':
+        convs = (str, parse_nb)
+
+    elif format == '(joker, c_fun)':
+        convs = ('*', parse_nb)
+
+    elif format == '(None, c_fun)':
+        convs = (None, parse_nb)
+
+    elif format == '{v_fun: c_fun}':
+        convs = {valid_str: parse_nb}
+
+    elif format == '{v_type: c_fun}':
+        convs = {str: parse_nb}
+
+    elif format == '{joker: c_fun}':
+        convs = {'*': parse_nb}
+
+    elif format == '{None: c_fun}':
+        convs = {None: parse_nb}
+
+    else:
+        raise ValueError(format)
+
+    class Foo(object):
+        f = field(converters=convs, validators=[x % 3 == 0])
+
+    o = Foo()
+    f_converters = Foo.__dict__['f'].converters
+    assert len(f_converters) == 1 and isinstance(f_converters[0], Converter)
+    o.f = 3
+    o.f = '6'
+    assert o.f == 6
+    with pytest.raises(ValueError) as exc_info:
+        o.f = '5'
+    if sys.version_info < (3, 0):
+        qualname = "pyfields.tests.test_core.Foo.f"  # qualname does not exist, we use str(cls)
+    else:
+        qualname = "test_converters.<locals>.Foo.f"
+    assert str(exc_info.value) == "Error validating [%s=5]. " \
+                                  "InvalidValue: Function [x %% 3 == 0] returned [False] for value 5." % qualname
 
 
 @pytest.mark.parametrize("native", [False, True], ids="native={}".format)
