@@ -167,7 +167,7 @@ TypeError: Invalid value type provided for 'Wall.height'. \
 By default the type used for validation is the one provided in the annotation. If you use python < `3.6` or wish to override the annotation, you can explicitly fill the `type_hint` argument in `field()`. It supports both a single type or an iterable of alternate types (e.g. `(int, str)`). Note that PEP484 type comments are not taken into account - indeed it is not possible for python code to access type comments without source code inspection.
 
 !!! success "PEP484 `typing` support"
-    Now type hints relying on the `typing` module (PEP484) are correctly checked using whatever 3d party type checking library is available (`typeguard` is first looked for, then `pytypes` as a fallback). If none of these providers are available, a fallback implementation is provided, basically flattening `Union`s and replacing `TypeVar`s before doing `is_instance`. It is not guaranteed to support all `typing` subtelties.
+    Now type hints relying on the `typing` module (PEP484) are correctly checked using whatever 3d party type checking library is available (`typeguard` is first looked for, then `pytypes` as a fallback). If none of these providers are available, a fallback implementation is provided, basically flattening `Union`s and replacing `TypeVar`s before doing `is_instance`. It is not guaranteed to support all `typing` subtleties.
 
 #### Value validation
 
@@ -250,7 +250,7 @@ class Wall:
 
 As for all validators, the signature of the decorated function should be either `(value)`, `(obj/self, value)`, or `(obj/self, field, value)`.
 
-Several such decorators can be applied on the same function, so as to mutualize implementation. In that case you might wish to use the signature with 3 arguments so as to easily debug which field is being validated:
+Several such decorators can be applied on the same function, so as to mutualize implementation. In that case, you might wish to use the signature with 3 arguments so as to easily debug which field is being validated:
 
 ```python
 class Wall:
@@ -271,7 +271,72 @@ See `valid8` documentation for details about the [syntax](https://smarie.github.
 
 #### Converters
 
-*todo*
+You can add converters to a field by providing `converters`. 
+
+A `Converter` consists in a *conversion function*, with an optional *name*, and an optional *acceptance criterion*. 
+
+ - The *conversion function* should be a callable with signature `f(value)`, `f(obj/self, value)`, or `f(obj/self, field, value)`, returning the converted value in case of success and raising an exception in case of converion failure. 
+ 
+ - The optional *acceptance criterion* can be a type, or a callable. When a type is provided, `isinstance` is used as the callable. The definition for the callable is exactly the same than for validation callables, see previous section. In addition, one can use a wildcard `'*'` or `None` to denote "accept everything". In that case acceptance is basically reduced to the conversion function raising exceptions when it can not convert values.
+
+
+To add converters on a field using `field(converters=...)`, the supported syntax is the following:
+
+ - For a single converter, either provide a `Converter`, a `<conversion_callable>`, a tuple `(<accepted_type>, <conversion_callable>)`, or a tuple `(<acceptance_callable>, <conversion_callable>)`. 
+ 
+ - For several converters, either provide a list of elements above, or a dictionary. In case of a dictionary, the key is `<accepted_type>`/`<acceptance_callable>`, and the value is `<conversion_callable>`.
+
+For example
+
+```python
+from pyfields import field
+class Foo(object):
+    f = field(type_hint=int, converters=int)
+    g = field(type_hint=int, converters={str: lambda s: len(s), 
+                                         '*': int})
+```
+
+When a new value is set on a field, all of its converters are first scanned in order. Everytime a converter accepts a value, it is applied to convert it. The process stops at the first successful conversion, or after all converters have been tried. The obtained value (either the original one or the converted one) is then passed as usual to the validators (see previous section).
+
+As for validators, you can easily define converters using a decorator `@<field>.converter`. As for all converters, the signature of the decorated function should be either `(value)`, `(obj/self, value)`, or `(obj/self, field, value)`.
+
+Several such decorators can be applied on the same function, so as to mutualize implementation. In that case, you might wish to use the signature with 3 arguments so as to easily debug which field is being validated:
+
+```python
+class Foo(object):
+    m = field(type_hint=int, check_type=True)
+    m2 = field(type_hint=int, check_type=True)
+    
+    @m.converter(accepts=str)
+    @m2.converter
+    def from_anything(self, field, value):
+        print("converting a value for %s" % field.qualname)
+        return int(value)
+```
+
+You can check that everything works as expected:
+
+```bash
+>>> o = Foo()
+>>> o.m2 = '12'
+converting a value for Foo.m2
+>>> o.m2 = 1.5
+converting a value for Foo.m2
+>>> o.m = 1.5  # doctest: +NORMALIZE_WHITESPACE
+Traceback (most recent call last):
+...
+TypeError: Invalid value type provided for 'Foo.m'. Value should be of type <class 'int'>.
+  Instead, received a 'float': 1.5
+```
+
+Finally since debugging conversion issues might not be straightforward, a special `trace_convert` function is provided to output details about the outcome of each converter's acceptance and conversion step. This function is also available as a method of the field objects (obtained from the class).
+
+```python
+m_field = Foo.__dict__['m']
+converted_value, details = m_field.trace_convert(1.5)
+print(details)
+```
+
 
 #### Native vs. Descriptor fields
 
