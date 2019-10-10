@@ -1,5 +1,17 @@
 # Changelog
 
+### 0.9.0 - Converters
+
+**converters**
+
+ - Fields can now be equipped with converters by using `field(converters=...)`. Fixes [#5](https://github.com/smarie/python-pyfields/issues/5)
+ - New method `trace_convert` to debug conversion issues. It is available both as an independent function and as a method on `Field`. Fixes [#31](https://github.com/smarie/python-pyfields/issues/31)
+ - New decorator `@<field>.converter` to add a converter to a field. Fixed [#28](https://github.com/smarie/python-pyfields/issues/28).
+
+**misc**
+
+ - The base `Field` class is now exposed at package level.
+
 ### 0.8.0 - PEP484 support
 
 **PEP484 type hints support**
