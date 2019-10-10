@@ -500,8 +500,8 @@ def test_converters(format, nbargs, validator_return_none):
     elif format == '(v_type, c_fun)':
         convs = (str, parse_nb)
         accepts_int = False
-        c_error_details = "Acceptance test: ERROR [HasWrongType] Value should be an instance of <class 'str'>. " \
-                          "Wrong value: 1."
+        c_error_details = "Acceptance test: ERROR [HasWrongType] Value should be an instance of %s. " \
+                          "Wrong value: 1." % str
         c_name = 'parse_nb'
 
     elif format == '(joker, c_fun)':
@@ -523,8 +523,8 @@ def test_converters(format, nbargs, validator_return_none):
     elif format == '{v_type: c_fun}':
         convs = {str: parse_nb}
         accepts_int = False
-        c_error_details = "Acceptance test: ERROR [HasWrongType] Value should be an instance of <class 'str'>. " \
-                          "Wrong value: 1."
+        c_error_details = "Acceptance test: ERROR [HasWrongType] Value should be an instance of %s. " \
+                          "Wrong value: 1." % str
         c_name = 'parse_nb'
 
     elif format == '{joker: c_fun}':
