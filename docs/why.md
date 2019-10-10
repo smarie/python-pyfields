@@ -16,15 +16,25 @@ I discovered:
  - [`autoclass`](https://smarie.github.io/python-autoclass/) was one of my first open-source projects in python: I tried to create a less optimized version of `attrs`, but at least something that would support basic use cases. The main difference with `attrs` is that fields are defined using the `__init__` signature, instead of class attributes, and it is possible to define custom setters to perform validation, that are effectively called on value modification. I also developed at the time a validation lib [`valid8`](https://smarie.github.io/python-valid8/)) that works with `autoclass` and `attrs`. The result has been used in industrial projects. But it is still not satisfying because relying on the `__init__` signature to define the fields is not very elegant and flexible in particular in case of multiple inheritance.
  
  - [PEP557 `dataclasses`](https://docs.python.org/3/library/dataclasses.html) was largely inspired by and is roughly equivalent to `attrs`, although a few design choices differ and its scope seems more limited.
+
+In parallel I discovered a few libraries oriented towards data modelling and serialization:
+
+ - [`marshmallow`](https://marshmallow.readthedocs.io/en/stable/), an ORM / ODM / framework-agnostic library for converting complex datatypes, such as objects, to and from native Python datatypes.
  
+ - [`related`](https://github.com/genomoncology/related) is also a library oriented towards converting data models from/to json/yaml/python
+
+ - [`colander`](https://docs.pylonsproject.org/projects/colander/en/latest/)
+
 This topic was left aside for a moment, until half 2019 where I thought that I had accumulated enough python expertise (with [`makefun`](https://smarie.github.io/python-makefun/), [`decopatch`](https://smarie.github.io/python-decopatch/) and [many pytest libraries](https://github.com/smarie/ALL_OF_THE_ABOVE#python)) to have a fresh look on it. In the meantime I had discovered:
 
  - [`traitlets`](https://traitlets.readthedocs.io/en/stable/) which provides a quite elegant way to define typed fields and define validation, but requires the classes to inherit from `HasTraits`, and does not allow users to define converters.
  
  - [`traits`](https://docs.enthought.com/traits/)
  
-  - werkzeug's [`@cached_property`](https://werkzeug.palletsprojects.com/en/0.15.x/utils/#werkzeug.utils.cached_property) and sagemath's [`@lazy_attribute`](http://doc.sagemath.org/html/en/reference/misc/sage/misc/lazy_attribute.html), that both rely on the descriptor protocol to define class fields, but lack compacity
- 
+ - werkzeug's [`@cached_property`](https://werkzeug.palletsprojects.com/en/0.15.x/utils/#werkzeug.utils.cached_property) and sagemath's [`@lazy_attribute`](http://doc.sagemath.org/html/en/reference/misc/sage/misc/lazy_attribute.html), that both rely on the descriptor protocol to define class fields, but lack compacity
+
+ - [`zopeinterface`](https://zopeinterface.readthedocs.io/en/latest/README.html), targeting definition of strict interfaces (but including attributes in their definition)
+  
  - [`pydantic`](https://pydantic-docs.helpmanual.io/) embraces python 3.6+ type hints (that can be defined on class attributes). It is quite elegant, is compliant with `dataclasses`, and supports validators that can act on single or multiple fields. It requires classes to inherit from a `BaseModel`. It does not seem to support converters as of version 0.32, rather, some type conversion happens behind the scenes (see for example [this issue](https://github.com/samuelcolvin/pydantic/issues/453)). But it looks definitely promising.
- 
-I was still not satisfied by the landscape. So I wrote this alternative, maybe it can fit in *some* use cases ! Do not hesitate to provide feedback in the issues page.
+
+I was still not satisfied by the landscape :(. So I wrote this alternative, maybe it can fit in *some* use cases ! Do not hesitate to provide feedback in the issues page.
