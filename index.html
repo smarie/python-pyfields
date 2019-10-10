@@ -788,7 +788,7 @@
 <p>By default the type used for validation is the one provided in the annotation. If you use python &lt; <code>3.6</code> or wish to override the annotation, you can explicitly fill the <code>type_hint</code> argument in <code>field()</code>. It supports both a single type or an iterable of alternate types (e.g. <code>(int, str)</code>). Note that PEP484 type comments are not taken into account - indeed it is not possible for python code to access type comments without source code inspection.</p>
 <div class="admonition success">
 <p class="admonition-title">PEP484 <code>typing</code> support</p>
-<p>Now type hints relying on the <code>typing</code> module (PEP484) are correctly checked using whatever 3d party type checking library is available (<code>typeguard</code> is first looked for, then <code>pytypes</code> as a fallback). If none of these providers are available, a fallback implementation is provided, basically flattening <code>Union</code>s and replacing <code>TypeVar</code>s before doing <code>is_instance</code>. It is not guaranteed to support all <code>typing</code> subtelties.</p>
+<p>Now type hints relying on the <code>typing</code> module (PEP484) are correctly checked using whatever 3d party type checking library is available (<code>typeguard</code> is first looked for, then <code>pytypes</code> as a fallback). If none of these providers are available, a fallback implementation is provided, basically flattening <code>Union</code>s and replacing <code>TypeVar</code>s before doing <code>is_instance</code>. It is not guaranteed to support all <code>typing</code> subtleties.</p>
 </div>
 <h4 id="value-validation">Value validation<a class="headerlink" href="#value-validation" title="Permanent link">&para;</a></h4>
 <p>You can add value (and type) validation to a field by providing <code>validators</code>. <code>pyfields</code> relies on <code>valid8</code> for validation, so the basic definition of a validation function is the same: it should be a <code>&lt;callable&gt;</code> with signature <code>f(value)</code>, returning <code>True</code> or <code>None</code> in case of success. </p>
@@ -866,7 +866,7 @@
 
 
 <p>As for all validators, the signature of the decorated function should be either <code>(value)</code>, <code>(obj/self, value)</code>, or <code>(obj/self, field, value)</code>.</p>
-<p>Several such decorators can be applied on the same function, so as to mutualize implementation. In that case you might wish to use the signature with 3 arguments so as to easily debug which field is being validated:</p>
+<p>Several such decorators can be applied on the same function, so as to mutualize implementation. In that case, you might wish to use the signature with 3 arguments so as to easily debug which field is being validated:</p>
 <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
     <span class="n">width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Width of the wall in mm.&quot;</span><span class="p">)</span>
@@ -882,7 +882,70 @@
 <p>See <code>API reference</code> for details on <a href="#ltfieldgtvalidator"><code>@&lt;field&gt;.validator</code></a>.</p>
 <p>See <code>valid8</code> documentation for details about the <a href="https://smarie.github.io/python-valid8/validation_funcs/c_simple_syntax/">syntax</a> and available <a href="https://smarie.github.io/python-valid8/validation_funcs/b_base_validation_lib/">validation lib</a>.</p>
 <h4 id="converters">Converters<a class="headerlink" href="#converters" title="Permanent link">&para;</a></h4>
-<p><em>todo</em></p>
+<p>You can add converters to a field by providing <code>converters</code>. </p>
+<p>A <code>Converter</code> consists in a <em>conversion function</em>, with an optional <em>name</em>, and an optional <em>acceptance criterion</em>. </p>
+<ul>
+<li>
+<p>The <em>conversion function</em> should be a callable with signature <code>f(value)</code>, <code>f(obj/self, value)</code>, or <code>f(obj/self, field, value)</code>, returning the converted value in case of success and raising an exception in case of converion failure. </p>
+</li>
+<li>
+<p>The optional <em>acceptance criterion</em> can be a type, or a callable. When a type is provided, <code>isinstance</code> is used as the callable. The definition for the callable is exactly the same than for validation callables, see previous section. In addition, one can use a wildcard <code>'*'</code> or <code>None</code> to denote "accept everything". In that case acceptance is basically reduced to the conversion function raising exceptions when it can not convert values.</p>
+</li>
+</ul>
+<p>To add converters on a field using <code>field(converters=...)</code>, the supported syntax is the following:</p>
+<ul>
+<li>
+<p>For a single converter, either provide a <code>Converter</code>, a <code>&lt;conversion_callable&gt;</code>, a tuple <code>(&lt;accepted_type&gt;, &lt;conversion_callable&gt;)</code>, or a tuple <code>(&lt;acceptance_callable&gt;, &lt;conversion_callable&gt;)</code>. </p>
+</li>
+<li>
+<p>For several converters, either provide a list of elements above, or a dictionary. In case of a dictionary, the key is <code>&lt;accepted_type&gt;</code>/<code>&lt;acceptance_callable&gt;</code>, and the value is <code>&lt;conversion_callable&gt;</code>.</p>
+</li>
+</ul>
+<p>For example</p>
+<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span>
+<span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">converters</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">converters</span><span class="o">=</span><span class="p">{</span><span class="nb">str</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> 
+                                         <span class="s1">&#39;*&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">})</span>
+</pre></div>
+
+
+<p>When a new value is set on a field, all of its converters are first scanned in order. Everytime a converter accepts a value, it is applied to convert it. The process stops at the first successful conversion, or after all converters have been tried. The obtained value (either the original one or the converted one) is then passed as usual to the validators (see previous section).</p>
+<p>As for validators, you can easily define converters using a decorator <code>@&lt;field&gt;.converter</code>. As for all converters, the signature of the decorated function should be either <code>(value)</code>, <code>(obj/self, value)</code>, or <code>(obj/self, field, value)</code>.</p>
+<p>Several such decorators can be applied on the same function, so as to mutualize implementation. In that case, you might wish to use the signature with 3 arguments so as to easily debug which field is being validated:</p>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">check_type</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">m2</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">check_type</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="nd">@m.converter</span><span class="p">(</span><span class="n">accepts</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="nd">@m2.converter</span>
+    <span class="k">def</span> <span class="nf">from_anything</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;converting a value for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">field</span><span class="o">.</span><span class="n">qualname</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</pre></div>
+
+
+<p>You can check that everything works as expected:</p>
+<div class="codehilite"><pre><span></span>&gt;&gt;&gt; <span class="nv">o</span> <span class="o">=</span> Foo<span class="o">()</span>
+&gt;&gt;&gt; o.m2 <span class="o">=</span> <span class="s1">&#39;12&#39;</span>
+converting a value <span class="k">for</span> Foo.m2
+&gt;&gt;&gt; o.m2 <span class="o">=</span> <span class="m">1</span>.5
+converting a value <span class="k">for</span> Foo.m2
+&gt;&gt;&gt; o.m <span class="o">=</span> <span class="m">1</span>.5  <span class="c1"># doctest: +NORMALIZE_WHITESPACE</span>
+Traceback <span class="o">(</span>most recent call last<span class="o">)</span>:
+...
+TypeError: Invalid value <span class="nb">type</span> provided <span class="k">for</span> <span class="s1">&#39;Foo.m&#39;</span>. Value should be of <span class="nb">type</span> &lt;class <span class="s1">&#39;int&#39;</span>&gt;.
+  Instead, received a <span class="s1">&#39;float&#39;</span>: <span class="m">1</span>.5
+</pre></div>
+
+
+<p>Finally since debugging conversion issues might not be straightforward, a special <code>trace_convert</code> function is provided to output details about the outcome of each converter's acceptance and conversion step. This function is also available as a method of the field objects (obtained from the class).</p>
+<div class="codehilite"><pre><span></span><span class="n">m_field</span> <span class="o">=</span> <span class="n">Foo</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;m&#39;</span><span class="p">]</span>
+<span class="n">converted_value</span><span class="p">,</span> <span class="n">details</span> <span class="o">=</span> <span class="n">m_field</span><span class="o">.</span><span class="n">trace_convert</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">details</span><span class="p">)</span>
+</pre></div>
+
+
 <h4 id="native-vs-descriptor-fields">Native vs. Descriptor fields<a class="headerlink" href="#native-vs-descriptor-fields" title="Permanent link">&para;</a></h4>
 <p><code>field()</code> by default creates a so-called <strong>native field</strong>. This special construct is designed to be as fast as a normal python attribute after the first access, so that performance is not impacted. This high level of performance has a drawback: validation and conversion are not possible on a native field. </p>
 <p>So when you add type or value validation, or conversion, to a field, <code>field()</code> will automatically create a <strong>descriptor field</strong> instead of a native field. This is an object relying on the <a href="https://docs.python.org/howto/descriptor.html">python descriptor protocol</a>. Such objects have slower access time than native python attributes but provide convenient hooks necessary to perform validation and conversion.</p>

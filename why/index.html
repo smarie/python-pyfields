@@ -318,6 +318,18 @@
 <p><a href="https://docs.python.org/3/library/dataclasses.html">PEP557 <code>dataclasses</code></a> was largely inspired by and is roughly equivalent to <code>attrs</code>, although a few design choices differ and its scope seems more limited.</p>
 </li>
 </ul>
+<p>In parallel I discovered a few libraries oriented towards data modelling and serialization:</p>
+<ul>
+<li>
+<p><a href="https://marshmallow.readthedocs.io/en/stable/"><code>marshmallow</code></a>, an ORM / ODM / framework-agnostic library for converting complex datatypes, such as objects, to and from native Python datatypes.</p>
+</li>
+<li>
+<p><a href="https://github.com/genomoncology/related"><code>related</code></a> is also a library oriented towards converting data models from/to json/yaml/python</p>
+</li>
+<li>
+<p><a href="https://docs.pylonsproject.org/projects/colander/en/latest/"><code>colander</code></a></p>
+</li>
+</ul>
 <p>This topic was left aside for a moment, until half 2019 where I thought that I had accumulated enough python expertise (with <a href="https://smarie.github.io/python-makefun/"><code>makefun</code></a>, <a href="https://smarie.github.io/python-decopatch/"><code>decopatch</code></a> and <a href="https://github.com/smarie/ALL_OF_THE_ABOVE#python">many pytest libraries</a>) to have a fresh look on it. In the meantime I had discovered:</p>
 <ul>
 <li>
@@ -330,10 +342,13 @@
 <p>werkzeug's <a href="https://werkzeug.palletsprojects.com/en/0.15.x/utils/#werkzeug.utils.cached_property"><code>@cached_property</code></a> and sagemath's <a href="http://doc.sagemath.org/html/en/reference/misc/sage/misc/lazy_attribute.html"><code>@lazy_attribute</code></a>, that both rely on the descriptor protocol to define class fields, but lack compacity</p>
 </li>
 <li>
+<p><a href="https://zopeinterface.readthedocs.io/en/latest/README.html"><code>zopeinterface</code></a>, targeting definition of strict interfaces (but including attributes in their definition)</p>
+</li>
+<li>
 <p><a href="https://pydantic-docs.helpmanual.io/"><code>pydantic</code></a> embraces python 3.6+ type hints (that can be defined on class attributes). It is quite elegant, is compliant with <code>dataclasses</code>, and supports validators that can act on single or multiple fields. It requires classes to inherit from a <code>BaseModel</code>. It does not seem to support converters as of version 0.32, rather, some type conversion happens behind the scenes (see for example <a href="https://github.com/samuelcolvin/pydantic/issues/453">this issue</a>). But it looks definitely promising.</p>
 </li>
 </ul>
-<p>I was still not satisfied by the landscape. So I wrote this alternative, maybe it can fit in <em>some</em> use cases ! Do not hesitate to provide feedback in the issues page.</p>
+<p>I was still not satisfied by the landscape :(. So I wrote this alternative, maybe it can fit in <em>some</em> use cases ! Do not hesitate to provide feedback in the issues page.</p>
                 
                   
                 
