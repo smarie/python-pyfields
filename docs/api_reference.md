@@ -20,7 +20,7 @@ def field(type_hint=None,        # type: Type[T]
 Returns a class-level attribute definition. It allows developers to define an attribute without writing an 
 `__init__` method. Typically useful for mixin classes.
 
-**Lazyness**
+**Laziness**
 
 The field will be lazily-defined, so if you create an instance of the class, the field will not have any value 
 until it is first read or written.
@@ -35,7 +35,7 @@ Type hints for fields can be provided using the standard python typing mechanism
 
 By default `check_type` is `False`. This means that the abovementioned `type_hint` is just a hint. If you set `check_type=True` the type declared in the type hint will be validated, and a `TypeError` will be raised if provided values are invalid. Important: if you are running python < 3.6 you have to set the type hint explicitly using `type_hint` if you wish to set `check_type=True`, otherwise you will get an exception. Indeed type comments can not be collected by the code.
 
-Now type hints relying on the `typing` module (PEP484) are correctly checked using whatever 3d party type checking library is available (`typeguard` is first looked for, then `pytypes` as a fallback). If none of these providers are available, a fallback implementation is provided, basically flattening `Union`s and replacing `TypeVar`s before doing `is_instance`. It is not guaranteed to support all `typing` subtelties.
+Now type hints relying on the `typing` module (PEP484) are correctly checked using whatever 3d party type checking library is available (`typeguard` is first looked for, then `pytypes` as a fallback). If none of these providers are available, a fallback implementation is provided, basically flattening `Union`s and replacing `TypeVar`s before doing `is_instance`. It is not guaranteed to support all `typing` subtleties.
 
 **Documentation**
 
