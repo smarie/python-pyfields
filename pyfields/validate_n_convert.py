@@ -339,13 +339,16 @@ if use_type_hints:
 
     # 2. the syntax to optionally transform them into Converter by providing a tuple
     ValidType = Type
+    # noinspection PyUnboundLocalVariable
     ConverterFuncDefinition = Union[Converter,
                                     ConverterFuncOrLambda,
                                     Tuple[ValidationFuncOrLambda, ConverterFuncOrLambda],
                                     Tuple[ValidType, ConverterFuncOrLambda]]
 
     TypeDef = Union[Type, Tuple[Type, ...]]
-    OneOrSeveralConverterDefinitions = Union[Iterable[Tuple[TypeDef, ConverterFunc]],
+    OneOrSeveralConverterDefinitions = Union[Converter,
+                                             ConverterFuncOrLambda,
+                                             Iterable[Tuple[TypeDef, ConverterFunc]],
                                              Mapping[TypeDef, ConverterFunc]]
     Converters = OneOrSeveralConverterDefinitions
 
@@ -477,15 +480,18 @@ def make_converter(converter_def  # type: ConverterFuncDefinition
 
 def make_converters_list(converters  # type: OneOrSeveralConverterDefinitions
                          ):
-    # type: (...) -> Iterable[Converter]
+    # type: (...) -> Tuple[Converter, ...]
     """
-    Creates a list of converters from the provided `converters`. The following things are supported:
+    Creates a tuple of converters from the provided `converters`. The following things are supported:
 
-     - a single item. This can be a `Converter` or
+     - a single item. This can be a `Converter`, a `<converter_callable>`, a tuple
+       `(<acceptance_callable>, <converter_callable>)` or a tuple `(<accepted_type>, <converter_callable>)`.
+       `<accepted_type>` can also contain `None` or `'*'`, both mean "anything".
 
+     - a list of such items
 
-     - a list
-     - a dictionary of definition elements
+     - a dictionary-like of `<acceptance>: <converter_callable>`, where `<acceptance>` can be an `<acceptance_callable>`
+       or an `<accepted_type>`.
 
     :param converters:
     :return:

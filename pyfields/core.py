@@ -13,18 +13,21 @@ except ImportError:
     from funcsigs import signature, Parameter
 
 import sentinel
-from valid8 import ValidationFailure
 
+from valid8 import ValidationFailure
 from pyfields.validate_n_convert import FieldValidator, make_converters_list, trace_convert
 
 try:  # python 3.5+
     # noinspection PyUnresolvedReferences
     from typing import List, Callable, Type, Any, Union, Iterable, Tuple, TypeVar
+    _NoneType = type(None)
     use_type_hints = sys.version_info > (3, 0)
     if use_type_hints:
         T = TypeVar('T')
         # noinspection PyUnresolvedReferences
-        from pyfields.validate_n_convert import ValidatorDef, Validators, Converters, DetailedConversionResults
+        from pyfields.validate_n_convert import ValidatorDef, Validators, Converters, ConverterFuncDefinition,\
+            DetailedConversionResults, ValidationFuncOrLambda, ValidType
+
 except ImportError:
     use_type_hints = False
 
@@ -46,10 +49,6 @@ if PY36:
         pass
 
 # PY35 = sys.version_info >= (3, 5)
-# if PY35:
-#     KEYWORD_ONLY_IF_POSSIBLE = Parameter.KEYWORD_ONLY
-# else:
-#     KEYWORD_ONLY_IF_POSSIBLE = Parameter.POSITIONAL_OR_KEYWORD
 
 try:
     object.__qualname__
@@ -92,7 +91,7 @@ class Field(object):
     Base class for fields
     """
     __slots__ = '__weakref__', 'is_mandatory', 'default', 'is_default_factory', 'name', 'type_hint', 'doc', \
-                'owner_cls', 'pending_validators'
+                'owner_cls', 'pending_validators', 'pending_converters'
 
     def __init__(self,
                  default=EMPTY,         # type: T
@@ -129,8 +128,9 @@ class Field(object):
         else:
             self.type_hint = EMPTY
 
-        # pending validators
+        # pending validators and converters
         self.pending_validators = None
+        self.pending_converters = None
 
     def set_as_cls_member(self,
                           owner_cls,
@@ -177,10 +177,11 @@ class Field(object):
                 # only use type hint if not empty
                 self.type_hint = t
 
-        # detect a validator on a native field
-        if self.pending_validators is not None:
+        # detect a validator or a converter on a native field
+        if self.pending_validators is not None or self.pending_converters is not None:
             # create a descriptor field to replace this native field
-            new_field = DescriptorField.create_from_field(self, validators=self.pending_validators)
+            new_field = DescriptorField.create_from_field(self, validators=self.pending_validators,
+                                                          converters=self.pending_converters)
             # register it on the class in place of self
             setattr(self.owner_cls, self.name, new_field)
 
@@ -352,6 +353,106 @@ class Field(object):
                 self.pending_validators = [validator]
             else:
                 self.pending_validators.append(validator)
+
+    def converter(self,
+                  _decorated_fun=None,  # type: _NoneType
+                  accepts=None,         # type: Union[ValidationFuncOrLambda, ValidType]
+                  ):
+        """
+        A decorator to add a validator to a field.
+
+        >>> import sys, pytest
+        >>> if sys.version_info < (3, 6): pytest.skip('skipped on python <3.6')
+        ...
+        >>> class Foo(object):
+        ...     m = field()
+        ...     @m.converter
+        ...     def m_from_anything(self, m_value):
+        ...         return int(m_value)
+        ...
+        >>> o = Foo()
+        >>> o.m = '0'
+        >>> o.m
+        0
+
+        The decorated function should have a signature of `(val)`, `(obj/self, val)`, or `(obj/self, field, val)`. It
+        should return a converted value in case of success.
+
+        You can explicitly declare which values are accepted by the converter, by providing an `accepts` argument.
+        It may either contain a `<validation_callable>`, an `<accepted_type>` or a wildcard (`'*'` or `None`). Passing
+        a wildcard is equivalent to calling the decorator without parenthesis as seen above.
+        WARNING: this argument needs to be provided as keyword for the converter to work properly.
+
+        You can use several of these decorators on the same function so as to share implementation across multiple
+        fields:
+
+        >>> class Foo(object):
+        ...     m = field(type_hint=int, check_type=True)
+        ...     m2 = field(type_hint=int, check_type=True)
+        ...
+        ...     @m.converter(accepts=str)
+        ...     @m2.converter
+        ...     def from_anything(self, field, value):
+        ...         print("converting a value for %s" % field.qualname)
+        ...         return int(value)
+        ...
+        >>> o = Foo()
+        >>> o.m2 = '12'
+        converting a value for Foo.m2
+        >>> o.m2 = 1.5
+        converting a value for Foo.m2
+        >>> o.m = 1.5  # doctest: +NORMALIZE_WHITESPACE
+        Traceback (most recent call last):
+        ...
+        TypeError: Invalid value type provided for 'Foo.m'. Value should be of type <class 'int'>.
+          Instead, received a 'float': 1.5
+
+        :param _decorated_fun: internal, the decorated function. Do not fill this argument!
+        :param accepts: a `<validation_callable>`, an `<accepted_type>` or a wildcard (`'*'` or `None`) defining on
+            which values this converter will have a chance to succeed. Default is `None`.
+        :return:
+        """
+        if accepts is None and _decorated_fun is not None:
+            # used without parenthesis @<field>.converter:
+            self.add_converter(_decorated_fun)
+            return _decorated_fun
+        else:
+            # used with parenthesis @<field>.converter(...): return a decorator
+            def decorate_f(f):
+                # create the converter definition
+                self.add_converter((accepts, f))
+                return f
+
+            return decorate_f
+
+    def add_converter(self,
+                      converter_def  # type: ConverterFuncDefinition
+                      ):
+        """
+        Adds a converter to the set of converters on that field.
+        This is the implementation for native fields.
+
+        :param converter_def:
+        :return:
+        """
+        if self.owner_cls is not None:
+            # create a descriptor field instead of this native field
+            new_field = DescriptorField.create_from_field(self, converters=(converter_def, ))
+
+            # register it on the class as a replacement for this native field
+            setattr(self.owner_cls, self.name, new_field)
+        else:
+            if not PY36:
+                raise UnsupportedOnNativeFieldError(
+                    "defining converters is not supported on native fields in python < 3.6."
+                    " Please set `native=False` on field '%s' to enable this feature."
+                    % (self,))
+
+            # mark as pending
+            if self.pending_converters is None:
+                self.pending_converters = [converter_def]
+            else:
+                self.pending_converters.append(converter_def)
 
     def trace_convert(self, value, obj=None):
         # type: (...) -> Tuple[Any, DetailedConversionResults]
@@ -639,8 +740,9 @@ class DescriptorField(Field):
 
     @classmethod
     def create_from_field(cls,
-                          other_field,     # type: Field
-                          validators=None  # type: Iterable[ValidatorDef]
+                          other_field,      # type: Field
+                          validators=None,  # type: Iterable[ValidatorDef]
+                          converters=None   # type: Iterable[ConverterFuncDefinition]
                           ):
         # type: (...) -> DescriptorField
         """
@@ -648,6 +750,7 @@ class DescriptorField(Field):
 
         :param other_field:
         :param validators: validators to add to the field definition
+        :param converters: converters to add to the field definition
         :return:
         """
         if other_field.is_default_factory:
@@ -658,7 +761,8 @@ class DescriptorField(Field):
             default = other_field.default
 
         new_field = DescriptorField(type_hint=other_field.type_hint, default=default, default_factory=default_factory,
-                                    doc=other_field.doc, name=other_field.name, validators=validators)
+                                    doc=other_field.doc, name=other_field.name, validators=validators,
+                                    converters=converters)
 
         # copy the owner class info too
         new_field.owner_cls = other_field.owner_cls
@@ -689,7 +793,7 @@ class DescriptorField(Field):
 
         # converters
         if converters is not None:
-            self.converters = make_converters_list(converters)
+            self.converters = list(make_converters_list(converters))
         else:
             self.converters = None
 
@@ -706,6 +810,17 @@ class DescriptorField(Field):
             self.root_validator = FieldValidator(self, validator)
         else:
             self.root_validator.add_validator(validator)
+
+    def add_converter(self,
+                      converter_def  # type: ConverterFuncDefinition
+                      ):
+        converters = make_converters_list(converter_def)
+        if self.converters is None:
+            # use the new list
+            self.converters = list(converters)
+        else:
+            # concatenate the lists
+            self.converters += converters
 
     def __get__(self, obj, obj_type):
         # type: (...) -> T

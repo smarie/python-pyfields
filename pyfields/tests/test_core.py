@@ -347,6 +347,8 @@ def test_field_validators_decorator(explicit):
         def f_should_be_larger_than_g(self, f_val):
             return f_val > self.g
 
+    f_field = Foo.__dict__['f']
+    assert len(f_field.root_validator.base_validation_funcs) == 2
     foo = Foo()
     foo.g = 0
     with pytest.raises(ValidationError) as exc_info:
@@ -374,6 +376,57 @@ def test_validator_not_compliant_with_native_field():
     with pytest.raises(UnsupportedOnNativeFieldError):
         class Foo(object):
             f = field(validators=lambda x: True, native=True)
+
+
+@pytest.mark.parametrize("explicit", [False, True], ids="explicit={}".format)
+def test_field_converters_decorator(explicit):
+    """Tests that the @<field>.converter works correctly"""
+
+    if explicit:
+        native = False
+    else:
+        native = None
+        if sys.version_info < (3, 6):
+            with pytest.raises(UnsupportedOnNativeFieldError):
+                class Foo(object):
+                    f = field(native=native)
+                    @f.converter
+                    def validate_f(self, val):
+                        return val % 3 == 0
+            return
+
+    class Foo(object):
+        f = field(native=native)
+
+        @f.converter(accepts=str)
+        def f_from_str(self, f_val):
+            # make sure the filter has worked
+            assert isinstance(f_val, str)
+            return int(f_val)
+
+        @f.converter
+        def f_from_anything(self, f_val):
+            if isinstance(f_val, int):
+                # of course we would not do that in real life but this is a test that exceptions are supported
+                raise Exception("no need to convert! already an int")
+            return int(f_val) + 1
+
+    f_field = Foo.__dict__['f']
+    assert len(f_field.converters) == 2
+    foo = Foo()
+    foo.f = 0    # uses no converter at all
+    assert foo.f == 0
+    foo.f = '2'  # uses the first converter
+    assert foo.f == 2
+    foo.f = 2.1  # uses the second converter
+    assert foo.f == 3
+
+
+def test_converter_not_compliant_with_native_field():
+    """tests that `native=True` can not be set when a validator is provided"""
+    with pytest.raises(UnsupportedOnNativeFieldError):
+        class Foo(object):
+            f = field(converters=lambda x: x, native=True)
 
 
 @pytest.mark.parametrize("validator_return_none", [False, True], ids="validator_return_none={}".format)
