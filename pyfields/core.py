@@ -15,7 +15,7 @@ except ImportError:
 import sentinel
 from valid8 import ValidationFailure
 
-from pyfields.validate_n_convert import FieldValidator, make_converters_list
+from pyfields.validate_n_convert import FieldValidator, make_converters_list, trace_convert
 
 try:  # python 3.5+
     # noinspection PyUnresolvedReferences
@@ -24,7 +24,7 @@ try:  # python 3.5+
     if use_type_hints:
         T = TypeVar('T')
         # noinspection PyUnresolvedReferences
-        from pyfields.validate_n_convert import ValidatorDef, Validators, Converters
+        from pyfields.validate_n_convert import ValidatorDef, Validators, Converters, DetailedConversionResults
 except ImportError:
     use_type_hints = False
 
@@ -352,6 +352,21 @@ class Field(object):
                 self.pending_validators = [validator]
             else:
                 self.pending_validators.append(validator)
+
+    def trace_convert(self, value, obj=None):
+        # type: (...) -> Tuple[Any, DetailedConversionResults]
+        """
+        Can be used to debug conversion problems.
+        Instead of just returning the converted value, it also returns conversion details.
+
+        Note that this method does not set the field value, it simply returns the conversion results.
+        In case no converter is able to convert the provided value, a `ConversionError` is raised.
+
+        :param obj:
+        :param value:
+        :return: a tuple (converted_value, details).
+        """
+        raise UnsupportedOnNativeFieldError("Native fields do not have converters.")
 
 
 def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
@@ -727,6 +742,10 @@ class DescriptorField(Field):
             setattr(obj, private_name, value)
 
         return value
+
+    def trace_convert(self, value, obj=None):
+        """Overrides the method in `Field` to provide a valid implementation."""
+        return trace_convert(field=self, value=value, obj=obj)
 
     def __set__(self,
                 obj,

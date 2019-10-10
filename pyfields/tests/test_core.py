@@ -14,7 +14,7 @@ from valid8.base import InvalidValue
 from valid8.validation_lib import non_empty, Empty
 
 from pyfields import field, MandatoryFieldInitError, UnsupportedOnNativeFieldError, inject_fields, make_init, \
-    copy_value, copy_field, Converter, Field
+    copy_value, copy_field, Converter, Field, ConversionError
 
 
 @pytest.mark.parametrize('read_first', [False, True], ids="read_first={}".format)
@@ -430,33 +430,59 @@ def test_converters(format, nbargs, validator_return_none):
                 elif nbargs == 3:
                     return parse_nb(obj, field, x)
         convs = ParseNb()
+        accepts_int = True
+        c_name = "ParseNb"
 
     elif format == 'single_fun':
         convs = parse_nb
+        accepts_int = True
+        c_name = 'parse_nb'
 
     elif format == '(v_fun, c_fun)':
         convs = (valid_str, parse_nb)
+        accepts_int = False
+        c_error_details = "Acceptance test: REJECTED (returned False)"
+        c_name = 'parse_nb'
 
     elif format == '(v_type, c_fun)':
         convs = (str, parse_nb)
+        accepts_int = False
+        c_error_details = "Acceptance test: ERROR [HasWrongType] Value should be an instance of <class 'str'>. " \
+                          "Wrong value: 1."
+        c_name = 'parse_nb'
 
     elif format == '(joker, c_fun)':
         convs = ('*', parse_nb)
+        accepts_int = True
+        c_name = 'parse_nb'
 
     elif format == '(None, c_fun)':
         convs = (None, parse_nb)
+        accepts_int = True
+        c_name = 'parse_nb'
 
     elif format == '{v_fun: c_fun}':
         convs = {valid_str: parse_nb}
+        accepts_int = False
+        c_error_details = "Acceptance test: REJECTED (returned False)"
+        c_name = 'parse_nb'
 
     elif format == '{v_type: c_fun}':
         convs = {str: parse_nb}
+        accepts_int = False
+        c_error_details = "Acceptance test: ERROR [HasWrongType] Value should be an instance of <class 'str'>. " \
+                          "Wrong value: 1."
+        c_name = 'parse_nb'
 
     elif format == '{joker: c_fun}':
         convs = {'*': parse_nb}
+        accepts_int = True
+        c_name = 'parse_nb'
 
     elif format == '{None: c_fun}':
         convs = {None: parse_nb}
+        accepts_int = True
+        c_name = 'parse_nb'
 
     else:
         raise ValueError(format)
@@ -465,7 +491,8 @@ def test_converters(format, nbargs, validator_return_none):
         f = field(converters=convs, validators=[x % 3 == 0])
 
     o = Foo()
-    f_converters = Foo.__dict__['f'].converters
+    f_field = Foo.__dict__['f']
+    f_converters = f_field.converters
     assert len(f_converters) == 1 and isinstance(f_converters[0], Converter)
     o.f = 3
     o.f = '6'
@@ -478,6 +505,28 @@ def test_converters(format, nbargs, validator_return_none):
         qualname = "test_converters.<locals>.Foo.f"
     assert str(exc_info.value) == "Error validating [%s=5]. " \
                                   "InvalidValue: Function [x %% 3 == 0] returned [False] for value 5." % qualname
+
+    if accepts_int:
+        if nbargs == 1:
+            converted_value, details = f_field.trace_convert(1)
+        else:
+            # we have to provide the object, as it is used in our converter
+            converted_value, details = f_field.trace_convert(1, obj=o)
+
+        assert converted_value == 1
+        assert str(details) == """Value 1 successfully converted to 1 using converter '%s', after the following attempts:
+ - Converter '%s': Acceptance test: SUCCESS (returned None). Conversion: SUCCESS -> 1
+""" % (c_name, c_name)
+    else:
+        with pytest.raises(ConversionError) as exc_info:
+            if nbargs == 1:
+                converted_value, details = f_field.trace_convert(1)
+            else:
+                # we have to provide the object, as it is used in our converter
+                converted_value, details = f_field.trace_convert(1, obj=o)
+        assert str(exc_info.value) == """Unable to convert value 1. Results:
+ - Converter '%s': %s
+""" % (c_name, c_error_details)
 
 
 @pytest.mark.parametrize("native", [False, True], ids="native={}".format)

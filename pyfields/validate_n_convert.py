@@ -244,7 +244,16 @@ class Converter(object):
     """
     A converter to be used in `field`s.
     """
-    __slots__ = ()
+    __slots__ = ('name', )
+
+    def __init__(self, name=None):
+        self.name = name
+
+    def __str__(self):
+        if self.name is not None:
+            return self.name
+        else:
+            return self.__class__.__name__
 
     def accepts(self, obj, field, value):
         # type: (...) -> Optional[bool]
@@ -308,7 +317,7 @@ class Converter(object):
 
         # create the type dynamically and instantiate
         c_type = type('SimpleConverter', (Converter,), methods_dict)
-        return c_type()
+        return c_type(name=converter_fun_3params.__name__)
 
 
 if use_type_hints:
@@ -506,3 +515,98 @@ def make_converters_list(converters  # type: OneOrSeveralConverterDefinitions
         raise ValueError("No converters provided")
     else:
         return all_converters
+
+
+def trace_convert(field,    # type: 'Field'
+                  value,    # type: Any
+                  obj=None  # type: Any
+                  ):
+    # type: (...) -> Tuple[Any, DetailedConversionResults]
+    """
+    Utility method to debug conversion issues.
+    Instead of just returning the converted value, it also returns conversion details.
+
+    In case conversion can not be made, a `ConversionError` is raised.
+
+    Inspired by the `getversion` library.
+
+    :param obj:
+    :param field:
+    :param value:
+    :return:
+    """
+    errors = OrderedDict()
+
+    for conv in field.converters:
+        try:
+            # check if converter accepts this ?
+            accepted = conv.accepts(obj, field, value)
+        except Exception as e:
+            # error in acceptance test
+            errors[conv] = "Acceptance test: ERROR [%s] %s" % (e.__class__.__name__, e)
+        else:
+            if accepted is not None and not accepted:
+                # acceptance failed
+                errors[conv] = "Acceptance test: REJECTED (returned %s)" % accepted
+            else:
+                # accepted! (None or True truth value)
+                try:
+                    # apply converter
+                    converted_value = conv.convert(obj, field, value)
+                except Exception as e:
+                    errors[conv] = "Acceptance test: SUCCESS (returned %s). Conversion: ERROR [%s] %s" \
+                                   % (accepted, e.__class__.__name__, e)
+                else:
+                    # conversion success !
+                    errors[conv] = "Acceptance test: SUCCESS (returned %s). Conversion: SUCCESS -> %s" \
+                                   % (accepted, converted_value)
+                    return converted_value, DetailedConversionResults(value, field, obj, errors, conv, converted_value)
+
+    raise ConversionError(value_to_convert=value, field=field, obj=obj, err_dct=errors)
+
+
+class ConversionError(Exception):
+    """
+    Final exception Raised by `trace_convert` when a value cannot be converted successfully
+    """
+    __slots__ = 'value_to_convert', 'field', 'obj', 'err_dct'
+
+    def __init__(self, value_to_convert, field, obj, err_dct):
+        self.value_to_convert = value_to_convert
+        self.field = field
+        self.obj = obj
+        self.err_dct = err_dct
+        super(ConversionError, self).__init__()
+
+    def __str__(self):
+        return "Unable to convert value %r. Results:\n%s" \
+               % (self.value_to_convert, err_dct_to_str(self.err_dct))
+
+
+def err_dct_to_str(err_dct  # Dict[Converter, str]
+                   ):
+    # type: (...) -> str
+    msg = ""
+    for converter, err in err_dct.items():
+        msg += " - Converter '%s': %s\n" % (converter, err)
+
+    return msg
+
+
+class DetailedConversionResults(object):
+    """
+    Returned by `trace_convert` for detailed results about which converter failed before the winning one.
+    """
+    __slots__ = 'value_to_convert', 'field', 'obj', 'err_dct', 'winning_converter', 'converted_value'
+
+    def __init__(self, value_to_convert, field, obj, err_dct, winning_converter, converted_value):
+        self.value_to_convert= value_to_convert
+        self.field = field
+        self.obj = obj
+        self.err_dct = err_dct
+        self.winning_converter = winning_converter
+        self.converted_value = converted_value
+
+    def __str__(self):
+        return "Value %r successfully converted to %r using converter '%s', after the following attempts:\n%s"\
+               % (self.value_to_convert, self.converted_value, self.winning_converter, err_dct_to_str(self.err_dct))
