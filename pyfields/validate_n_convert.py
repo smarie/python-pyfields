@@ -298,14 +298,15 @@ class Converter(object):
         :param validation_fun:
         :return:
         """
+        # Mandatory conversion callable
         if is_mini_lambda(converter_fun):
             is_mini = True
             converter_fun = converter_fun.as_function()
         else:
             is_mini = False
         converter_fun_3params = make_3params_callable(converter_fun, is_mini_lambda=is_mini)
-        methods_dict = {'__slots__': (), 'convert': staticmethod(converter_fun_3params)}
 
+        # Optional acceptance callable
         if validation_fun is not None:
             if is_mini_lambda(validation_fun):
                 is_mini = True
@@ -313,11 +314,35 @@ class Converter(object):
             else:
                 is_mini = False
             validation_fun_3params = make_3params_callable(validation_fun, is_mini_lambda=is_mini)
-            methods_dict['accepts'] = staticmethod(validation_fun_3params)
+        else:
+            validation_fun_3params = None
 
-        # create the type dynamically and instantiate
-        c_type = type('SimpleConverter', (Converter,), methods_dict)
-        return c_type(name=converter_fun_3params.__name__)
+        # Finally create the converter instance
+        return ConverterWithFuncs(name=converter_fun_3params.__name__,
+                                  accepts_fun=validation_fun_3params,
+                                  convert_fun=converter_fun_3params)
+
+
+# noinspection PyAbstractClass
+class ConverterWithFuncs(Converter):
+    """
+    Represents a converter for which the `accepts` and `convert` methods can be provided in the constructor.
+    """
+    __slots__ = ('accepts', 'convert')
+
+    def __init__(self, convert_fun, name=None, accepts_fun=None):
+        # call super to set the name
+        super(ConverterWithFuncs, self).__init__(name=name)
+
+        # use the convert method
+        self.convert = convert_fun
+
+        # use the accepts method if provided, otherwise use parent's
+        if accepts_fun is not None:
+            self.accepts = accepts_fun
+        else:
+            # use parent method - bind it on this instance
+            self.accepts = Converter.accepts.__get__(self, ConverterWithFuncs)
 
 
 if use_type_hints:
