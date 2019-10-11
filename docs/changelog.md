@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.9.1 - Minor improvements
+
+ - Minor performance improvement: `Converter.create_from_fun()` does not generate a new `type` everytime a converter needs to be created from a callable - now a single class `ConverterWithFuncs` is used. Fixed [#32](https://github.com/smarie/python-pyfields/issues/32). 
+
 ### 0.9.0 - Converters
 
 **converters**
