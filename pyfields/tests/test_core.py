@@ -44,9 +44,9 @@ def test_field(read_first, type_):
     # read
     if read_first and type_ == 'mandatory':
         with pytest.raises(MandatoryFieldInitError):
-            assert not t.afraid
+            print(t.afraid)
     else:
-        assert not t.afraid
+        assert t.afraid is False
 
     # set
     t.afraid = True
