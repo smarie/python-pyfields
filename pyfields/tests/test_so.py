@@ -181,8 +181,9 @@ def test_so6():
     p = Position(x=1, y=12)
     with pytest.raises(TypeError) as exc_info:
         p.x = '1'
-    assert str(exc_info.value) == "Invalid value type provided for 'test_so6.<locals>.Position.x'. " \
-                                  "Value should be of type <class 'int'>. Instead, received a 'str': '1'"
+    qualname = Position.__dict__['x'].qualname
+    assert str(exc_info.value) == "Invalid value type provided for '%s'. " \
+                                  "Value should be of type %r. Instead, received a 'str': '1'" % (qualname, int)
 
     with pytest.raises(ValidationError) as exc_info:
         p.y = 101
