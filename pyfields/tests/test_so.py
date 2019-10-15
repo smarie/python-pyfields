@@ -1,15 +1,16 @@
 #  Authors: Sylvain Marie <sylvain.marie@se.com>
 #
 #  Copyright (c) Schneider Electric Industries, 2019. All right reserved.
+
 import pytest
 
-from pyfields import field, init_fields, make_init
 from valid8 import ValidationError
-from valid8.validation_lib import is_in
 
 
 def test_so0(capsys):
-    """ Checks answer at """
+    """ Checks answer at https://stackoverflow.com/a/58344434/7262247 """
+
+    from pyfields import field, init_fields
 
     with capsys.disabled():
         class C(object):
@@ -34,6 +35,8 @@ def test_so0(capsys):
 def test_so1(capsys):
     """ Checks answer at https://stackoverflow.com/a/58344853/7262247 """
 
+    from pyfields import field, init_fields
+
     class Account(object):
         first = field(doc="first name")
         last = field(doc="last name")
@@ -56,6 +59,9 @@ def test_so1(capsys):
 
 def test_so2():
     """ Checks that answer at https://stackoverflow.com/a/58383062/7262247 is ok """
+
+    from pyfields import field
+
     class Position(object):
         x = field(validators=lambda x: x > 0)
         y = field(validators={'y should be between 0 and 100': lambda y: y > 0 and y < 100})
@@ -72,6 +78,9 @@ def test_so2():
 
 def test_so3():
     """https://stackoverflow.com/a/58391645/7262247"""
+
+    from pyfields import field
+
     class Spam(object):
         description = field(validators={"description can not be empty": lambda s: len(s) > 0})
         value = field(validators={"value must be greater than zero": lambda x: x > 0})
@@ -87,6 +96,10 @@ def test_so3():
 
 def test_so4():
     """check https://stackoverflow.com/a/58394381/7262247"""
+
+    from pyfields import field, init_fields
+    from valid8.validation_lib import is_in
+
     ALLOWED_COLORS = ('blue', 'yellow', 'brown')
 
     class Car(object):
@@ -115,3 +128,61 @@ def test_so4():
     assert str(exc_info.value) == "Error validating [%s=0]. " \
                                   "InvalidValue: should be positive. " \
                                   "Function [<lambda>] returned [False] for value 0." % qualname
+
+
+def test_so5():
+    """https://stackoverflow.com/a/58395677/7262247"""
+
+    from pyfields import field, copy_value, init_fields
+    from valid8.validation_lib import is_in
+
+    class Well(object):
+        name = field()                                        # Required
+        group = field()                                       # Required
+        operate_list = field(default_factory=copy_value([]))  # Optional
+        monitor_list = field(default_factory=copy_value([]))  # Optional
+        geometry = field(default=None)                        # Optional
+        perf = field(default=None)                            # Optional
+
+    valid_types = ('type_A', 'type_B')
+
+    class Operate(object):
+        att = field()                                  # Required
+        type_ = field(type_hint=str, check_type=True, validators=is_in(valid_types))   # Required
+        value = field(default_factory=copy_value([]))  # Optional
+        mode = field(default=None)                     # Optional
+        action = field(default=None)                   # Optional
+
+        @init_fields
+        def __init__(self):
+            pass
+
+    o = Operate(att="foo", type_='type_A')
+
+    with pytest.raises(TypeError):
+        o.type_ = 1  # <-- raises TypeError: Invalid value type provided
+
+    with pytest.raises(ValidationError):
+        bad_o = Operate(att="foo", type_='type_WRONG')  # <-- raises ValidationError: NotInAllowedValues: x in ('type_A', 'type_B') does not hold for x=type_WRONG
+
+
+def test_so6():
+    """checks that answer at https://stackoverflow.com/a/58396678/7262247 works"""
+    from pyfields import field, init_fields
+
+    class Position(object):
+        x: int = field(check_type=True, validators=lambda x: x > 0)
+        y: int = field(check_type=True, validators={'y should be between 0 and 100': lambda y: y > 0 and y < 100})
+
+        @init_fields
+        def __init__(self, msg="hello world!"):
+            print(msg)
+
+    p = Position(x=1, y=12)
+    with pytest.raises(TypeError) as exc_info:
+        p.x = '1'
+    assert str(exc_info.value) == "Invalid value type provided for 'test_so6.<locals>.Position.x'. " \
+                                  "Value should be of type <class 'int'>. Instead, received a 'str': '1'"
+
+    with pytest.raises(ValidationError) as exc_info:
+        p.y = 101
