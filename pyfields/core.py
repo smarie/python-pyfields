@@ -48,6 +48,7 @@ if PY36:
     except ImportError:
         pass
 
+PY2 = sys.version_info < (3, 0)
 # PY35 = sys.version_info >= (3, 5)
 
 try:
@@ -159,6 +160,9 @@ class Field(object):
         """
         # set the owner class
         self.owner_cls = owner_cls
+
+        if PY2 and isinstance(self, DescriptorField) and not issubclass(owner_cls, object):
+            raise ValueError("descriptor fields can not be used on old-style classes under python 2.")
 
         # check if the name provided as argument differ from the one provided
         if self.name is not None:
