@@ -153,6 +153,7 @@ def inject_fields(*fields  # type: Union[Field, Any]
 def make_init(*fields,  # type: Union[Field, Any]
               **kwargs
               ):
+    # type: (...) -> Callable
     """
     Creates a constructor based on the provided fields.
 
