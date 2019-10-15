@@ -171,8 +171,8 @@ def test_so6():
     from pyfields import field, init_fields
 
     class Position(object):
-        x: int = field(check_type=True, validators=lambda x: x > 0)
-        y: int = field(check_type=True, validators={'y should be between 0 and 100': lambda y: y > 0 and y < 100})
+        x = field(type_hint=int, check_type=True, validators=lambda x: x > 0)
+        y = field(type_hint=int, check_type=True, validators={'y should be between 0 and 100': lambda y: y > 0 and y < 100})
 
         @init_fields
         def __init__(self, msg="hello world!"):
