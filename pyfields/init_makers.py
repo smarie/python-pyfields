@@ -242,6 +242,9 @@ class InitDescriptor(object):
     The first time people access `cls.__init__`, the actual method will be created and injected in the class.
     This descriptor will then disappear and the class will behave normally.
 
+    The reason why we do not create the init method directly is that we require all fields to be attached to the class
+    so that they have names and type hints.
+
     Inspired by https://stackoverflow.com/a/3412743/7262247
     """
     __slots__ = 'fields', 'user_init_is_injected', 'user_init_fun', 'user_init_args_before'
@@ -258,16 +261,27 @@ class InitDescriptor(object):
     #         raise ValueError("this should not happen")
 
     def __get__(self, obj, objtype):
+        # type: (...) -> Callable
+        """
+        Python Descriptor protocol - this is called when the __init__ method is required for the first time,
+        it creates the `__init__` method, replaces itself with it, and returns it. Subsequent calls will directly
+        be routed to the new init method and not here.
+
+        :param obj:
+        :param objtype:
+        :return:
+        """
         if objtype is not None:
             # <objtype>.__init__ has been accessed. Create the modified init
             fields = self.fields
             if fields is None or len(fields) == 0:
-                # fields have not been access explicitly so they might have not been initialized yet.
-                fields = collect_all_fields(objtype, auto_fix_fields=not PY36)
+                # fields have not been provided explicitly, collect them all.
+                fields = collect_all_fields(objtype, include_inherited=True, ancestors_first=True,
+                                            auto_fix_fields=not PY36)
             elif not PY36:
                 # take this opportunity to apply all field names including inherited
-                # TODO set back inherited = False when the bug with class-level access is solved -> make_init will be ok then
-                collect_all_fields(objtype, include_inherited=True, auto_fix_fields=True)
+                # TODO set back inherited = False when the bug with class-level access is solved -> make_init will be ok
+                collect_all_fields(objtype, include_inherited=True, ancestors_first=True, auto_fix_fields=True)
 
             # create the init method
             new_init = create_init(fields=fields, inject_fields=self.user_init_is_injected,
@@ -315,6 +329,8 @@ def create_init(fields,                     # type: Iterable[Field]
                 ):
     """
     Creates the new init function that will replace `init_fun`.
+    It requires that all fields have correct names and type hints so we usually execute it from within a __init__
+    descriptor.
 
     :param fields:
     :param user_init_fun:
@@ -482,5 +498,8 @@ def _insert_fields_at_position(fields_to_insert,
         # finally inject the new parameter in the signature
         new_param = Parameter(_field.name, kind=Parameter.POSITIONAL_OR_KEYWORD, default=default, annotation=annotation)
         params.insert(where_to_insert, new_param)
+
+    # dont forget to reverse the list !
+    field_names.reverse()
 
     return field_names, last_mandatory_idx

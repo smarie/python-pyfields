@@ -999,6 +999,8 @@ class DescriptorField(Field):
 
 def collect_all_fields(cls,
                        include_inherited=True,
+                       remove_duplicates=True,
+                       ancestors_first=True,
                        auto_fix_fields=False
                        ):
     """
@@ -1008,12 +1010,16 @@ def collect_all_fields(cls,
 
     :param cls:
     :param auto_fix_fields:
+    :param remove_duplicates:
+    :param ancestors_first:
     :param include_inherited:
     :return: a list of fields
     """
+    names = set()
     result = []
+
     if include_inherited:
-        where = ordered_dir(cls)
+        where = ordered_dir(cls, ancestors_first=ancestors_first)
     else:
         where = vars(cls)
 
@@ -1030,26 +1036,43 @@ def collect_all_fields(cls,
                     if auto_fix_fields:
                         # take this opportunity to set the name and type hints
                         member.set_as_cls_member(cls, member_name, cls_type_hints)
+                    if remove_duplicates:
+                        if member_name in names:
+                            continue
+                        else:
+                            names.add(member_name)
+
                     result.append(member)
             except ClassFieldAccessError as e:
                 # we know it is a field :)
                 if auto_fix_fields:
                     # take this opportunity to set the name
                     e.field.set_as_cls_member(cls, member_name, cls_type_hints)
+                if remove_duplicates:
+                    if member_name in names:
+                        continue
+                    else:
+                        names.add(member_name)
+
                 result.append(e.field)
 
     return result
 
 
-def ordered_dir(cls):
+def ordered_dir(cls,
+                ancestors_first=False  # type: bool
+                ):
     """
     since `dir` does not preserve order, lets have our own implementation
 
     :param cls:
+    :param ancestors_first:
     :return:
     """
-    for parent in getmro(cls):
-        for k in vars(parent):
+    classes = reversed(getmro(cls)) if ancestors_first else getmro(cls)
+
+    for _cls in classes:
+        for k in vars(_cls):
             yield k
 
 
