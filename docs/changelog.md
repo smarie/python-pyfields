@@ -1,5 +1,16 @@
 # Changelog
 
+### 0.10.0 - Read-only fields + minor improvements
+
+**Read-only fields**
+
+ - Read-only fields are now supported through `field(read_only=True)`. Fixes [#33](https://github.com/smarie/python-pyfields/issues/33).
+
+**Misc**
+
+ - All core exceptions now derive from a common `FieldError`, for easier exception handling. 
+ - Now raising an explicit `ValueError` when a descriptor field is used with an old-style class in python 2. Fixes [#34](https://github.com/smarie/python-pyfields/issues/34) 
+
 ### 0.9.1 - Minor improvements
 
  - Minor performance improvement: `Converter.create_from_fun()` does not generate a new `type` everytime a converter needs to be created from a callable - now a single class `ConverterWithFuncs` is used. Fixed [#32](https://github.com/smarie/python-pyfields/issues/32). 
