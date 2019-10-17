@@ -4,6 +4,7 @@
 
 import pytest
 
+from pyfields import ReadOnlyFieldError
 from valid8 import ValidationError
 
 
@@ -187,3 +188,21 @@ def test_so6():
 
     with pytest.raises(ValidationError) as exc_info:
         p.y = 101
+
+
+def test_so7():
+    """ checks answer at https://stackoverflow.com/a/58432813/7262247 """
+
+    from pyfields import field
+
+    class User(object):
+        username = field(read_only=True, validators={'should contain more than 2 characters': lambda s: len(s) > 2})
+
+    u = User()
+    u.username = "earthling"
+    assert vars(u) == {'_username': "earthling"}
+    with pytest.raises(ReadOnlyFieldError) as exc_info:
+        u.username = "earthling2"
+    qualname = User.__dict__['username'].qualname
+    assert str(exc_info.value) == "Read-only field '%s' has already been initialized on instance %s and cannot be " \
+                                  "modified anymore." % (qualname, u)
