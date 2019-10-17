@@ -1,5 +1,13 @@
 # Changelog
 
+### 0.11.0 - Better initialization orders in generated `__init__`
+
+Fixed fields initialization order in generated constructor methods:
+
+ - the order is now the same than the order of appearance in the class (and not reversed as it was). Fixed [#36](https://github.com/smarie/python-pyfields/issues/36). 
+ - the order now takes into account first the ancestors and then the subclasses, for the most intuitive behaviour. Fixed [#37](https://github.com/smarie/python-pyfields/issues/37).
+ 
+
 ### 0.10.0 - Read-only fields + minor improvements
 
 **Read-only fields**
