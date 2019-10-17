@@ -38,6 +38,9 @@ If your first reaction is "what about `attrs` / `dataclasses` / `pydantic` / `ch
 
 ## Usage
 
+!!! warning  "compliance with python 2's old-style classes"
+    All examples below assume python 3 and therefore show new-style classes without explicit inheritance of `object`, for readability. If you're using python 2 do not forget to explicitly use a new-style class otherwise some features will not be available (the ones where a setter on the field is required: validation, conversion, read-only).
+
 ### 1. Defining a field
 
 A field is defined as a class member using the `field()` method. The idea (not new) is that you declare in a single place all aspects related to each field. For mandatory fields you do not need to provide any argument. For optional fields, you will typically provide a `default` value or a `default_factory` (we will see that later).
@@ -143,6 +146,54 @@ Finally, you can use the following built-in helper functions to cover most commo
  - `copy_field(<field_or_name>)` returns a factory that will create copies of the given object field
  - `copy_attr(<attr_name>)` returns a factory that will create copies of the given object attribute (not necessary a field)
 
+#### Read-only fields
+
+You can define fields that can only be set once:
+
+```python
+class User:
+    name = field(read_only=True)
+
+u = User()
+u.name = "john"
+print("name: %s\n" % u.name)
+u.name = "john2"
+```
+
+yields
+
+```bash
+name: john
+
+pyfields.core.ReadOnlyFieldError: 
+   Read-only field '<...>.User.name' has already been initialized on instance 
+   <<...>.User object at 0x000001CA70FA25F8> and cannot be modified anymore.
+```
+
+Of course this makes more sense when an appropriate constructor is defined on the class as we'll see [below](#2-adding-a-constructor), but it also works independently.
+
+Optional fields can also be "read-only" of course. But remember that in that case, **reading** the field on a brand new object will assign it to its default value - therefore is will not modifiable anymore:
+
+```python
+class User:
+    name = field(read_only=True, default="dummy")
+
+u = User()
+print("name: %s\n" % u.name)
+u.name = "john"
+```
+
+yields
+
+```bash
+name: dummy
+
+pyfields.core.ReadOnlyFieldError: 
+   Read-only field '<...>.User.name' has already been initialized on instance 
+   <<...>.User object at 0x000001ED05E22CC0> and cannot be modified anymore.
+```
+
+In practice if you have your own constructor or if you generate one using the methods [below](#2-adding-a-constructor), it will work without problem. But when debugging your constructor with an IDE that automatically calls "repr" on your object you might have to remember it and take extra care.
 
 #### Type validation
 
@@ -290,7 +341,7 @@ For example
 
 ```python
 from pyfields import field
-class Foo(object):
+class Foo:
     f = field(type_hint=int, converters=int)
     g = field(type_hint=int, converters={str: lambda s: len(s), 
                                          '*': int})
@@ -303,7 +354,7 @@ As for validators, you can easily define converters using a decorator `@<field>.
 Several such decorators can be applied on the same function, so as to mutualize implementation. In that case, you might wish to use the signature with 3 arguments so as to easily debug which field is being validated:
 
 ```python
-class Foo(object):
+class Foo:
     m = field(type_hint=int, check_type=True)
     m2 = field(type_hint=int, check_type=True)
     
@@ -535,7 +586,7 @@ Note on the order of arguments in the resulting `__init__` signature: as you can
 You can use `pyfields` if your class has `__slots__`. You will simply have to use an underscore in the slot name corresponding to a field: `_<field_name>`. For example:
 
 ```python
-class WithSlots(object):
+class WithSlots:
     __slots__ = ('_a',)
     a = field()
 ```

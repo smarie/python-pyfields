@@ -5,7 +5,7 @@ import timeit
 import pytest
 from valid8 import ValidationError, ValidationFailure
 
-from pyfields import field, MandatoryFieldInitError, make_init, init_fields, copy_field
+from pyfields import field, MandatoryFieldInitError, make_init, init_fields, ReadOnlyFieldError
 
 
 def runs_on_travis():
@@ -69,6 +69,30 @@ def test_default_factory(use_decorator):
     p.items.append('thing')
     assert p.items == ['thing']
     assert g.items == []
+
+
+def test_readonly_field():
+    """ checks that the example in the readme is correct """
+
+    class User(object):
+        name = field(read_only=True)
+
+    u = User()
+    u.name = "john"
+    assert "name: %s" % u.name == "name: john"
+    with pytest.raises(ReadOnlyFieldError) as exc_info:
+        u.name = "john2"
+    qualname = User.__dict__['name'].qualname
+    assert str(exc_info.value) == "Read-only field '%s' has already been " \
+                                  "initialized on instance %s and cannot be modified anymore." % (qualname, u)
+
+    class User(object):
+        name = field(read_only=True, default="dummy")
+
+    u = User()
+    assert "name: %s" % u.name == "name: dummy"
+    with pytest.raises(ReadOnlyFieldError):
+        u.name = "john"
 
 
 @pytest.mark.parametrize("py36_style_type_hints", [False, True], ids="py36_style_type_hints={}".format)
