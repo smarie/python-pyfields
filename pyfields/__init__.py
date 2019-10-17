@@ -1,4 +1,4 @@
-from .core import field, Field, MandatoryFieldInitError, UnsupportedOnNativeFieldError
+from .core import field, Field, MandatoryFieldInitError, UnsupportedOnNativeFieldError, ReadOnlyFieldError, FieldError
 from .validate_n_convert import Converter, ConversionError, DetailedConversionResults, trace_convert
 from .init_makers import inject_fields, make_init, init_fields
 from .helpers import copy_value, copy_field, copy_attr
@@ -17,7 +17,7 @@ __all__ = [
     # submodules
     'core', 'validate_n_convert', 'init_makers', 'helpers',
     # symbols
-    'field', 'Field', 'MandatoryFieldInitError', 'UnsupportedOnNativeFieldError',
+    'field', 'Field', 'MandatoryFieldInitError', 'UnsupportedOnNativeFieldError', 'ReadOnlyFieldError', 'FieldError',
     'Converter', 'ConversionError', 'DetailedConversionResults', 'trace_convert',
     'inject_fields', 'make_init', 'init_fields',
     'copy_value', 'copy_field', 'copy_attr'

@@ -67,7 +67,14 @@ except AttributeError:
             return cls_str
 
 
-class MandatoryFieldInitError(Exception):
+class FieldError(Exception):
+    """
+    Base class for exceptions related to fields
+    """
+    pass
+
+
+class MandatoryFieldInitError(FieldError):
     """
     Raised by `field` when a mandatory field is read without being set first.
     """
@@ -79,6 +86,21 @@ class MandatoryFieldInitError(Exception):
 
     def __str__(self):
         return "Mandatory field '%s' has not been initialized yet on instance %s." % (self.field_name, self.obj)
+
+
+class ReadOnlyFieldError(FieldError):
+    """
+    Raised by descriptor field when a read-only attribute is accessed for writing
+    """
+    __slots__ = 'field_name', 'obj'
+
+    def __init__(self, field_name, obj):
+        self.field_name = field_name
+        self.obj = obj
+
+    def __str__(self):
+        return "Read-only field '%s' has already been initialized on instance %s and cannot be modified anymore." \
+               % (self.field_name, self.obj)
 
 
 # a few symbols used in `fields`
@@ -480,6 +502,7 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
           default_factory=None,  # type: Callable[[], T]
           validators=None,       # type: Validators
           converters=None,       # type: Converters
+          read_only=False,       # type: bool
           doc=None,              # type: str
           name=None,             # type: str
           native=None            # type: bool
@@ -502,6 +525,10 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
     values. If you wish to run specific code to instantiate the default value, you may provide a `default_factory`
     callable instead. That callable should have no mandatory argument and should return the default value. Alternately
     you can use the `@<field>.default_factory` decorator.
+
+    Read-only
+    ---------
+    TODO
 
     Typing
     ------
@@ -617,6 +644,8 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
         validation function definitions. See `valid8` "simple syntax" for details
     :param converters: a sequence of (<type_def>, <converter>) pairs or a dict-like of such pairs. `<type_def>` should
         either be a type, a tuple of types, or the '*' string indicating "any other case".
+    :param read_only: a boolean (default `False`) stating if a field can be modified after initial value has been
+        provided.
     :param doc: documentation for the field. This is mostly for class readability purposes for now.
     :param name: in python < 3.6 this is mandatory if you do not use any other decorator or constructor creation on the
         class (such as `make_init`). If provided, it should be the same name than the one used used in the class field
@@ -631,14 +660,15 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
     # Should we create a Native or a Descriptor field ?
     if native is None:
         # default: choose automatically according to user-provided options
-        create_descriptor = check_type or (validators is not None) or (converters is not None)
+        create_descriptor = check_type or (validators is not None) or (converters is not None) or read_only
     else:
         # explicit user choice
         if native:
             # explicit `native=True`.
-            if check_type or (validators is not None) or (converters is not None):
-                raise UnsupportedOnNativeFieldError("`native=False` can not be set if a `validators` or "
-                                                    "`converters` is provided or if `check_type` is `True`")
+            if check_type or (validators is not None) or (converters is not None) or read_only:
+                raise UnsupportedOnNativeFieldError("`native=False` can not be set "
+                                                    "if a `validators` or `converters` is provided "
+                                                    "or if `check_type` or `read_only` is `True`")
             else:
                 create_descriptor = False
         else:
@@ -649,20 +679,20 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
     if create_descriptor:
         return DescriptorField(type_hint=type_hint, default=default, default_factory=default_factory,
                                check_type=check_type, validators=validators, converters=converters,
-                               doc=doc, name=name)
+                               read_only=read_only, doc=doc, name=name)
     else:
         return NativeField(type_hint=type_hint, default=default, default_factory=default_factory,
                            doc=doc, name=name)
 
 
-class UnsupportedOnNativeFieldError(Exception):
+class UnsupportedOnNativeFieldError(FieldError):
     """
     Exception raised whenever someone tries to perform an operation that is not supported on a "native" field.
     """
     pass
 
 
-class ClassFieldAccessError(Exception):
+class ClassFieldAccessError(FieldError):
     """
     Error raised when you use <cls>.<field>. This is currently put in place because otherwise the
     type hints in pycharm get messed up. See below.
@@ -740,7 +770,7 @@ class DescriptorField(Field):
     """
     General-purpose implementation for fields that require type-checking or validation or converter
     """
-    __slots__ = 'root_validator', 'check_type', 'converters'
+    __slots__ = 'root_validator', 'check_type', 'converters', 'read_only'
 
     @classmethod
     def create_from_field(cls,
@@ -779,6 +809,7 @@ class DescriptorField(Field):
                  check_type=False,      # type: bool
                  validators=None,       # type: Validators
                  converters=None,       # type: Converters
+                 read_only=False,       # type: bool
                  doc=None,              # type: str
                  name=None              # type: str
                  ):
@@ -800,6 +831,9 @@ class DescriptorField(Field):
             self.converters = list(make_converters_list(converters))
         else:
             self.converters = None
+
+        # read-only
+        self.read_only = read_only
 
     def add_validator(self,
                       validator  # type: ValidatorDef
@@ -947,6 +981,13 @@ class DescriptorField(Field):
         # run the validators
         if self.root_validator is not None:
             self.root_validator.assert_valid(obj, value)
+
+        # read-only check
+        if self.read_only:
+            # Check if the field is already set in the object
+            _v = getattr(obj, private_name, _unset)
+            if _v is not _unset:
+                raise ReadOnlyFieldError(self.qualname, obj)
 
         # set the new value
         setattr(obj, private_name, value)

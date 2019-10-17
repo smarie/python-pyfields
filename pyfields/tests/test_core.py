@@ -14,43 +14,66 @@ from valid8.base import InvalidValue
 from valid8.validation_lib import non_empty, Empty
 
 from pyfields import field, MandatoryFieldInitError, UnsupportedOnNativeFieldError, inject_fields, make_init, \
-    copy_value, copy_field, Converter, Field, ConversionError
+    copy_value, copy_field, Converter, Field, ConversionError, ReadOnlyFieldError
 
 
-@pytest.mark.parametrize('read_first', [False, True], ids="read_first={}".format)
+@pytest.mark.parametrize('write_before_reading', [False, True], ids="write_before_reading={}".format)
 @pytest.mark.parametrize('type_', ['default_factory', 'default', 'mandatory'], ids="type_={}".format)
-def test_field(read_first, type_):
+@pytest.mark.parametrize('read_only', [False, True], ids="read_only={}".format)
+def test_field(write_before_reading, type_, read_only):
     """Checks that field works as expected"""
 
     if type_ == 'default_factory':
-        class Tweety:
-            afraid = field(default_factory=lambda obj: False)
+        class Tweety(object):
+            afraid = field(default_factory=lambda obj: False, read_only=read_only)
     elif type_ == 'default':
-        class Tweety:
-            afraid = field(default=False)
+        class Tweety(object):
+            afraid = field(default=False, read_only=read_only)
     elif type_ == 'mandatory':
-        class Tweety:
-            afraid = field()
+        class Tweety(object):
+            afraid = field(read_only=read_only)
     else:
         raise ValueError()
 
     # instantiate
     t = Tweety()
 
-    if not read_first:
-        # set
-        t.afraid = False
+    written = False
 
-    # read
-    if read_first and type_ == 'mandatory':
+    # (1) write
+    if write_before_reading:
+        t.afraid = True
+        written = True
+
+    # (2) read
+    if not write_before_reading and type_ == 'mandatory':
+        # mandatory value not already overridden
         with pytest.raises(MandatoryFieldInitError):
             print(t.afraid)
     else:
-        assert t.afraid is False
+        # either default value (False) or already-written value (True)
+        assert t.afraid is write_before_reading
+        written = True  # because reading a non-mandatory field sets it to default
 
-    # set
-    t.afraid = True
-    assert t.afraid
+    # (3) write (possibly again) and check
+    if not (read_only and written):
+        t.afraid = True
+        assert t.afraid is True
+        if not read_only:
+            t.afraid = False
+            assert t.afraid is False
+        written = True
+
+    # if read only, check exception on second write
+    if read_only:
+        # make sure that now the value has been
+        assert written
+
+        with pytest.raises(ReadOnlyFieldError) as exc_info:
+            t.afraid = False
+        qualname = Tweety.__dict__['afraid'].qualname
+        assert str(exc_info.value) == "Read-only field '%s' has already been " \
+                                      "initialized on instance %s and cannot be modified anymore." % (qualname, t)
 
 
 def test_slots():
