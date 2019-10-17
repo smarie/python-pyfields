@@ -277,6 +277,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0100-read-only-fields-minor-improvements" class="md-nav__link">
+    0.10.0 - Read-only fields + minor improvements
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#091-minor-improvements" class="md-nav__link">
     0.9.1 - Minor improvements
   </a>
@@ -357,6 +364,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#0100-read-only-fields-minor-improvements" class="md-nav__link">
+    0.10.0 - Read-only fields + minor improvements
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#091-minor-improvements" class="md-nav__link">
     0.9.1 - Minor improvements
   </a>
@@ -425,6 +439,16 @@
                 
                 
                 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
+<h3 id="0100-read-only-fields-minor-improvements">0.10.0 - Read-only fields + minor improvements<a class="headerlink" href="#0100-read-only-fields-minor-improvements" title="Permanent link">&para;</a></h3>
+<p><strong>Read-only fields</strong></p>
+<ul>
+<li>Read-only fields are now supported through <code>field(read_only=True)</code>. Fixes <a href="https://github.com/smarie/python-pyfields/issues/33">#33</a>.</li>
+</ul>
+<p><strong>Misc</strong></p>
+<ul>
+<li>All core exceptions now derive from a common <code>FieldError</code>, for easier exception handling. </li>
+<li>Now raising an explicit <code>ValueError</code> when a descriptor field is used with an old-style class in python 2. Fixes <a href="https://github.com/smarie/python-pyfields/issues/34">#34</a> </li>
+</ul>
 <h3 id="091-minor-improvements">0.9.1 - Minor improvements<a class="headerlink" href="#091-minor-improvements" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Minor performance improvement: <code>Converter.create_from_fun()</code> does not generate a new <code>type</code> everytime a converter needs to be created from a callable - now a single class <code>ConverterWithFuncs</code> is used. Fixed <a href="https://github.com/smarie/python-pyfields/issues/32">#32</a>. </li>

@@ -278,6 +278,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#read-only-fields" class="md-nav__link">
+    Read-only fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#type-validation" class="md-nav__link">
     Type validation
   </a>
@@ -501,6 +508,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#read-only-fields" class="md-nav__link">
+    Read-only fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#type-validation" class="md-nav__link">
     Type validation
   </a>
@@ -677,6 +691,10 @@
 
 
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">compliance with python 2's old-style classes</p>
+<p>All examples below assume python 3 and therefore show new-style classes without explicit inheritance of <code>object</code>, for readability. If you're using python 2 do not forget to explicitly use a new-style class otherwise some features will not be available (the ones where a setter on the field is required: validation, conversion, read-only).</p>
+</div>
 <h3 id="1-defining-a-field">1. Defining a field<a class="headerlink" href="#1-defining-a-field" title="Permanent link">&para;</a></h3>
 <p>A field is defined as a class member using the <code>field()</code> method. The idea (not new) is that you declare in a single place all aspects related to each field. For mandatory fields you do not need to provide any argument. For optional fields, you will typically provide a <code>default</code> value or a <code>default_factory</code> (we will see that later).</p>
 <p>For example let's create a <code>Wall</code> class with one <em>mandatory</em> <code>height</code> and one <em>optional</em> <code>color</code> field:</p>
@@ -768,6 +786,48 @@
 <li><code>copy_field(&lt;field_or_name&gt;)</code> returns a factory that will create copies of the given object field</li>
 <li><code>copy_attr(&lt;attr_name&gt;)</code> returns a factory that will create copies of the given object attribute (not necessary a field)</li>
 </ul>
+<h4 id="read-only-fields">Read-only fields<a class="headerlink" href="#read-only-fields" title="Permanent link">&para;</a></h4>
+<p>You can define fields that can only be set once:</p>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">User</span><span class="p">:</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">u</span> <span class="o">=</span> <span class="n">User</span><span class="p">()</span>
+<span class="n">u</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;john&quot;</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;name: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">u</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="n">u</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;john2&quot;</span>
+</pre></div>
+
+
+<p>yields</p>
+<div class="codehilite"><pre><span></span>name: john
+
+pyfields.core.ReadOnlyFieldError: 
+   Read-only field <span class="s1">&#39;&lt;...&gt;.User.name&#39;</span> has already been initialized on instance 
+   &lt;&lt;...&gt;.User object at 0x000001CA70FA25F8&gt; and cannot be modified anymore.
+</pre></div>
+
+
+<p>Of course this makes more sense when an appropriate constructor is defined on the class as we'll see <a href="#2-adding-a-constructor">below</a>, but it also works independently.</p>
+<p>Optional fields can also be "read-only" of course. But remember that in that case, <strong>reading</strong> the field on a brand new object will assign it to its default value - therefore is will not modifiable anymore:</p>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">User</span><span class="p">:</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;dummy&quot;</span><span class="p">)</span>
+
+<span class="n">u</span> <span class="o">=</span> <span class="n">User</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;name: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">u</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="n">u</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;john&quot;</span>
+</pre></div>
+
+
+<p>yields</p>
+<div class="codehilite"><pre><span></span>name: dummy
+
+pyfields.core.ReadOnlyFieldError: 
+   Read-only field <span class="s1">&#39;&lt;...&gt;.User.name&#39;</span> has already been initialized on instance 
+   &lt;&lt;...&gt;.User object at 0x000001ED05E22CC0&gt; and cannot be modified anymore.
+</pre></div>
+
+
+<p>In practice if you have your own constructor or if you generate one using the methods <a href="#2-adding-a-constructor">below</a>, it will work without problem. But when debugging your constructor with an IDE that automatically calls "repr" on your object you might have to remember it and take extra care.</p>
 <h4 id="type-validation">Type validation<a class="headerlink" href="#type-validation" title="Permanent link">&para;</a></h4>
 <p>You can add type validation to a field by setting <code>check_type=True</code>.</p>
 <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
@@ -903,7 +963,7 @@
 </ul>
 <p>For example</p>
 <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span>
-<span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
     <span class="n">f</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">converters</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">g</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">converters</span><span class="o">=</span><span class="p">{</span><span class="nb">str</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> 
                                          <span class="s1">&#39;*&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">})</span>
@@ -913,7 +973,7 @@
 <p>When a new value is set on a field, all of its converters are first scanned in order. Everytime a converter accepts a value, it is applied to convert it. The process stops at the first successful conversion, or after all converters have been tried. The obtained value (either the original one or the converted one) is then passed as usual to the validators (see previous section).</p>
 <p>As for validators, you can easily define converters using a decorator <code>@&lt;field&gt;.converter</code>. As for all converters, the signature of the decorated function should be either <code>(value)</code>, <code>(obj/self, value)</code>, or <code>(obj/self, field, value)</code>.</p>
 <p>Several such decorators can be applied on the same function, so as to mutualize implementation. In that case, you might wish to use the signature with 3 arguments so as to easily debug which field is being validated:</p>
-<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">check_type</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
     <span class="n">m2</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">check_type</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 
@@ -1115,7 +1175,7 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 <h3 id="3-misc">3. Misc.<a class="headerlink" href="#3-misc" title="Permanent link">&para;</a></h3>
 <h4 id="slots">Slots<a class="headerlink" href="#slots" title="Permanent link">&para;</a></h4>
 <p>You can use <code>pyfields</code> if your class has <code>__slots__</code>. You will simply have to use an underscore in the slot name corresponding to a field: <code>_&lt;field_name&gt;</code>. For example:</p>
-<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">WithSlots</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">WithSlots</span><span class="p">:</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;_a&#39;</span><span class="p">,)</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
 </pre></div>
