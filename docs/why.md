@@ -25,6 +25,8 @@ In parallel I discovered a few libraries oriented towards data modelling and ser
 
  - [`colander`](https://docs.pylonsproject.org/projects/colander/en/latest/)
 
+ - [`django` forms](https://docs.djangoproject.com/en/2.2/ref/forms/api/#django.forms.Form)
+
 This topic was left aside for a moment, until half 2019 where I thought that I had accumulated enough python expertise (with [`makefun`](https://smarie.github.io/python-makefun/), [`decopatch`](https://smarie.github.io/python-decopatch/) and [many pytest libraries](https://github.com/smarie/ALL_OF_THE_ABOVE#python)) to have a fresh look on it. In the meantime I had discovered:
 
  - [`traitlets`](https://traitlets.readthedocs.io/en/stable/) which provides a quite elegant way to define typed fields and define validation, but requires the classes to inherit from `HasTraits`, and does not allow users to define converters.
@@ -33,8 +35,10 @@ This topic was left aside for a moment, until half 2019 where I thought that I h
  
  - werkzeug's [`@cached_property`](https://werkzeug.palletsprojects.com/en/0.15.x/utils/#werkzeug.utils.cached_property) and sagemath's [`@lazy_attribute`](http://doc.sagemath.org/html/en/reference/misc/sage/misc/lazy_attribute.html), that both rely on the descriptor protocol to define class fields, but lack compacity
 
- - [`zopeinterface`](https://zopeinterface.readthedocs.io/en/latest/README.html), targeting definition of strict interfaces (but including attributes in their definition)
+ - [`zopeinterface`](https://zopeinterface.readthedocs.io/en/latest/README.html), targeting definition of strict interfaces (but including attributes in their definition). It also defines the concept of "invariants"
   
  - [`pydantic`](https://pydantic-docs.helpmanual.io/) embraces python 3.6+ type hints (that can be defined on class attributes). It is quite elegant, is compliant with `dataclasses`, and supports validators that can act on single or multiple fields. It requires classes to inherit from a `BaseModel`. It does not seem to support converters as of version 0.32, rather, some type conversion happens behind the scenes (see for example [this issue](https://github.com/samuelcolvin/pydantic/issues/453)). But it looks definitely promising.
+
+ - [`trellis`](http://peak.telecommunity.com/DevCenter/Trellis) which provides an event-driven framework for class attributes with linked effects
 
 I was still not satisfied by the landscape :(. So I wrote this alternative, maybe it can fit in *some* use cases ! Do not hesitate to provide feedback in the issues page.
