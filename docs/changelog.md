@@ -1,5 +1,10 @@
 # Changelog
 
+### 0.12.0 - Minor improvements
+
+ - Now all type validation errors are `FieldTypeError`. Fixed [#40](https://github.com/smarie/python-pyfields/issues/40).
+ - Fixed bug with python < 3.6 where fields were not automatically attached to their class when used from within a subclass first. Fixed [#41](https://github.com/smarie/python-pyfields/issues/41)
+
 ### 0.11.0 - Better initialization orders in generated `__init__`
 
 Fixed fields initialization order in generated constructor methods:
