@@ -14,7 +14,7 @@ from valid8.base import InvalidValue
 from valid8.validation_lib import non_empty, Empty
 
 from pyfields import field, MandatoryFieldInitError, UnsupportedOnNativeFieldError, \
-    copy_value, copy_field, Converter, Field, ConversionError, ReadOnlyFieldError
+    copy_value, copy_field, Converter, Field, ConversionError, ReadOnlyFieldError, FieldTypeError
 
 
 @pytest.mark.parametrize('write_before_reading', [False, True], ids="write_before_reading={}".format)
@@ -166,7 +166,7 @@ def test_type():
 
     o = Foo()
     o.f = 'hello'
-    with pytest.raises(TypeError) as exc_info:
+    with pytest.raises(FieldTypeError) as exc_info:
         o.f = 1
 
     if sys.version_info < (3, 0):
@@ -187,11 +187,11 @@ def test_type_multiple_tuple():
     o = Foo()
     o.f = 'hello'
     o.f = 1
-    with pytest.raises(TypeError) as exc_info:
+    with pytest.raises(FieldTypeError) as exc_info:
         o.f = 1.1
 
     # msg = Value type should be one of ('str', 'int')
-    msg = "Value should be of type (%s, %s)" % (str, int)
+    msg = "Value type should be one of (%s, %s)" % (str, int)
     if sys.version_info < (3, 0):
         qualname = 'pyfields.tests.test_core.Foo.f'
     else:
@@ -212,7 +212,7 @@ def test_type_multiple_typing():
     o = Foo()
     o.f = 'hello'
     o.f = 1
-    with pytest.raises(TypeError) as exc_info:
+    with pytest.raises(FieldTypeError) as exc_info:
         o.f = 1.1
 
     if sys.version_info < (3, 0):

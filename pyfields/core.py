@@ -15,6 +15,8 @@ except ImportError:
 import sentinel
 
 from valid8 import ValidationFailure
+
+from pyfields.typing_utils import assert_is_of_type, FieldTypeError
 from pyfields.validate_n_convert import FieldValidator, make_converters_list, trace_convert
 
 try:  # python 3.5+
@@ -31,14 +33,9 @@ try:  # python 3.5+
 except ImportError:
     use_type_hints = False
 
-try:  # very minimal way to check if typing it available, for runtime type checking
-    # noinspection PyUnresolvedReferences
-    from typing import Tuple
-    # noinspection PyUnresolvedReferences
-    from .typing_utils import assert_is_of_type
-    USE_ADVANCED_TYPE_CHECKER = True
-except ImportError:
-    USE_ADVANCED_TYPE_CHECKER = False
+
+USE_ADVANCED_TYPE_CHECKER = assert_is_of_type is not None
+
 
 PY36 = sys.version_info >= (3, 6)
 if PY36:
@@ -446,8 +443,8 @@ class Field(object):
         >>> o.m = 1.5  # doctest: +NORMALIZE_WHITESPACE
         Traceback (most recent call last):
         ...
-        TypeError: Invalid value type provided for 'Foo.m'. Value should be of type <class 'int'>.
-          Instead, received a 'float': 1.5
+        pyfields.typing_utils.FieldTypeError: Invalid value type provided for 'Foo.m'. Value should be of type
+          <class 'int'>. Instead, received a 'float': 1.5
 
         :param _decorated_fun: internal, the decorated function. Do not fill this argument!
         :param accepts: a `<validation_callable>`, an `<accepted_type>` or a wildcard (`'*'` or `None`) defining on
@@ -556,7 +553,7 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
     `type_hint` explicitly is mostly useful if you are running python < 3.6 and wish to use type validation, see below.
 
     By default `check_type` is `False`. This means that the above mentioned `type_hint` is just a hint. If you set
-    `check_type=True` the type declared in the type hint will be validated, and a `TypeError` will be raised if
+    `check_type=True` the type declared in the type hint will be validated, and a `FieldTypeError` will be raised if
     provided values are invalid. Important: if you are running python < 3.6 you have to set the type hint explicitly
     using `type_hint` if you wish to set `check_type=True`, otherwise you will get an exception. Indeed type comments
     can not be collected by the code.
@@ -614,7 +611,7 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
     >>> o.mt = '1'
     Traceback (most recent call last):
         ...
-    TypeError: Invalid value type ...
+    pyfields.typing_utils.FieldTypeError: Invalid value type ...
 
     Limitations
     -----------
@@ -972,27 +969,10 @@ class DescriptorField(Field):
 
             if USE_ADVANCED_TYPE_CHECKER:
                 # take into account all the subtleties from `typing` module by relying on 3d party providers.
-                assert_is_of_type(self.qualname, value, t)
+                assert_is_of_type(self, value, t)
 
             elif not isinstance(value, t):
-                # representing the object might fail, protect ourselves
-                # noinspection PyBroadException
-                try:
-                    val_repr = repr(value)
-                except Exception as e:
-                    val_repr = "<error while trying to represent object: %s>" % e
-
-                # detail error message
-                # noinspection PyBroadException
-                try:
-                    # tuple or iterable of types ?
-                    sub_msg = "Value type should be one of (%s)" % ', '.join(("%s" % _t for _t in t))
-                except:  # noqa E722
-                    # single type
-                    sub_msg = "Value should be of type %s" % (t, )
-
-                raise TypeError("Invalid value type provided for '%s'. %s. Instead, received a '%s': %s"
-                                % (self.qualname, sub_msg, value.__class__.__name__, val_repr))
+                raise FieldTypeError(self, value, t)
 
         # run the validators
         if self.root_validator is not None:
