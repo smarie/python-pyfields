@@ -1086,12 +1086,14 @@ def collect_all_fields(cls,
 
 
 def fix_fields(cls,                 # type: Type[Any]
+               include_inherited=True,  # type: bool
                fix_type_hints=PY36  # type: bool
                ):
     """
     Fixes all field names and type hints at once on the given class
 
     :param cls:
+    :param include_inherited: should the fields be looked for in parent classes following the mro. Default = True
     :param fix_type_hints:
     :return:
     """
@@ -1100,28 +1102,38 @@ def fix_fields(cls,                 # type: Type[Any]
     else:
         cls_type_hints = None
 
-    for member_name, member in vars(cls).items():
-        if not member_name.startswith('__'):
-            try:
-                member = getattr(cls, member_name)
-                if isinstance(member, Field):
-                    # do the same than in __set_name__
-                    member.set_as_cls_member(cls, member_name, cls_type_hints)
+    where_cls = getmro(cls) if include_inherited else (cls, )
 
+    for _cls in where_cls:
+        for member_name, member in vars(_cls).items():
+            # if not member_name.startswith('__'):   not stated in the doc: too dangerous to have such implicit filter
+            try:
+                member = getattr(_cls, member_name)
             except ClassFieldAccessError as e:
-                e.field.name = member_name
+                # we know it is a field :)
+                _is_field = True
+                member = e.field
+            else:
+                # it is a field if instance of Field
+                _is_field = isinstance(member, Field)
+
+            if _is_field:
+                # do the same than in __set_name__
+                member.set_as_cls_member(_cls, member_name, cls_type_hints)
 
 
 # noinspection PyShadowingNames
-def fix_field(cls,                 # type: Type[Any]
-              field,               # type: Field
-              fix_type_hints=PY36  # type: bool
+def fix_field(cls,                     # type: Type[Any]
+              field,                   # type: Field
+              include_inherited=True,  # type: bool
+              fix_type_hints=PY36      # type: bool
               ):
     """
     Fixes the given field name and type hint on the given class
 
     :param cls:
     :param field:
+    :param include_inherited: should the field be looked for in parent classes following the mro. Default = True
     :param fix_type_hints:
     :return:
     """
@@ -1130,13 +1142,23 @@ def fix_field(cls,                 # type: Type[Any]
     else:
         cls_type_hints = None
 
-    for member_name, member in vars(cls).items():
-        if not member_name.startswith('__'):
+    where_cls = getmro(cls) if include_inherited else (cls, )
+
+    found = False
+    for _cls in where_cls:
+        for member_name, member in vars(_cls).items():
+            # if not member_name.startswith('__'):   not stated in the doc: too dangerous to have such implicit filter
             if member is field:
                 # do the same than in __set_name__
-                field.set_as_cls_member(cls, member_name, cls_type_hints)
+                field.set_as_cls_member(_cls, member_name, cls_type_hints)
                 # found: no need to look further
+                found = True
                 break
+        if found:
+            break
+    else:
+        raise ValueError("field %s was not found on class %s%s"
+                         % (field, cls, 'or its ancestors' if include_inherited else ''))
 
 
 def pop_kwargs(kwargs,

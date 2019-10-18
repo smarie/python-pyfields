@@ -603,3 +603,21 @@ def test_converters(format, nbargs, validator_return_none):
         assert str(exc_info.value) == """Unable to convert value 1. Results:
  - Converter '%s': %s
 """ % (c_name, c_error_details)
+
+
+def test_inheritance():
+    """Makes sure that fields from parent classes are automatically fixed on old python versions.
+    See https://github.com/smarie/python-pyfields/issues/41
+    """
+
+    class A(object):
+        a = field(default='hello')
+
+    class B(A):
+        pass
+
+    b = B()
+    assert b.a == 'hello'  # first access should have fixed the field name
+
+    # make sure that for all python versions (especially 2 and 3.5) the name is now ok.
+    assert A.__dict__['a'].name == 'a'
