@@ -329,6 +329,9 @@
 <li>
 <p><a href="https://docs.pylonsproject.org/projects/colander/en/latest/"><code>colander</code></a></p>
 </li>
+<li>
+<p><a href="https://docs.djangoproject.com/en/2.2/ref/forms/api/#django.forms.Form"><code>django</code> forms</a></p>
+</li>
 </ul>
 <p>This topic was left aside for a moment, until half 2019 where I thought that I had accumulated enough python expertise (with <a href="https://smarie.github.io/python-makefun/"><code>makefun</code></a>, <a href="https://smarie.github.io/python-decopatch/"><code>decopatch</code></a> and <a href="https://github.com/smarie/ALL_OF_THE_ABOVE#python">many pytest libraries</a>) to have a fresh look on it. In the meantime I had discovered:</p>
 <ul>
@@ -342,10 +345,13 @@
 <p>werkzeug's <a href="https://werkzeug.palletsprojects.com/en/0.15.x/utils/#werkzeug.utils.cached_property"><code>@cached_property</code></a> and sagemath's <a href="http://doc.sagemath.org/html/en/reference/misc/sage/misc/lazy_attribute.html"><code>@lazy_attribute</code></a>, that both rely on the descriptor protocol to define class fields, but lack compacity</p>
 </li>
 <li>
-<p><a href="https://zopeinterface.readthedocs.io/en/latest/README.html"><code>zopeinterface</code></a>, targeting definition of strict interfaces (but including attributes in their definition)</p>
+<p><a href="https://zopeinterface.readthedocs.io/en/latest/README.html"><code>zopeinterface</code></a>, targeting definition of strict interfaces (but including attributes in their definition). It also defines the concept of "invariants"</p>
 </li>
 <li>
 <p><a href="https://pydantic-docs.helpmanual.io/"><code>pydantic</code></a> embraces python 3.6+ type hints (that can be defined on class attributes). It is quite elegant, is compliant with <code>dataclasses</code>, and supports validators that can act on single or multiple fields. It requires classes to inherit from a <code>BaseModel</code>. It does not seem to support converters as of version 0.32, rather, some type conversion happens behind the scenes (see for example <a href="https://github.com/samuelcolvin/pydantic/issues/453">this issue</a>). But it looks definitely promising.</p>
+</li>
+<li>
+<p><a href="http://peak.telecommunity.com/DevCenter/Trellis"><code>trellis</code></a> which provides an event-driven framework for class attributes with linked effects</p>
 </li>
 </ul>
 <p>I was still not satisfied by the landscape :(. So I wrote this alternative, maybe it can fit in <em>some</em> use cases ! Do not hesitate to provide feedback in the issues page.</p>
