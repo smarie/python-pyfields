@@ -108,13 +108,23 @@ EMPTY = sentinel.create('empty')
 USE_FACTORY = sentinel.create('use_factory')
 _unset = sentinel.create('_unset')
 
+if not PY36:
+    # a thread-safe lock for the global instance counter
+    from threading import Lock
+    threadLock = Lock()
+
 
 class Field(object):
     """
     Base class for fields
     """
-    __slots__ = '__weakref__', 'is_mandatory', 'default', 'is_default_factory', 'name', 'type_hint', 'doc', \
-                'owner_cls', 'pending_validators', 'pending_converters'
+    __slots__ = ('__weakref__', 'is_mandatory', 'default', 'is_default_factory', 'name', 'type_hint', 'doc',
+                 'owner_cls', 'pending_validators', 'pending_converters')
+    if not PY36:
+        # we need to count the instances created, so as to be able to track their order in classes
+        # indeed in python < 3.6, class members are not sorted by order of appearance.
+        __slots__ += ('__fieldinstcount__', )
+        __field_global_inst_counter__ = 0
 
     def __init__(self,
                  default=EMPTY,         # type: T
@@ -124,6 +134,12 @@ class Field(object):
                  name=None              # type: str
                  ):
         """See help(field) for details"""
+
+        if not PY36:
+            with threadLock:
+                # remember the instance creation number, and increment the counter
+                self.__fieldinstcount__ = Field.__field_global_inst_counter__
+                Field.__field_global_inst_counter__ += 1
 
         # default
         if default_factory is not None:
@@ -1018,21 +1034,42 @@ def collect_all_fields(cls,
     names = set()
     result = []
 
+    # list the classes where we should be looking for fields
     if include_inherited:
-        where = ordered_dir(cls, ancestors_first=ancestors_first)
+        where_cls = reversed(getmro(cls)) if ancestors_first else getmro(cls)
     else:
-        where = vars(cls)
+        where_cls = (cls, )
 
+    # optionally fix the type hints
     if auto_fix_fields and PY36:
         cls_type_hints = get_type_hints(cls)
     else:
         cls_type_hints = None
 
-    for member_name in where:
-        if not member_name.startswith('__'):
-            try:
-                member = getattr(cls, member_name)
-                if isinstance(member, Field):
+    # finally for each class, gather all fields in order
+    for _cls in where_cls:
+        # in python < 3.6 we'll need to sort the fields at the end as class member order is not preserved
+        if not PY36:
+            res_for_cls = []
+        else:
+            res_for_cls = result
+
+        for member_name in vars(_cls):
+            # if not member_name.startswith('__'):   not stated in the doc: too dangerous to have such implicit filter
+
+            # avoid infinite recursion as this method is called in the descriptor for __init__
+            if not member_name == '__init__':
+                try:
+                    member = getattr(cls, member_name)
+                except ClassFieldAccessError as e:
+                    # we know it is a field :)
+                    _is_field = True
+                    member = e.field
+                else:
+                    # it is a field if instance of Field
+                    _is_field = isinstance(member, Field)
+
+                if _is_field:
                     if auto_fix_fields:
                         # take this opportunity to set the name and type hints
                         member.set_as_cls_member(cls, member_name, cls_type_hints)
@@ -1041,39 +1078,31 @@ def collect_all_fields(cls,
                             continue
                         else:
                             names.add(member_name)
+                    res_for_cls.append(member)
 
-                    result.append(member)
-            except ClassFieldAccessError as e:
-                # we know it is a field :)
-                if auto_fix_fields:
-                    # take this opportunity to set the name
-                    e.field.set_as_cls_member(cls, member_name, cls_type_hints)
-                if remove_duplicates:
-                    if member_name in names:
-                        continue
-                    else:
-                        names.add(member_name)
-
-                result.append(e.field)
+        if not PY36:
+            # order is random in python < 3.6 - we need to explicitly sort according to instance creation number
+            res_for_cls.sort(key=lambda f: f.__fieldinstcount__)
+            result += res_for_cls
 
     return result
 
 
-def ordered_dir(cls,
-                ancestors_first=False  # type: bool
-                ):
-    """
-    since `dir` does not preserve order, lets have our own implementation
-
-    :param cls:
-    :param ancestors_first:
-    :return:
-    """
-    classes = reversed(getmro(cls)) if ancestors_first else getmro(cls)
-
-    for _cls in classes:
-        for k in vars(_cls):
-            yield k
+# def ordered_dir(cls,
+#                 ancestors_first=False  # type: bool
+#                 ):
+#     """
+#     since `dir` does not preserve order, lets have our own implementation
+#
+#     :param cls:
+#     :param ancestors_first:
+#     :return:
+#     """
+#     classes = reversed(getmro(cls)) if ancestors_first else getmro(cls)
+#
+#     for _cls in classes:
+#         for k in vars(_cls):
+#             yield k
 
 
 def fix_fields(cls,                 # type: Type[Any]

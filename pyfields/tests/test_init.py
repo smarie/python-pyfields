@@ -133,7 +133,7 @@ def test_init_partial_fields():
 
 
 def test_init_order():
-    """"""
+    """Tests that order of initialization is the same than order of definition in the class"""
 
     class C(object):
         y = field()
