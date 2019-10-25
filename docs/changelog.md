@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.13.0 - `nonable` fields
+
+ - Fields can now be `nonable`, so as to bypass type and value validation when `None` is received. Fixed [#44](https://github.com/smarie/python-pyfields/issues/44)
+
 ### 0.12.0 - Minor improvements
 
  - Now all type validation errors are `FieldTypeError`. Fixed [#40](https://github.com/smarie/python-pyfields/issues/40).
