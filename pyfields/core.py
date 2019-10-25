@@ -671,6 +671,45 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
     :return:
     """
     # Should we create a Native or a Descriptor field ?
+    create_descriptor = _descriptor_needed(check_type, validators, converters, read_only, native)
+
+    # Create the correct type of field
+    if create_descriptor:
+        return DescriptorField(type_hint=type_hint, default=default, default_factory=default_factory,
+                               check_type=check_type, validators=validators, converters=converters,
+                               read_only=read_only, doc=doc, name=name)
+    else:
+        return NativeField(type_hint=type_hint, default=default, default_factory=default_factory,
+                           doc=doc, name=name)
+
+
+def classfield(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
+               check_type=False,      # type: bool
+               default=EMPTY,         # type: T
+               default_factory=None,  # type: Callable[[], T]
+               validators=None,       # type: Validators
+               converters=None,       # type: Converters
+               read_only=False,       # type: bool
+               doc=None,              # type: str
+               name=None,             # type: str
+               native=None            # type: bool
+               ):
+    # type: (...) -> Union[T, Field]
+    # Should we create a Native or a Descriptor field ?
+    create_descriptor = _descriptor_needed(check_type, validators, converters, read_only, native)
+
+    # Create the correct type of field
+    if create_descriptor:
+        return DescriptorClassField(type_hint=type_hint, default=default, default_factory=default_factory,
+                                    check_type=check_type, validators=validators, converters=converters,
+                                    read_only=read_only, doc=doc, name=name)
+    else:
+        return NativeClassField(type_hint=type_hint, default=default, default_factory=default_factory,
+                                doc=doc, name=name)
+
+
+def _descriptor_needed(check_type, validators, converters, read_only, native):
+    """ Should we create a Native or a Descriptor field ? """
     if native is None:
         # default: choose automatically according to user-provided options
         create_descriptor = check_type or (validators is not None) or (converters is not None) or read_only
@@ -687,15 +726,7 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
         else:
             # explicit `native=False`. Force-use a descriptor
             create_descriptor = True
-
-    # Create the correct type of field
-    if create_descriptor:
-        return DescriptorField(type_hint=type_hint, default=default, default_factory=default_factory,
-                               check_type=check_type, validators=validators, converters=converters,
-                               read_only=read_only, doc=doc, name=name)
-    else:
-        return NativeField(type_hint=type_hint, default=default, default_factory=default_factory,
-                           doc=doc, name=name)
+    return create_descriptor
 
 
 class UnsupportedOnNativeFieldError(FieldError):
@@ -777,6 +808,18 @@ class NativeField(Field):
     #         # silently ignore: the field has not been set on that object yet,
     #         # and we wont delete the class `field` anyway...
     #         pass
+
+
+class NativeClassField(NativeField):
+    """
+    A field that is replaced with a native python attribute on first read or write access.
+    Faster but provides not much flexibility (no validator, no type check, no converter)
+    """
+    __slots__ = ()
+
+    def __get__(self, obj, obj_type):
+        # same than super but it acts on the object type
+        return super(NativeClassField, self).__get__(obj_type, obj_type)
 
 
 class DescriptorField(Field):
@@ -991,6 +1034,25 @@ class DescriptorField(Field):
     def __delete__(self, obj):
         # private_name = "_" + self.name
         delattr(obj, "_" + self.name)
+
+
+class DescriptorClassField(DescriptorField):
+    """
+    A field that is replaced with a native python attribute on first read or write access.
+    Faster but provides not much flexibility (no validator, no type check, no converter)
+    """
+    __slots__ = ()
+
+    def __get__(self, obj, obj_type):
+        # same than super but it acts on the object type
+        return super(DescriptorClassField, self).__get__(obj_type, obj_type)
+
+    def __set__(self,
+                obj,
+                value  # type: T
+                ):
+        # same than super but it acts on the object type
+        return super(DescriptorClassField, self).__set__(obj.__class__, value)
 
 
 def collect_all_fields(cls,
