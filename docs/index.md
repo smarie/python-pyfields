@@ -220,6 +220,28 @@ By default the type used for validation is the one provided in the annotation. I
 !!! success "PEP484 `typing` support"
     Now type hints relying on the `typing` module (PEP484) are correctly checked using whatever 3d party type checking library is available (`typeguard` is first looked for, then `pytypes` as a fallback). If none of these providers are available, a fallback implementation is provided, basically flattening `Union`s and replacing `TypeVar`s before doing `is_instance`. It is not guaranteed to support all `typing` subtleties.
 
+#### Nonable fields
+
+**Definition**
+
+A *nonable* field is a field that can be set to `None`. It can be mandatory, or optional. By default, `pyfields` tries to guess if a field is *nonable* :
+
+ - if a type hint is provided and it is PEP484 `typing.Optional[...]`, then this explicitly means that the fields is *nonable*. (Note: the choice of this name `Optional` is terrible but it is like that, see [this discussion](https://github.com/python/typing/issues/275#issuecomment-244736968)
+ 
+ - if the field is optional with a default value of `None`, then this implicitly means that the field is *nonable*. This is not the recommended way anymore but it has the advantage of being compact, so it is supported by `pyfields`.
+
+ - in all other cases, `pyfields` can not really tell and sets the field to *nonable=UNKNOWN*. 
+
+You can override this behaviour by explicitly stating `field(nonable=True)` or `field(nonable=False)`.
+
+See also [this stack overflow answer](https://stackoverflow.com/questions/57390073/how-to-type-check-a-function-in-python3-that-has-an-optional-argument-initially/57390124#57390124).
+
+**Effect**
+
+When a field is known to be *nonable*, all of its type checks and validators are skipped when `None` is received.
+
+When a field is forced explicitly to `nonable=False`, by default nothing happens, this is just declarative. However as soon as the field has type checking or validation activated, then a `NoneError` will be raised when `None` is received.
+
 #### Value validation
 
 You can add value (and type) validation to a field by providing `validators`. `pyfields` relies on `valid8` for validation, so the basic definition of a validation function is the same: it should be a `<callable>` with signature `f(value)`, returning `True` or `None` in case of success. 
