@@ -5,14 +5,14 @@ import timeit
 import pytest
 from valid8 import ValidationError, ValidationFailure
 
-from pyfields import field, MandatoryFieldInitError, make_init, init_fields, ReadOnlyFieldError
+from pyfields import field, MandatoryFieldInitError, make_init, init_fields, ReadOnlyFieldError, NoneError
 
 
 def runs_on_travis():
     return "TRAVIS_PYTHON_VERSION" in os.environ
 
 
-def test_readme_lazy_fields():
+def test_lazy_fields():
 
     class Wall(object):
         height = field(doc="Height of the wall in mm.")           # type: int
@@ -190,14 +190,58 @@ def test_value_validation_advanced(py36_style_type_hints):
     assert "InvalidWidth: should be a multiple of the height (100). Wrong value: 201." in str(exc_info.value)
 
 
-def test_readme_native_descriptors():
+@pytest.mark.parametrize("declaration", ['typing', 'default_value', 'explicit_nonable'], ids="declaration={}".format)
+def test_nonable_fields(declaration):
+    """Tests that nonable fields are supported and correctly handled"""
+
+    if declaration == 'typing':
+        from typing import Optional
+        
+        class Foo(object):
+            a = field(type_hint=Optional[int], check_type=True)
+            b = field(type_hint=Optional[int], validators={'is positive': lambda x: x > 0})
+            c = field(nonable=False, check_type=True)
+            d = field(validators={'accept_all': lambda x: True})
+            e = field(nonable=False)
+
+    elif declaration == 'default_value':
+        class Foo(object):
+            a = field(type_hint=int, default=None, check_type=True)
+            b = field(type_hint=int, default=None, validators={'is positive': lambda x: x > 0})
+            c = field(nonable=False, check_type=True)
+            d = field(validators={'accept_all': lambda x: True})
+            e = field(nonable=False)
+
+    elif declaration == 'explicit_nonable':
+        class Foo(object):
+            a = field(type_hint=int, nonable=True, check_type=True)
+            b = field(type_hint=int, nonable=True, validators={'is positive': lambda x: x > 0})
+            c = field(nonable=False, check_type=True)
+            d = field(validators={'accept_all': lambda x: True})
+            e = field(nonable=False)
+
+    else:
+        raise ValueError(declaration)
+
+    f = Foo()
+    f.a = None
+    f.b = None
+    with pytest.raises(NoneError):
+        f.c = None
+    f.d = None
+    f.e = None
+    assert vars(f) == {'_a': None, '_b': None, '_d': None, 'e': None}
+
+
+def test_native_descriptors():
+    """"""
     class Foo:
         a = field()
         b = field(native=False)
 
     # TODO change when issue with class level access is fixed
-    a_name = "test_readme_native_descriptors.<locals>.Foo.a" if sys.version_info >= (3, 6) else "<unknown_cls>.None"
-    b_name = "test_readme_native_descriptors.<locals>.Foo.b" if sys.version_info >= (3, 6) else "<unknown_cls>.None"
+    a_name = "test_native_descriptors.<locals>.Foo.a" if sys.version_info >= (3, 6) else "<unknown_cls>.None"
+    b_name = "test_native_descriptors.<locals>.Foo.b" if sys.version_info >= (3, 6) else "<unknown_cls>.None"
     assert repr(Foo.__dict__['a']) == "<NativeField: %s>" % a_name
     assert repr(Foo.__dict__['b']) == "<DescriptorField: %s>" % b_name
 
@@ -236,7 +280,7 @@ def test_readme_native_descriptors():
 #     return fman, fexp
 
 
-def test_readme_make_init_full_defaults():
+def test_make_init_full_defaults():
     class Wall:
         height = field(doc="Height of the wall in mm.")           # type: int
         color = field(default='white', doc="Color of the wall.")  # type: str
@@ -255,7 +299,7 @@ def test_readme_make_init_full_defaults():
     assert vars(w) == {'color': 'blue', 'height': 12}
 
 
-def test_readme_make_init_with_explicit_list():
+def test_make_init_with_explicit_list():
     class Wall:
         height = field(doc="Height of the wall in mm.")  # type: int
         color = field(default='white', doc="Color of the wall.")  # type: str
@@ -268,7 +312,7 @@ def test_readme_make_init_with_explicit_list():
     assert str(exc_info.value).startswith("__init__()")
 
 
-def test_readme_make_init_with_inheritance():
+def test_make_init_with_inheritance():
     class Wall:
         height = field(doc="Height of the wall in mm.")  # type: int
         __init__ = make_init(height)
@@ -284,7 +328,7 @@ def test_readme_make_init_with_inheritance():
     assert vars(w) == {'color': 'blue', 'height': 12}
 
 
-def test_readme_make_init_callback():
+def test_make_init_callback():
     class Wall:
         height = field(doc="Height of the wall in mm.")  # type: int
         color = field(default='white', doc="Color of the wall.")  # type: str
@@ -305,7 +349,7 @@ def test_readme_make_init_callback():
     assert vars(w) == {'color': 'white', 'height': 1, 'non_field_attr': 'hey'}
 
 
-def test_readme_init_fields():
+def test_init_fields():
     class Wall:
         height = field(doc="Height of the wall in mm.")  # type: int
         color = field(default='white', doc="Color of the wall.")  # type: str

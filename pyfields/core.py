@@ -3,6 +3,7 @@
 #  Copyright (c) Schneider Electric Industries, 2019. All right reserved.
 
 import sys
+from enum import Enum
 from textwrap import dedent
 from inspect import getmro
 
@@ -12,9 +13,7 @@ except ImportError:
     # noinspection PyUnresolvedReferences,PyPackageRequirements
     from funcsigs import signature, Parameter
 
-import sentinel
-
-from valid8 import ValidationFailure
+from valid8 import ValidationFailure, is_pep484_nonable
 
 from pyfields.typing_utils import assert_is_of_type, FieldTypeError
 from pyfields.validate_n_convert import FieldValidator, make_converters_list, trace_convert
@@ -100,10 +99,41 @@ class ReadOnlyFieldError(FieldError):
                % (self.field_name, self.obj)
 
 
-# a few symbols used in `fields`
-EMPTY = sentinel.create('empty')
-USE_FACTORY = sentinel.create('use_factory')
-_unset = sentinel.create('_unset')
+class Symbols(Enum):
+    """
+    A few symbols used in `fields` for signatures
+
+    note: we used to use the great `sentinel` package to create these symbols one by one, but since we have
+    now quite a number of symbols, it seemed overkill to create one anonymous class for each.
+
+    Still, I am not sure if this made a perf difference actually.
+    """
+    GUESS = 0
+    UNKNOWN = 1
+    EMPTY = 2
+    USE_FACTORY = 3
+    _unset = 4
+
+    def __repr__(self):
+        """ More compact representation for signatures readability"""
+        return self.name
+
+
+# GUESS = sentinel.create('guess')
+GUESS = Symbols.GUESS
+
+# UNKNOWN = sentinel.create('unknown')
+UNKNOWN = Symbols.UNKNOWN
+
+# EMPTY = sentinel.create('empty')
+EMPTY = Symbols.EMPTY
+
+# USE_FACTORY = sentinel.create('use_factory')
+USE_FACTORY = Symbols.USE_FACTORY
+
+# _unset = sentinel.create('_unset')
+_unset = Symbols._unset
+
 
 if not PY36:
     # a thread-safe lock for the global instance counter
@@ -115,7 +145,7 @@ class Field(object):
     """
     Base class for fields
     """
-    __slots__ = ('__weakref__', 'is_mandatory', 'default', 'is_default_factory', 'name', 'type_hint', 'doc',
+    __slots__ = ('__weakref__', 'is_mandatory', 'default', 'is_default_factory', 'name', 'type_hint', 'nonable', 'doc',
                  'owner_cls', 'pending_validators', 'pending_converters')
     if not PY36:
         # we need to count the instances created, so as to be able to track their order in classes
@@ -127,6 +157,7 @@ class Field(object):
                  default=EMPTY,         # type: T
                  default_factory=None,  # type: Callable[[], T]
                  type_hint=EMPTY,       # type: Any
+                 nonable=UNKNOWN,       # type: Union[bool, Symbols]
                  doc=None,              # type: str
                  name=None              # type: str
                  ):
@@ -163,6 +194,21 @@ class Field(object):
             self.type_hint = type_hint
         else:
             self.type_hint = EMPTY
+
+        # nonable
+        if nonable is GUESS:
+            if self.default is None:
+                self.nonable = True
+            elif type_hint is not EMPTY and type_hint is not None:
+                if is_pep484_nonable(type_hint):
+                    self.nonable = True
+                else:
+                    self.nonable = UNKNOWN
+            else:
+                # set as unknown until type hint is set (in set_as_cls_member)
+                self.nonable = UNKNOWN
+        else:
+            self.nonable = nonable
 
         # pending validators and converters
         self.pending_validators = None
@@ -215,6 +261,11 @@ class Field(object):
             if t is not None:
                 # only use type hint if not empty
                 self.type_hint = t
+                # update the 'nonable' status
+                if is_pep484_nonable(t):
+                    self.nonable = True
+                else:
+                    self.nonable = UNKNOWN
 
         # detect a validator or a converter on a native field
         if self.pending_validators is not None or self.pending_converters is not None:
@@ -510,6 +561,7 @@ class Field(object):
 
 
 def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
+          nonable=GUESS,         # type: Union[bool, Type[GUESS]]
           check_type=False,      # type: bool
           default=EMPTY,         # type: T
           default_factory=None,  # type: Callable[[], T]
@@ -566,6 +618,11 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
     Validation
     ----------
     TODO
+
+    Nonable
+    -------
+    TODO
+    see also: https://stackoverflow.com/a/57390124/7262247
 
     Conversion
     ----------
@@ -644,6 +701,17 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
         especially on old python versions because type comments can not be captured. Both a single type or an iterable
         of alternate types (e.g. `(int, str)`) are supported. By default the type hint is just a
         hint and does not contribute to validation. To enable type validation, set `check_type` to `True`.
+    :param nonable: a boolean that can be used to explicitly declare that a field can contain `None`. When this is set
+        to an explicit `True` or `False` value, usual type checking and validation (*if any*) are not anymore executed
+        on `None` values. Instead ; if this is `True`, type checking and validation will be *deactivated* when the field
+        is set to `None` so as to always accept the value. If this is `False`, an `None`error will be raised when `None` is
+        set on the field.
+        When this is left as `GUESS` (default), the behaviour is "automatic". This means that
+         - if the field (a) is optional with default value `None` or (b) has type hint `typing.Optional[]`, the
+           behaviour will be the same as with `nonable=True`.
+         - otherwise, the value will be the same as `nonable=UNKNOWN` and no special behaviour is put in place. `None`
+           values will be treated as any other value. This can be particularly handy if a field accepts `None` ONLY IF
+           another field is set to a special value. This can be done in a custom validator.
     :param check_type: by default (`check_type=False`), the type of a field, provided using PEP484 type hints or
         an explicit `type_hint`, is not validated when you assign a new value to it. You can activate type validation
         by setting `check_type=True`. In that case the field will become a descriptor field.
@@ -690,11 +758,11 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
 
     # Create the correct type of field
     if create_descriptor:
-        return DescriptorField(type_hint=type_hint, default=default, default_factory=default_factory,
+        return DescriptorField(type_hint=type_hint, nonable=nonable, default=default, default_factory=default_factory,
                                check_type=check_type, validators=validators, converters=converters,
                                read_only=read_only, doc=doc, name=name)
     else:
-        return NativeField(type_hint=type_hint, default=default, default_factory=default_factory,
+        return NativeField(type_hint=type_hint, nonable=nonable, default=default, default_factory=default_factory,
                            doc=doc, name=name)
 
 
@@ -779,6 +847,21 @@ class NativeField(Field):
     #         pass
 
 
+class NoneError(TypeError, ValueError, FieldError):
+    """
+    Error raised when `None` is set on an explicitly not-nonable field. It is both a `TypeError` and a `ValueError`.
+    """
+    __slots__ = ('field', )
+
+    def __init__(self, field):
+        super(NoneError, self).__init__()
+        self.field = field
+
+    def __str__(self):
+        return "Received invalid value `None` for '%s'. This field is explicitely declared as non-nonable."\
+               % (self.field.qualname, )
+
+
 class DescriptorField(Field):
     """
     General-purpose implementation for fields that require type-checking or validation or converter
@@ -817,6 +900,7 @@ class DescriptorField(Field):
 
     def __init__(self,
                  type_hint=None,        # type: Type[T]
+                 nonable=UNKNOWN,       # type: Union[bool, Symbols]
                  default=EMPTY,         # type: T
                  default_factory=None,  # type: Callable[[], T]
                  check_type=False,      # type: bool
@@ -827,8 +911,8 @@ class DescriptorField(Field):
                  name=None              # type: str
                  ):
         """See help(field) for details"""
-        super(DescriptorField, self).__init__(type_hint=type_hint, default=default, default_factory=default_factory,
-                                              doc=doc, name=name)
+        super(DescriptorField, self).__init__(type_hint=type_hint, nonable=nonable,
+                                              default=default, default_factory=default_factory, doc=doc, name=name)
 
         # type validation
         self.check_type = check_type
@@ -957,26 +1041,8 @@ class DescriptorField(Field):
 
         # speedup for vars used several time
         t = self.type_hint
+        nonable = self.nonable
         private_name = "_" + self.name
-
-        # check the type
-        if self.check_type:
-            if t is EMPTY:
-                raise ValueError("`check_type` is enabled on field '%s' but no type hint is available. Please provide"
-                                 "type hints or set `field.check_type` to `False`. Note that python code is not able to"
-                                 " read type comments so if you wish to be compliant with python < 3.6 you'll have to"
-                                 "set the type hint explicitly in `field.type_hint` instead")
-
-            if USE_ADVANCED_TYPE_CHECKER:
-                # take into account all the subtleties from `typing` module by relying on 3d party providers.
-                assert_is_of_type(self, value, t)
-
-            elif not isinstance(value, t):
-                raise FieldTypeError(self, value, t)
-
-        # run the validators
-        if self.root_validator is not None:
-            self.root_validator.assert_valid(obj, value)
 
         # read-only check
         if self.read_only:
@@ -984,6 +1050,35 @@ class DescriptorField(Field):
             _v = getattr(obj, private_name, _unset)
             if _v is not _unset:
                 raise ReadOnlyFieldError(self.qualname, obj)
+
+        # type checker and validators
+        if value is not None or nonable is UNKNOWN:
+            # check the type
+            if self.check_type:
+                if t is EMPTY:
+                    raise ValueError("`check_type` is enabled on field '%s' but no type hint is available. Please provide"
+                                     "type hints or set `field.check_type` to `False`. Note that python code is not able to"
+                                     " read type comments so if you wish to be compliant with python < 3.6 you'll have to"
+                                     "set the type hint explicitly in `field.type_hint` instead")
+
+                if USE_ADVANCED_TYPE_CHECKER:
+                    # take into account all the subtleties from `typing` module by relying on 3d party providers.
+                    assert_is_of_type(self, value, t)
+
+                elif not isinstance(value, t):
+                    raise FieldTypeError(self, value, t)
+
+            # run the validators
+            if self.root_validator is not None:
+                self.root_validator.assert_valid(obj, value)
+
+        elif not nonable:
+            # value is None and field is not nonable: raise an error
+            # note: the root validator might not even exist, so do not reuse valid8 none rejecter here
+            raise NoneError(self)
+        # else:
+        #     # value is None and field is nonable: nothing to do
+        #     pass
 
         # set the new value
         setattr(obj, private_name, value)

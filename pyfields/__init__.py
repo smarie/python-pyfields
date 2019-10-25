@@ -1,6 +1,6 @@
 from .typing_utils import FieldTypeError
 from .core import field, Field, FieldError, MandatoryFieldInitError, UnsupportedOnNativeFieldError, \
-    ReadOnlyFieldError
+    ReadOnlyFieldError, NoneError
 from .validate_n_convert import Converter, ConversionError, DetailedConversionResults, trace_convert
 from .init_makers import inject_fields, make_init, init_fields
 from .helpers import copy_value, copy_field, copy_attr
@@ -20,7 +20,7 @@ __all__ = [
     'core', 'validate_n_convert', 'init_makers', 'helpers',
     # symbols
     'field', 'Field', 'FieldError', 'MandatoryFieldInitError', 'UnsupportedOnNativeFieldError',
-    'ReadOnlyFieldError', 'FieldTypeError',
+    'ReadOnlyFieldError', 'FieldTypeError', 'NoneError',
     'Converter', 'ConversionError', 'DetailedConversionResults', 'trace_convert',
     'inject_fields', 'make_init', 'init_fields',
     'copy_value', 'copy_field', 'copy_attr'
