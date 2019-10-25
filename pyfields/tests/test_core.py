@@ -4,6 +4,7 @@
 
 #  Authors: Sylvain Marie <sylvain.marie@se.com>
 #
+import pickle
 import sys
 from collections import OrderedDict
 
@@ -14,7 +15,7 @@ from valid8.base import InvalidValue
 from valid8.validation_lib import non_empty, Empty
 
 from pyfields import field, MandatoryFieldInitError, UnsupportedOnNativeFieldError, \
-    copy_value, copy_field, Converter, Field, ConversionError, ReadOnlyFieldError, FieldTypeError
+    copy_value, copy_field, Converter, Field, ConversionError, ReadOnlyFieldError, FieldTypeError, make_init
 
 
 @pytest.mark.parametrize('write_before_reading', [False, True], ids="write_before_reading={}".format)
@@ -621,3 +622,19 @@ def test_inheritance():
 
     # make sure that for all python versions (especially 2 and 3.5) the name is now ok.
     assert A.__dict__['a'].name == 'a'
+
+
+class Foo(object):
+    a = field(type_hint=int, default=0, check_type=True)
+    b = field(type_hint=int, validators={'is positive': lambda x: x > 0})
+    c = field(default_factory=copy_field(a))
+    __init__ = make_init()
+
+
+def test_pickle():
+    """ Tests that pickle actually works """
+
+    f = Foo(b=1)
+    serialized = pickle.dumps(f)
+    g = pickle.loads(serialized)
+    assert vars(g) == vars(f)
