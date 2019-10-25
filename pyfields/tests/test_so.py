@@ -4,7 +4,8 @@
 
 import pytest
 
-from pyfields import ReadOnlyFieldError
+from pyfields import ReadOnlyFieldError, MandatoryFieldInitError, FieldTypeError
+from pyfields.core import DescriptorClassField
 from valid8 import ValidationError
 
 
@@ -206,3 +207,25 @@ def test_so7():
     qualname = User.__dict__['username'].qualname
     assert str(exc_info.value) == "Read-only field '%s' has already been initialized on instance %s and cannot be " \
                                   "modified anymore." % (qualname, u)
+
+
+def test_so8_classfields():
+    """ checks answer at xxx (todo: not capable of doing this yet) """
+
+    from pyfields import classfield
+
+    class A(object):
+        s = classfield(type_hint=int, check_type=True)
+
+    class ClassFromA(A):
+        pass
+
+    s_field = A.__dict__['s']
+    assert isinstance(s_field, DescriptorClassField)
+
+    for c in (A, ClassFromA):
+        with pytest.raises(MandatoryFieldInitError):
+            print(c.s)
+
+        with pytest.raises(FieldTypeError):
+            c.s = "hello"
