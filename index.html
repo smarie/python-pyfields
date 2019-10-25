@@ -292,6 +292,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#nonable-fields" class="md-nav__link">
+    Nonable fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#value-validation" class="md-nav__link">
     Value validation
   </a>
@@ -517,6 +524,13 @@
           <li class="md-nav__item">
   <a href="#type-validation" class="md-nav__link">
     Type validation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nonable-fields" class="md-nav__link">
+    Nonable fields
   </a>
   
 </li>
@@ -850,6 +864,25 @@ pyfields.core.ReadOnlyFieldError:
 <p class="admonition-title">PEP484 <code>typing</code> support</p>
 <p>Now type hints relying on the <code>typing</code> module (PEP484) are correctly checked using whatever 3d party type checking library is available (<code>typeguard</code> is first looked for, then <code>pytypes</code> as a fallback). If none of these providers are available, a fallback implementation is provided, basically flattening <code>Union</code>s and replacing <code>TypeVar</code>s before doing <code>is_instance</code>. It is not guaranteed to support all <code>typing</code> subtleties.</p>
 </div>
+<h4 id="nonable-fields">Nonable fields<a class="headerlink" href="#nonable-fields" title="Permanent link">&para;</a></h4>
+<p><strong>Definition</strong></p>
+<p>A <em>nonable</em> field is a field that can be set to <code>None</code>. It can be mandatory, or optional. By default, <code>pyfields</code> tries to guess if a field is <em>nonable</em> :</p>
+<ul>
+<li>
+<p>if a type hint is provided and it is PEP484 <code>typing.Optional[...]</code>, then this explicitly means that the fields is <em>nonable</em>. (Note: the choice of this name <code>Optional</code> is terrible but it is like that, see <a href="https://github.com/python/typing/issues/275#issuecomment-244736968">this discussion</a></p>
+</li>
+<li>
+<p>if the field is optional with a default value of <code>None</code>, then this implicitly means that the field is <em>nonable</em>. This is not the recommended way anymore but it has the advantage of being compact, so it is supported by <code>pyfields</code>.</p>
+</li>
+<li>
+<p>in all other cases, <code>pyfields</code> can not really tell and sets the field to <em>nonable=UNKNOWN</em>. </p>
+</li>
+</ul>
+<p>You can override this behaviour by explicitly stating <code>field(nonable=True)</code> or <code>field(nonable=False)</code>.</p>
+<p>See also <a href="https://stackoverflow.com/questions/57390073/how-to-type-check-a-function-in-python3-that-has-an-optional-argument-initially/57390124#57390124">this stack overflow answer</a>.</p>
+<p><strong>Effect</strong></p>
+<p>When a field is known to be <em>nonable</em>, all of its type checks and validators are skipped when <code>None</code> is received.</p>
+<p>When a field is forced explicitly to <code>nonable=False</code>, by default nothing happens, this is just declarative. However as soon as the field has type checking or validation activated, then a <code>NoneError</code> will be raised when <code>None</code> is received.</p>
 <h4 id="value-validation">Value validation<a class="headerlink" href="#value-validation" title="Permanent link">&para;</a></h4>
 <p>You can add value (and type) validation to a field by providing <code>validators</code>. <code>pyfields</code> relies on <code>valid8</code> for validation, so the basic definition of a validation function is the same: it should be a <code>&lt;callable&gt;</code> with signature <code>f(value)</code>, returning <code>True</code> or <code>None</code> in case of success. </p>
 <p>A validator consists in a base validation function, with an optional error message and an optional failure type. To specify all these elements, the supported syntax is the same than in <code>valid8</code>:</p>
