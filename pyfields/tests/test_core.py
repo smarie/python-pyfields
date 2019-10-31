@@ -202,6 +202,14 @@ def test_type_multiple_tuple():
                                   "Instead, received a 'float': 1.1" % (qualname, msg)
 
 
+try:
+    from typing import Optional
+    typing_present = True
+except ImportError:
+    typing_present = False
+
+
+@pytest.mark.skipif(not typing_present, reason="typing module is not present")
 def test_type_multiple_typing():
     """ Tests that when `type_hint` is provided and `validate_type` is explicitly set, it works as expected """
 

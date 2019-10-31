@@ -189,7 +189,14 @@ def test_value_validation_advanced(py36_style_type_hints):
         w.width = 201
     assert "InvalidWidth: should be a multiple of the height (100). Wrong value: 201." in str(exc_info.value)
 
+try:
+    from typing import Optional
+    typing_present = True
+except ImportError:
+    typing_present = False
 
+
+@pytest.mark.skipif(not typing_present, reason="typing module is not present")
 @pytest.mark.parametrize("declaration", ['typing', 'default_value', 'explicit_nonable'], ids="declaration={}".format)
 def test_nonable_fields(declaration):
     """Tests that nonable fields are supported and correctly handled"""
