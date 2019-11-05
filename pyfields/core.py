@@ -785,8 +785,9 @@ class ClassFieldAccessError(FieldError):
         self.field = field
 
     def __str__(self):
-        return "Accessing a `field` from the class is not yet supported. " \
-               "See https://github.com/smarie/python-pyfields/issues/12"
+        return "Accessing a `field` from the class is not yet supported. You can use %s.__dict__['%s'] as a " \
+               "workaround. See https://github.com/smarie/python-pyfields/issues/12" \
+               % (self.field.owner_cls.__name__, self.field.name)
 
 
 class NativeField(Field):
