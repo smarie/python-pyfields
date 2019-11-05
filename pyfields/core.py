@@ -37,9 +37,9 @@ USE_ADVANCED_TYPE_CHECKER = assert_is_of_type is not None
 
 
 PY36 = sys.version_info >= (3, 6)
+get_type_hints = None
 if PY36:
     try:
-        # noinspection PyUnresolvedReferences
         from typing import get_type_hints
     except ImportError:
         pass
@@ -1089,135 +1089,6 @@ class DescriptorField(Field):
         delattr(obj, "_" + self.name)
 
 
-def collect_all_fields(cls,
-                       include_inherited=True,
-                       remove_duplicates=True,
-                       ancestors_first=True,
-                       auto_fix_fields=False
-                       ):
-    """
-    Utility method to collect all fields defined in a class, including all inherited or not.
-    If `auto_set_names` is set to True, all field names will be updated. This can be convenient under python 3.5-
-    where the `__setname__` callback did not exist.
-
-    :param cls:
-    :param auto_fix_fields:
-    :param remove_duplicates:
-    :param ancestors_first:
-    :param include_inherited:
-    :return: a list of fields
-    """
-    names = set()
-    result = []
-
-    # list the classes where we should be looking for fields
-    if include_inherited:
-        where_cls = reversed(getmro(cls)) if ancestors_first else getmro(cls)
-    else:
-        where_cls = (cls, )
-
-    # optionally fix the type hints
-    if auto_fix_fields and PY36:
-        cls_type_hints = get_type_hints(cls)
-    else:
-        cls_type_hints = None
-
-    # finally for each class, gather all fields in order
-    for _cls in where_cls:
-        # in python < 3.6 we'll need to sort the fields at the end as class member order is not preserved
-        if not PY36:
-            res_for_cls = []
-        else:
-            res_for_cls = result
-
-        for member_name in vars(_cls):
-            # if not member_name.startswith('__'):   not stated in the doc: too dangerous to have such implicit filter
-
-            # avoid infinite recursion as this method is called in the descriptor for __init__
-            if not member_name == '__init__':
-                try:
-                    member = getattr(cls, member_name)
-                except ClassFieldAccessError as e:
-                    # we know it is a field :)
-                    _is_field = True
-                    member = e.field
-                else:
-                    # it is a field if instance of Field
-                    _is_field = isinstance(member, Field)
-
-                if _is_field:
-                    if auto_fix_fields:
-                        # take this opportunity to set the name and type hints
-                        member.set_as_cls_member(cls, member_name, cls_type_hints)
-                    if remove_duplicates:
-                        if member_name in names:
-                            continue
-                        else:
-                            names.add(member_name)
-                    res_for_cls.append(member)
-
-        if not PY36:
-            # order is random in python < 3.6 - we need to explicitly sort according to instance creation number
-            res_for_cls.sort(key=lambda f: f.__fieldinstcount__)
-            result += res_for_cls
-
-    return result
-
-
-# def ordered_dir(cls,
-#                 ancestors_first=False  # type: bool
-#                 ):
-#     """
-#     since `dir` does not preserve order, lets have our own implementation
-#
-#     :param cls:
-#     :param ancestors_first:
-#     :return:
-#     """
-#     classes = reversed(getmro(cls)) if ancestors_first else getmro(cls)
-#
-#     for _cls in classes:
-#         for k in vars(_cls):
-#             yield k
-
-
-def fix_fields(cls,                 # type: Type[Any]
-               include_inherited=True,  # type: bool
-               fix_type_hints=PY36  # type: bool
-               ):
-    """
-    Fixes all field names and type hints at once on the given class
-
-    :param cls:
-    :param include_inherited: should the fields be looked for in parent classes following the mro. Default = True
-    :param fix_type_hints:
-    :return:
-    """
-    if fix_type_hints:
-        cls_type_hints = get_type_hints(cls)
-    else:
-        cls_type_hints = None
-
-    where_cls = getmro(cls) if include_inherited else (cls, )
-
-    for _cls in where_cls:
-        for member_name, member in vars(_cls).items():
-            # if not member_name.startswith('__'):   not stated in the doc: too dangerous to have such implicit filter
-            try:
-                member = getattr(_cls, member_name)
-            except ClassFieldAccessError as e:
-                # we know it is a field :)
-                _is_field = True
-                member = e.field
-            else:
-                # it is a field if instance of Field
-                _is_field = isinstance(member, Field)
-
-            if _is_field:
-                # do the same than in __set_name__
-                member.set_as_cls_member(_cls, member_name, cls_type_hints)
-
-
 # noinspection PyShadowingNames
 def fix_field(cls,                     # type: Type[Any]
               field,                   # type: Field
@@ -1255,32 +1126,3 @@ def fix_field(cls,                     # type: Type[Any]
     else:
         raise ValueError("field %s was not found on class %s%s"
                          % (field, cls, 'or its ancestors' if include_inherited else ''))
-
-
-def pop_kwargs(kwargs,
-               names_with_defaults,  # type: List[Tuple[str, Any]]
-               allow_others=False
-               ):
-    """
-    Internal utility method to extract optional arguments from kwargs.
-
-    :param kwargs:
-    :param names_with_defaults:
-    :param allow_others: if False (default) then an error will be raised if kwargs still contains something at the end.
-    :return:
-    """
-    all_arguments = []
-    for name, default_ in names_with_defaults:
-        try:
-            val = kwargs.pop(name)
-        except KeyError:
-            val = default_
-        all_arguments.append(val)
-
-    if not allow_others and len(kwargs) > 0:
-        raise ValueError("Unsupported arguments: %s" % kwargs)
-
-    if len(names_with_defaults) == 1:
-        return all_arguments[0]
-    else:
-        return all_arguments

@@ -21,7 +21,8 @@ except ImportError:
 
 from makefun import wraps, with_signature
 
-from pyfields.core import collect_all_fields, PY36, USE_FACTORY, EMPTY, Field, pop_kwargs
+from pyfields.core import PY36, USE_FACTORY, EMPTY, Field
+from pyfields.helpers import get_fields
 
 
 def init_fields(*fields,   # type: Union[Field, Any]
@@ -276,12 +277,12 @@ class InitDescriptor(object):
             fields = self.fields
             if fields is None or len(fields) == 0:
                 # fields have not been provided explicitly, collect them all.
-                fields = collect_all_fields(objtype, include_inherited=True, ancestors_first=True,
-                                            auto_fix_fields=not PY36)
+                fields = get_fields(objtype, include_inherited=True, ancestors_first=True,
+                                    _auto_fix_fields=not PY36)
             elif not PY36:
                 # take this opportunity to apply all field names including inherited
                 # TODO set back inherited = False when the bug with class-level access is solved -> make_init will be ok
-                collect_all_fields(objtype, include_inherited=True, ancestors_first=True, auto_fix_fields=True)
+                get_fields(objtype, include_inherited=True, ancestors_first=True, _auto_fix_fields=True)
 
             # create the init method
             new_init = create_init(fields=fields, inject_fields=self.user_init_is_injected,
@@ -503,3 +504,32 @@ def _insert_fields_at_position(fields_to_insert,
     field_names.reverse()
 
     return field_names, last_mandatory_idx
+
+
+def pop_kwargs(kwargs,
+               names_with_defaults,  # type: List[Tuple[str, Any]]
+               allow_others=False
+               ):
+    """
+    Internal utility method to extract optional arguments from kwargs.
+
+    :param kwargs:
+    :param names_with_defaults:
+    :param allow_others: if False (default) then an error will be raised if kwargs still contains something at the end.
+    :return:
+    """
+    all_arguments = []
+    for name, default_ in names_with_defaults:
+        try:
+            val = kwargs.pop(name)
+        except KeyError:
+            val = default_
+        all_arguments.append(val)
+
+    if not allow_others and len(kwargs) > 0:
+        raise ValueError("Unsupported arguments: %s" % kwargs)
+
+    if len(names_with_defaults) == 1:
+        return all_arguments[0]
+    else:
+        return all_arguments
