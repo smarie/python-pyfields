@@ -67,12 +67,17 @@ def init_fields(*fields,   # type: Union[Field, Any]
 
     :param fields: list of fields to initialize before entering the decorated `__init__` method. For each of these
         fields a corresponding argument will be added in the method's signature. If an empty list is provided, all
-        fields from the class will be used including inherited fields following the mro.
+        fields from the class will be used including inherited fields following the mro. In case of inherited fields,
+        they will appear before the class fields if `ancestor_fields_first` is `True` (default), after otherwise.
     :param init_args_before: If set to `True` (default), arguments from the decorated init method will appear before
         the fields when possible. If set to `False` the contrary will happen.
+    :param ancestor_fields_first: If set to `True` (default behaviour), when the provided list of fields is empty,
+        ancestor-inherited fields will appear before the class fields when possible (even for fields overridden in the
+        subclass). If set to `False` the contrary will happen.
     :return:
     """
-    init_args_before = pop_kwargs(kwargs, [('init_args_before', True)], allow_others=False)
+    init_args_before, ancestor_fields_first = pop_kwargs(kwargs, [('init_args_before', True),
+                                                                  ('ancestor_fields_first', None)], allow_others=False)
 
     if len(fields) == 1:
         # used without argument ?
@@ -81,7 +86,8 @@ def init_fields(*fields,   # type: Union[Field, Any]
             # @init_fields decorator used without parenthesis
 
             # The list of fields is NOT explicit: we have no way to gather this list without creating a descriptor
-            return InitDescriptor(user_init_fun=f, user_init_is_injected=False)
+            return InitDescriptor(user_init_fun=f, user_init_is_injected=False,
+                                  ancestor_fields_first=ancestor_fields_first)
 
     def apply_decorator(init_fun):
         # @init_fields(...)
@@ -89,7 +95,7 @@ def init_fields(*fields,   # type: Union[Field, Any]
         # The list of fields is explicit AND names/type hints have been set already:
         # it is not easy to be sure of this (names yes, but annotations?) > prefer the descriptor anyway
         return InitDescriptor(fields=fields, user_init_fun=init_fun, user_init_args_before=init_args_before,
-                              user_init_is_injected=False)
+                              user_init_is_injected=False, ancestor_fields_first=ancestor_fields_first)
 
     return apply_decorator
 
@@ -154,7 +160,7 @@ def inject_fields(*fields  # type: Union[Field, Any]
 def make_init(*fields,  # type: Union[Field, Any]
               **kwargs
               ):
-    # type: (...) -> Callable
+    # type: (...) -> InitDescriptor
     """
     Creates a constructor based on the provided fields.
 
@@ -227,14 +233,18 @@ def make_init(*fields,  # type: Union[Field, Any]
     :param post_init_args_before: boolean. Defines if the arguments from the `post_init_fun` should appear before
         (default: `True`) or after (`False`) the fields in the generated signature. Of course in all cases, mandatory
         arguments will appear after optional arguments, so as to ensure that the created signature is valid.
+    :param ancestor_fields_first: If set to `True` (default behaviour), when the provided list of fields is empty,
+        ancestor-inherited fields will appear before the class fields when possible (even for fields overridden in the
+        subclass). If set to `False` the contrary will happen.
     :return: a constructor method to be used as `__init__`
     """
     # python <3.5 compliance: pop the kwargs following the varargs
-    post_init_fun, post_init_args_before = pop_kwargs(kwargs, [('post_init_fun', None),
-                                                               ('post_init_args_before', True)], allow_others=False)
+    post_init_fun, post_init_args_before, ancestor_fields_first = pop_kwargs(kwargs, [
+        ('post_init_fun', None), ('post_init_args_before', True), ('ancestor_fields_first', None)
+    ], allow_others=False)
 
     return InitDescriptor(fields=fields, user_init_fun=post_init_fun, user_init_args_before=post_init_args_before,
-                          user_init_is_injected=False)
+                          user_init_is_injected=False, ancestor_fields_first=ancestor_fields_first)
 
 
 class InitDescriptor(object):
@@ -248,13 +258,19 @@ class InitDescriptor(object):
 
     Inspired by https://stackoverflow.com/a/3412743/7262247
     """
-    __slots__ = 'fields', 'user_init_is_injected', 'user_init_fun', 'user_init_args_before'
+    __slots__ = 'fields', 'user_init_is_injected', 'user_init_fun', 'user_init_args_before', 'ancestor_fields_first'
 
-    def __init__(self, fields=None, user_init_is_injected=False, user_init_fun=None, user_init_args_before=True):
+    def __init__(self, fields=None, user_init_is_injected=False, user_init_fun=None, user_init_args_before=True,
+                 ancestor_fields_first=None):
         self.fields = fields
         self.user_init_is_injected = user_init_is_injected
         self.user_init_fun = user_init_fun
         self.user_init_args_before = user_init_args_before
+        if ancestor_fields_first is None:
+            ancestor_fields_first = True
+        elif fields is not None:
+            raise ValueError("`ancestor_fields_first` is only applicable when `fields` is empty")
+        self.ancestor_fields_first = ancestor_fields_first
 
     # not useful and may slow things down anyway
     # def __set_name__(self, owner, name):
@@ -264,25 +280,23 @@ class InitDescriptor(object):
     def __get__(self, obj, objtype):
         # type: (...) -> Callable
         """
+        THIS IS NOT THE INIT METHOD ! THIS IS THE CREATOR OF THE INIT METHOD (first time only)
         Python Descriptor protocol - this is called when the __init__ method is required for the first time,
         it creates the `__init__` method, replaces itself with it, and returns it. Subsequent calls will directly
         be routed to the new init method and not here.
-
-        :param obj:
-        :param objtype:
-        :return:
         """
         if objtype is not None:
             # <objtype>.__init__ has been accessed. Create the modified init
             fields = self.fields
             if fields is None or len(fields) == 0:
                 # fields have not been provided explicitly, collect them all.
-                fields = get_fields(objtype, include_inherited=True, ancestors_first=True,
+                fields = get_fields(objtype, include_inherited=True, ancestors_first=self.ancestor_fields_first,
                                     _auto_fix_fields=not PY36)
             elif not PY36:
                 # take this opportunity to apply all field names including inherited
                 # TODO set back inherited = False when the bug with class-level access is solved -> make_init will be ok
-                get_fields(objtype, include_inherited=True, ancestors_first=True, _auto_fix_fields=True)
+                get_fields(objtype, include_inherited=True, ancestors_first=self.ancestor_fields_first,
+                           _auto_fix_fields=True)
 
             # create the init method
             new_init = create_init(fields=fields, inject_fields=self.user_init_is_injected,

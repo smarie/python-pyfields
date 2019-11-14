@@ -4,7 +4,8 @@ from pyfields.core import Field
 
 
 def init_fields(*fields: Union[Field, Any],
-                init_args_before: bool = True
+                init_args_before: bool = True,
+                ancestor_fields_first: bool = True
                 ):
     ...
 
@@ -16,7 +17,8 @@ def inject_fields(*fields: Union[Field, Any],
 
 def make_init(*fields: Union[Field, Any],
               post_init_fun: Callable = None,
-              post_init_args_before: bool = True
+              post_init_args_before: bool = True,
+              ancestor_fields_first: bool = True
               ) -> Callable:
     ...
 
