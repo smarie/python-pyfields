@@ -163,5 +163,26 @@ def test_init_order2():
         def __init__(self):
             pass
 
+    # make sure that a and c have default values and therefore just passing b is ok.
     c = C(1)
     assert vars(c) == {'a': None, 'b': 1, 'c': 1}
+
+
+def test_init_inheritance():
+    """Makes sure that the init method can be generated in inheritance case """
+
+    class A(object):
+        a = field(default='hello')
+
+    class B(A):
+        b = field(default='world')
+
+        def a(self):
+            """ purposedly override the base class field name """
+            pass
+
+        __init__ = make_init()
+
+    # make sure that the 'a' field is ok
+    b = B(a='h', b='w')
+    assert b.a, b.b == ('h', 'w')

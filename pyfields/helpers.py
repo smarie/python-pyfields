@@ -36,17 +36,15 @@ def yield_fields(cls,
     else:
         where_cls = (cls,)
 
-    # optionally fix the type hints
-    if _auto_fix_fields and PY36:
-        cls_type_hints = get_type_hints(cls)
-    else:
-        cls_type_hints = None
-
     # finally for each class, gather all fields in order
+    _cls_pep484_member_type_hints, res_for_cls = None, None
     for _cls in where_cls:
-        # in python < 3.6 we'll need to sort the fields at the end as class member order is not preserved
         if not PY36:
+            # in python < 3.6 we'll need to sort the fields at the end as class member order is not preserved
             res_for_cls = []
+        elif _auto_fix_fields:
+            # in python >= 3.6, pep484 type hints can be available as member annotation, grab them
+            _cls_pep484_member_type_hints = get_type_hints(_cls)
 
         for member_name in vars(_cls):
             # if not member_name.startswith('__'):   not stated in the doc: too dangerous to have such implicit filter
@@ -54,7 +52,7 @@ def yield_fields(cls,
             # avoid infinite recursion as this method is called in the descriptor for __init__
             if not member_name == '__init__':
                 try:
-                    member = getattr(cls, member_name)
+                    member = getattr(_cls, member_name)
                 except ClassFieldAccessError as e:
                     # we know it is a field :)
                     _is_field = True
@@ -66,12 +64,24 @@ def yield_fields(cls,
                 if _is_field:
                     if _auto_fix_fields:
                         # take this opportunity to set the name and type hints
-                        member.set_as_cls_member(cls, member_name, cls_type_hints)
+                        member.set_as_cls_member(_cls, member_name, _cls_pep484_member_type_hints)
                     if remove_duplicates:
                         if member_name in names:
                             continue
                         else:
                             names.add(member_name)
+
+                    # maybe the field is overriden, in that case we should directly yield the new one
+                    if _cls is not cls:
+                        try:
+                            overridden_member = getattr(cls, member_name)
+                        except ClassFieldAccessError as e:
+                            member = e.field
+                        else:
+                            if isinstance(overridden_member, Field):
+                                member = overridden_member
+
+                    # finally yield it
                     if not PY36:
                         res_for_cls.append(member)
                     else:
@@ -116,8 +126,9 @@ def get_fields(cls,
     :param _auto_fix_fields:
     :return: the fields (by default, as a tuple)
     """
-    return container_type(yield_fields(cls, include_inherited=include_inherited, remove_duplicates=remove_duplicates,
-                                       ancestors_first=ancestors_first, _auto_fix_fields=_auto_fix_fields))
+    return container_type(yield_fields(cls, include_inherited=include_inherited,
+                                       remove_duplicates=remove_duplicates, ancestors_first=ancestors_first,
+                                       _auto_fix_fields=_auto_fix_fields))
 
 
 # def ordered_dir(cls,
