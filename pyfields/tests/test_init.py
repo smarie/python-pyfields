@@ -5,7 +5,8 @@ import sys
 
 import pytest
 
-from pyfields import field, init_fields, inject_fields, make_init, MandatoryFieldInitError, copy_field
+from pyfields import field, init_fields, inject_fields, make_init, MandatoryFieldInitError, copy_field, get_fields
+from pyfields.core import PY36
 
 
 @pytest.mark.parametrize("native", [False, True], ids="native={}".format)
@@ -147,10 +148,12 @@ def test_init_order():
     print(vars(c))
 
 
-def test_init_order2():
+@pytest.mark.parametrize("a_first", [None, False, True], ids="ancestor_first={}".format)
+def test_init_order2(a_first):
     """"""
     class A(object):
         a = field()
+        d = field(default=5)
 
     class B(object):
         b = field()
@@ -159,13 +162,35 @@ def test_init_order2():
         a = field(default=None)
         c = field(default_factory=copy_field('b'))
 
-        @init_fields
+        @init_fields(ancestor_fields_first=a_first)
         def __init__(self):
             pass
 
+    fields = get_fields(C, include_inherited=True, ancestors_first=a_first if a_first is not None else True,
+                        _auto_fix_fields=not PY36)
+    field_names = [f.name for f in fields]
+    if a_first is None or a_first:
+        assert field_names == ['a', 'd', 'b', 'c']
+    else:
+        assert field_names == ['a', 'c', 'b', 'd']
+
     # make sure that a and c have default values and therefore just passing b is ok.
     c = C(1)
-    assert vars(c) == {'a': None, 'b': 1, 'c': 1}
+    assert vars(c) == {'b': 1, 'c': 1, 'a': None, 'd': 5}
+
+    c = C(1, 2, 3)
+    if a_first is None or a_first:
+        assert vars(c) == {'b': 1,  # 1st arg
+                           'c': 1,  # default: copy of b
+                           'a': 2,  # 2d arg
+                           'd': 3   # 3d arg
+                           }
+    else:
+        assert vars(c) == {'b': 1,  # 1st arg
+                           'c': 3,  # 3d arg
+                           'a': 2,  # 2d arg
+                           'd': 5   # default: 5
+                           }
 
 
 def test_init_inheritance():
