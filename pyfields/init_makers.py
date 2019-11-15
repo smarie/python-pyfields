@@ -487,6 +487,7 @@ def _insert_fields_at_position(fields_to_insert,
     if field_names is None:
         field_names = []
 
+    initial_i = i
     last_mandatory_idx = i
     for _field in reversed(fields_to_insert):
         # Is this field optional ?
@@ -507,15 +508,12 @@ def _insert_fields_at_position(fields_to_insert,
         # Are there annotations on the field ?
         annotation = _field.type_hint if _field.type_hint is not EMPTY else Parameter.empty
 
-        # remember the list of field names for later use
-        field_names.append(_field.name)
+        # remember the list of field names for later use - but in the right order
+        field_names.insert(where_to_insert - initial_i, _field.name)
 
         # finally inject the new parameter in the signature
         new_param = Parameter(_field.name, kind=Parameter.POSITIONAL_OR_KEYWORD, default=default, annotation=annotation)
         params.insert(where_to_insert, new_param)
-
-    # dont forget to reverse the list !
-    field_names.reverse()
 
     return field_names, last_mandatory_idx
 
