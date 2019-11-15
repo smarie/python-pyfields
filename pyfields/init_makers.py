@@ -262,6 +262,8 @@ class InitDescriptor(object):
 
     def __init__(self, fields=None, user_init_is_injected=False, user_init_fun=None, user_init_args_before=True,
                  ancestor_fields_first=None):
+        if fields is not None and len(fields) == 0:
+            fields = None
         self.fields = fields
         self.user_init_is_injected = user_init_is_injected
         self.user_init_fun = user_init_fun
@@ -288,7 +290,7 @@ class InitDescriptor(object):
         if objtype is not None:
             # <objtype>.__init__ has been accessed. Create the modified init
             fields = self.fields
-            if fields is None or len(fields) == 0:
+            if fields is None:
                 # fields have not been provided explicitly, collect them all.
                 fields = get_fields(objtype, include_inherited=True, ancestors_first=self.ancestor_fields_first,
                                     _auto_fix_fields=not PY36)
