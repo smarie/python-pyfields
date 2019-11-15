@@ -1,5 +1,23 @@
 # Changelog
 
+### 0.14.0 - helpers, bugfix, and ancestor-first option in init makers
+
+**API**
+
+ - new helper methods `get_field`, `yield_fields`, `has_fields` and `get_fields` (new name of `collect_all_fields`) so that other libraries such as `autoclass` can easily access the various information. `fix_fields` removed. Fixed [#48](https://github.com/smarie/python-pyfields/issues/48) 
+
+ - New `ancestor_fields_first` option in all the `__init__` makers (`make_init` and `@init_fields`). Fixed [#50](https://github.com/smarie/python-pyfields/issues/50)
+
+**Bugfixes**
+
+ - Bugfixes in all the `__init__` makers (`make_init` and `@init_fields`):  
+
+    - bugfix in case of inheritance with override: [#49](https://github.com/smarie/python-pyfields/issues/49)
+
+    - the argument order used for fields initialization (inside the generated init method body) was sometimes incorrect. This would trigger a bug when one field was requiring another one to initialize.
+
+    - when the list of fields received by `InitDescriptor` was an empty tuple and not `None`, the constructor was not created properly
+
 ### 0.13.0 - `nonable` fields
 
  - Fields can now be `nonable`, so as to bypass type and value validation when `None` is received. Fixed [#44](https://github.com/smarie/python-pyfields/issues/44)
