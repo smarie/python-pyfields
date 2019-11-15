@@ -13,6 +13,37 @@ except ImportError:
 from pyfields.core import Field, ClassFieldAccessError, PY36, get_type_hints
 
 
+class NotAFieldError(TypeError):
+    """ Raised by `get_field` when the class member with that name is not a field """
+    __slots__ = 'name', 'cls'
+
+    def __init__(self, cls, name):
+        self.name = name
+        self.cls = cls
+
+
+def get_field(cls, name):
+    """
+    Utility method to return the field member with name `name` in class `cls`.
+    If the member is not a field, a `NotAFieldError` is raised.
+
+    :param cls:
+    :param name:
+    :return:
+    """
+    try:
+        member = getattr(cls, name)
+    except ClassFieldAccessError as e:
+        # we know it is a field :)
+        return e.field
+    else:
+        # it is a field if is it an instance of Field
+        if isinstance(member, Field):
+            return member
+        else:
+            raise NotAFieldError(cls, name)
+
+
 def yield_fields(cls,
                  include_inherited=True,  # type: bool
                  remove_duplicates=True,  # type: bool
@@ -28,20 +59,22 @@ def yield_fields(cls,
     :param _auto_fix_fields:
     :return:
     """
-    names = set()
-
-    # list the classes where we should be looking for fields
+    # List the classes where we should be looking for fields
     if include_inherited:
         where_cls = reversed(getmro(cls)) if ancestors_first else getmro(cls)
     else:
         where_cls = (cls,)
 
+    # Init
+    _already_found_names = set() if remove_duplicates else None  # a reference set of already yielded field names
+    _cls_pep484_member_type_hints = None                         # where to hold found type hints if needed
+    _all_fields_for_cls = None                                   # temporary list when we have to reorder
+
     # finally for each class, gather all fields in order
-    _cls_pep484_member_type_hints, res_for_cls = None, None
     for _cls in where_cls:
         if not PY36:
             # in python < 3.6 we'll need to sort the fields at the end as class member order is not preserved
-            res_for_cls = []
+            _all_fields_for_cls = []
         elif _auto_fix_fields:
             # in python >= 3.6, pep484 type hints can be available as member annotation, grab them
             _cls_pep484_member_type_hints = get_type_hints(_cls)
@@ -52,46 +85,40 @@ def yield_fields(cls,
             # avoid infinite recursion as this method is called in the descriptor for __init__
             if not member_name == '__init__':
                 try:
-                    member = getattr(_cls, member_name)
-                except ClassFieldAccessError as e:
-                    # we know it is a field :)
-                    _is_field = True
-                    member = e.field
-                else:
-                    # it is a field if instance of Field
-                    _is_field = isinstance(member, Field)
+                    field = get_field(_cls, member_name)
+                except NotAFieldError:
+                    continue
 
-                if _is_field:
-                    if _auto_fix_fields:
-                        # take this opportunity to set the name and type hints
-                        member.set_as_cls_member(_cls, member_name, _cls_pep484_member_type_hints)
-                    if remove_duplicates:
-                        if member_name in names:
-                            continue
-                        else:
-                            names.add(member_name)
+                if _auto_fix_fields:
+                    # take this opportunity to set the name and type hints
+                    field.set_as_cls_member(_cls, member_name, _cls_pep484_member_type_hints)
 
-                    # maybe the field is overriden, in that case we should directly yield the new one
-                    if _cls is not cls:
-                        try:
-                            overridden_member = getattr(cls, member_name)
-                        except ClassFieldAccessError as e:
-                            member = e.field
-                        else:
-                            if isinstance(overridden_member, Field):
-                                member = overridden_member
-
-                    # finally yield it
-                    if not PY36:
-                        res_for_cls.append(member)
+                if remove_duplicates:
+                    if member_name in _already_found_names:
+                        continue
                     else:
-                        yield member
+                        _already_found_names.add(member_name)
+
+                # maybe the field is overridden, in that case we should directly yield the new one
+                if _cls is not cls:
+                    try:
+                        overridden_field = get_field(cls, member_name)
+                    except NotAFieldError:
+                        overridden_field = None
+                else:
+                    overridden_field = None
+
+                # finally yield it...
+                if PY36:  # ...immediately in recent python versions because order is correct already
+                    yield field if overridden_field is None else overridden_field
+                else:     # ...or wait for this class to be collected, because the order needs to be fixed
+                    _all_fields_for_cls.append((field, overridden_field))
 
         if not PY36:
             # order is random in python < 3.6 - we need to explicitly sort according to instance creation number
-            res_for_cls.sort(key=lambda f: f.__fieldinstcount__)
-            for m in res_for_cls:
-                yield m
+            _all_fields_for_cls.sort(key=lambda f: f[0].__fieldinstcount__)
+            for field, overridden_field in _all_fields_for_cls:
+                yield field if overridden_field is None else overridden_field
 
 
 def has_fields(cls,
