@@ -132,6 +132,14 @@ generating default value for <pyfields.core.Pocket object ...
 []
 ```
 
+Several helper functions are available to create default factories:
+
+ - `copy_value(<value>)` returns a factory that creates a copy of the provided `val` everytime it is called. Handy if you wish to use mutable
+    objects as default values for your fields ; for example lists.
+  
+ - `copy_attr(<att_name>, deep=True)` returns a factory that creates a (deep or not) copy of the value in the given attribute everytime it is called.
+
+ - `copy_field(<field_or_name>, deep=True)` is similar to `copy_attr` but you can provide a `field` instead of a name.
 
 ### `@<field>.validator`
 
@@ -343,3 +351,52 @@ Wall<height=1, color='white'>
 **Parameters:**
 
  - `fields`: list of fields to initialize before entering the decorated `__init__` method. For each of these fields a corresponding argument will be added in the method's signature. If an empty list is provided, all fields from the class will be used including inherited fields following the mro.
+
+
+## API
+
+### `has_fields`
+
+```python
+def has_fields(cls,
+               include_inherited=True  # type: bool
+               )
+```
+
+Returns True if class `cls` defines at least one `pyfields` field.
+If `include_inherited` is `True` (default), the method will return `True` if at least a field is defined in the class or one of its ancestors. If `False`, the fields need to be defined on the class itself.
+
+### `get_fields`
+
+```python
+def get_fields(cls,
+               include_inherited=True,  # type: bool
+               remove_duplicates=True,  # type: bool
+               ancestors_first=True,    # type: bool
+               container_type=tuple,    # type: Type[T]
+               )
+```
+
+Utility method to collect all fields defined in a class, including all inherited or not.
+By default duplicates are removed and ancestor fields are included and appear first. If a field is overridden, it will appear at the position of the overridden field in the order.
+
+### `yield_fields`
+
+```python
+def yield_fields(cls,
+                 include_inherited=True,  # type: bool
+                 remove_duplicates=True,  # type: bool
+                 ancestors_first=True,    # type: bool
+                 )
+```
+
+Similar to `get_fields` but as a generator.
+
+### `get_field`
+
+```python
+def get_field(cls, name)
+```
+
+Utility method to return the field member with name `name` in class `cls`.
+If the member is not a field, a `NotAFieldError` is raised.

@@ -6,6 +6,7 @@
 
 [![Documentation](https://img.shields.io/badge/doc-latest-blue.svg)](https://smarie.github.io/python-pyfields/) [![PyPI](https://img.shields.io/pypi/v/pyfields.svg)](https://pypi.python.org/pypi/pyfields/) [![Downloads](https://pepy.tech/badge/pyfields)](https://pepy.tech/project/pyfields) [![Downloads per week](https://pepy.tech/badge/pyfields/week)](https://pepy.tech/project/pyfields) [![GitHub stars](https://img.shields.io/github/stars/smarie/python-pyfields.svg)](https://github.com/smarie/python-pyfields/stargazers)
 
+!!! success "`pyfields` is now automatically supported by `autoclass` ! See [here](https://smarie.github.io/python-autoclass/#pyfields-combo) for details."
 
 `pyfields` provides a simple and elegant way to define fields in python classes. With `pyfields` you explicitly define all aspects of a field (default value, type, documentation...) in a single place, and can refer to it from other places.
 
@@ -27,7 +28,9 @@ It provides **many optional features** that will make your object-oriented devel
 
  - initializing fields in your *constructor* is very easy and highly customizable
 
-If your first reaction is "what about `attrs` / `dataclasses` / `pydantic` / `characteristic` / `traits` / `traitlets` / `autoclass` / ...", please have a look [here](why.md).
+Finally, it offers an API that other libraries can leverage to get the list of fields. For example `autoclass` now leverages `pyfields` to automatically add hash/dict/eq/repr to your class.
+
+If your first reaction is "what about `attrs` / `dataclasses` / `pydantic` / `characteristic` / `traits` / `traitlets` / ...", please have a look [here](why.md).
 
 
 ## Installing
@@ -602,6 +605,14 @@ Note on the order of arguments in the resulting `__init__` signature: as you can
 
 
 ### 3. Misc.
+
+#### API
+
+`pyfields` offers an API so that other libraries can inspect the fields: `get_fields`, `yield_fields`, `has_fields`, `get_field`. See [API reference](https://smarie.github.io/python-pyfields/api_reference/#api) for details.
+
+#### hash, dict, eq, repr 
+
+`autoclass` is now compliant with `pyfields`. So you can use `@autoclass`, or `@autorepr`, `@autohash`, `@autodict`... on the decorated class. That way, your fields definition is directly reused for most of the class behaviour. See [here](https://smarie.github.io/python-autoclass/#pyfields-combo) for details.
 
 #### Slots
 

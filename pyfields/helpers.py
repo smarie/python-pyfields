@@ -51,6 +51,7 @@ def yield_fields(cls,
                  _auto_fix_fields=False   # type: bool
                  ):
     """
+    Similar to `get_fields` but as a generator.
 
     :param cls:
     :param include_inherited:
@@ -125,7 +126,9 @@ def has_fields(cls,
                include_inherited=True  # type: bool
                ):
     """
-    Returns True if class `cls` defines at least one `pyfields` field
+    Returns True if class `cls` defines at least one `pyfields` field.
+    If `include_inherited` is `True` (default), the method will return `True` if at least a field is defined in the
+    class or one of its ancestors. If `False`, the fields need to be defined on the class itself.
 
     :param cls:
     :param include_inherited:
@@ -144,6 +147,9 @@ def get_fields(cls,
     # type: (...) -> T
     """
     Utility method to collect all fields defined in a class, including all inherited or not.
+
+    By default duplicates are removed and ancestor fields are included and appear first. If a field is overridden,
+    it will appear at the position of the overridden field in the order.
 
     :param cls:
     :param include_inherited:
