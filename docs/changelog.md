@@ -1,5 +1,11 @@
 # Changelog
 
+### 1.0.0 - Stable version
+
+Overall behaviour stabilized and compliance with `@autoclass` to cover most use cases.
+
+The only bug that has not yet been fixed is [#12](https://github.com/smarie/python-pyfields/issues/12) 
+
 ### 0.14.0 - helpers, bugfix, and ancestor-first option in init makers
 
 **API**
