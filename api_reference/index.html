@@ -325,6 +325,47 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    API
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#has_fields" class="md-nav__link">
+    has_fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_fields" class="md-nav__link">
+    get_fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#yield_fields" class="md-nav__link">
+    yield_fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_field" class="md-nav__link">
+    get_field
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
       
       
       
@@ -420,6 +461,47 @@
           <li class="md-nav__item">
   <a href="#inject_fields" class="md-nav__link">
     @inject_fields
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    API
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#has_fields" class="md-nav__link">
+    has_fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_fields" class="md-nav__link">
+    get_fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#yield_fields" class="md-nav__link">
+    yield_fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get_field" class="md-nav__link">
+    get_field
   </a>
   
 </li>
@@ -558,6 +640,19 @@ default.</p>
 </pre></div>
 
 
+<p>Several helper functions are available to create default factories:</p>
+<ul>
+<li>
+<p><code>copy_value(&lt;value&gt;)</code> returns a factory that creates a copy of the provided <code>val</code> everytime it is called. Handy if you wish to use mutable
+    objects as default values for your fields ; for example lists.</p>
+</li>
+<li>
+<p><code>copy_attr(&lt;att_name&gt;, deep=True)</code> returns a factory that creates a (deep or not) copy of the value in the given attribute everytime it is called.</p>
+</li>
+<li>
+<p><code>copy_field(&lt;field_or_name&gt;, deep=True)</code> is similar to <code>copy_attr</code> but you can provide a <code>field</code> instead of a name.</p>
+</li>
+</ul>
 <h3 id="ltfieldgtvalidator"><code>@&lt;field&gt;.validator</code><a class="headerlink" href="#ltfieldgtvalidator" title="Permanent link">&para;</a></h3>
 <p>A decorator to add a validator to a field.</p>
 <div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -745,6 +840,45 @@ object so that users can manually execute the fields initialization. This is don
 <ul>
 <li><code>fields</code>: list of fields to initialize before entering the decorated <code>__init__</code> method. For each of these fields a corresponding argument will be added in the method's signature. If an empty list is provided, all fields from the class will be used including inherited fields following the mro.</li>
 </ul>
+<h2 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
+<h3 id="has_fields"><code>has_fields</code><a class="headerlink" href="#has_fields" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">has_fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
+               <span class="n">include_inherited</span><span class="o">=</span><span class="bp">True</span>  <span class="c1"># type: bool</span>
+               <span class="p">)</span>
+</pre></div>
+
+
+<p>Returns True if class <code>cls</code> defines at least one <code>pyfields</code> field.
+If <code>include_inherited</code> is <code>True</code> (default), the method will return <code>True</code> if at least a field is defined in the class or one of its ancestors. If <code>False</code>, the fields need to be defined on the class itself.</p>
+<h3 id="get_fields"><code>get_fields</code><a class="headerlink" href="#get_fields" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
+               <span class="n">include_inherited</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>  <span class="c1"># type: bool</span>
+               <span class="n">remove_duplicates</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>  <span class="c1"># type: bool</span>
+               <span class="n">ancestors_first</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>    <span class="c1"># type: bool</span>
+               <span class="n">container_type</span><span class="o">=</span><span class="nb">tuple</span><span class="p">,</span>    <span class="c1"># type: Type[T]</span>
+               <span class="p">)</span>
+</pre></div>
+
+
+<p>Utility method to collect all fields defined in a class, including all inherited or not.
+By default duplicates are removed and ancestor fields are included and appear first. If a field is overridden, it will appear at the position of the overridden field in the order.</p>
+<h3 id="yield_fields"><code>yield_fields</code><a class="headerlink" href="#yield_fields" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">yield_fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
+                 <span class="n">include_inherited</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>  <span class="c1"># type: bool</span>
+                 <span class="n">remove_duplicates</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>  <span class="c1"># type: bool</span>
+                 <span class="n">ancestors_first</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>    <span class="c1"># type: bool</span>
+                 <span class="p">)</span>
+</pre></div>
+
+
+<p>Similar to <code>get_fields</code> but as a generator.</p>
+<h3 id="get_field"><code>get_field</code><a class="headerlink" href="#get_field" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_field</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Utility method to return the field member with name <code>name</code> in class <code>cls</code>.
+If the member is not a field, a <code>NotAFieldError</code> is raised.</p>
                 
                   
                 

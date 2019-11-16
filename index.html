@@ -360,6 +360,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    API
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hash-dict-eq-repr" class="md-nav__link">
+    hash, dict, eq, repr
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#slots" class="md-nav__link">
     Slots
   </a>
@@ -597,6 +611,20 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    API
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hash-dict-eq-repr" class="md-nav__link">
+    hash, dict, eq, repr
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#slots" class="md-nav__link">
     Slots
   </a>
@@ -670,6 +698,9 @@
 <p><em>Define fields in python classes. Easily.</em></p>
 <p><a href="https://pypi.python.org/pypi/pyfields/"><img alt="Python versions" src="https://img.shields.io/pypi/pyversions/pyfields.svg" /></a> <a href="https://travis-ci.org/smarie/python-pyfields"><img alt="Build Status" src="https://travis-ci.org/smarie/python-pyfields.svg?branch=master" /></a> <a href="https://smarie.github.io/python-pyfields/junit/report.html"><img alt="Tests Status" src="https://smarie.github.io/python-pyfields/junit/junit-badge.svg?dummy=8484744" /></a> <a href="https://codecov.io/gh/smarie/python-pyfields"><img alt="codecov" src="https://codecov.io/gh/smarie/python-pyfields/branch/master/graph/badge.svg" /></a></p>
 <p><a href="https://smarie.github.io/python-pyfields/"><img alt="Documentation" src="https://img.shields.io/badge/doc-latest-blue.svg" /></a> <a href="https://pypi.python.org/pypi/pyfields/"><img alt="PyPI" src="https://img.shields.io/pypi/v/pyfields.svg" /></a> <a href="https://pepy.tech/project/pyfields"><img alt="Downloads" src="https://pepy.tech/badge/pyfields" /></a> <a href="https://pepy.tech/project/pyfields"><img alt="Downloads per week" src="https://pepy.tech/badge/pyfields/week" /></a> <a href="https://github.com/smarie/python-pyfields/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/smarie/python-pyfields.svg" /></a></p>
+<div class="admonition success">
+<p class="admonition-title"><code>pyfields</code> is now automatically supported by <code>autoclass</code> ! See <a href="https://smarie.github.io/python-autoclass/#pyfields-combo">here</a> for details.</p>
+</div>
 <p><code>pyfields</code> provides a simple and elegant way to define fields in python classes. With <code>pyfields</code> you explicitly define all aspects of a field (default value, type, documentation...) in a single place, and can refer to it from other places.</p>
 <p>It is designed with <strong>development freedom</strong> as primary target: </p>
 <ul>
@@ -698,7 +729,8 @@
 <p>initializing fields in your <em>constructor</em> is very easy and highly customizable</p>
 </li>
 </ul>
-<p>If your first reaction is "what about <code>attrs</code> / <code>dataclasses</code> / <code>pydantic</code> / <code>characteristic</code> / <code>traits</code> / <code>traitlets</code> / <code>autoclass</code> / ...", please have a look <a href="why/">here</a>.</p>
+<p>Finally, it offers an API that other libraries can leverage to get the list of fields. For example <code>autoclass</code> now leverages <code>pyfields</code> to automatically add hash/dict/eq/repr to your class.</p>
+<p>If your first reaction is "what about <code>attrs</code> / <code>dataclasses</code> / <code>pydantic</code> / <code>characteristic</code> / <code>traits</code> / <code>traitlets</code> / ...", please have a look <a href="why/">here</a>.</p>
 <h2 id="installing">Installing<a class="headerlink" href="#installing" title="Permanent link">&para;</a></h2>
 <div class="codehilite"><pre><span></span>&gt; pip install pyfields
 </pre></div>
@@ -1206,6 +1238,10 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 
 <p>Note on the order of arguments in the resulting <code>__init__</code> signature: as you can see, <code>msg</code> appears between <code>height</code> and <code>color</code> in the signature. This corresponds to the </p>
 <h3 id="3-misc">3. Misc.<a class="headerlink" href="#3-misc" title="Permanent link">&para;</a></h3>
+<h4 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h4>
+<p><code>pyfields</code> offers an API so that other libraries can inspect the fields: <code>get_fields</code>, <code>yield_fields</code>, <code>has_fields</code>, <code>get_field</code>. See <a href="https://smarie.github.io/python-pyfields/api_reference/#api">API reference</a> for details.</p>
+<h4 id="hash-dict-eq-repr">hash, dict, eq, repr<a class="headerlink" href="#hash-dict-eq-repr" title="Permanent link">&para;</a></h4>
+<p><code>autoclass</code> is now compliant with <code>pyfields</code>. So you can use <code>@autoclass</code>, or <code>@autorepr</code>, <code>@autohash</code>, <code>@autodict</code>... on the decorated class. That way, your fields definition is directly reused for most of the class behaviour. See <a href="https://smarie.github.io/python-autoclass/#pyfields-combo">here</a> for details.</p>
 <h4 id="slots">Slots<a class="headerlink" href="#slots" title="Permanent link">&para;</a></h4>
 <p>You can use <code>pyfields</code> if your class has <code>__slots__</code>. You will simply have to use an underscore in the slot name corresponding to a field: <code>_&lt;field_name&gt;</code>. For example:</p>
 <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">WithSlots</span><span class="p">:</span>
