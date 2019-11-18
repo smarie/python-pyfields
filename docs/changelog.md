@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.0.1 - `pyproject.toml`
+
+Added `pyproject.toml`
+
 ### 1.0.0 - Stable version
 
 Overall behaviour stabilized and compliance with `@autoclass` to cover most use cases.
