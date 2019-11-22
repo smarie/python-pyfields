@@ -44,23 +44,65 @@ class FieldTypeError(TypeError):  # FieldError
 def _make_assert_is_of_type():
     try:
         from typeguard import check_type
+        try:
+            from typing import Union
+        except ImportError:
+            # (a) typing is not available, transform iterables of types into several calls
+            def assert_is_of_type(field, value, typ):
+                """
+                Type checker relying on `typeguard` (python 3.5+)
 
-        def assert_is_of_type(field, value, typ):
-            """
-            Type checker relying on `typeguard` (python 3.5+)
+                :param field:
+                :param value:
+                :param typ:
+                :return:
+                """
+                try:
+                    # iterate on the types
+                    t_gen = (t for t in typ)
+                except TypeError:
+                    # not iterable : a single type
+                    try:
+                        check_type(field.qualname, value, typ)
+                    except Exception as e:
+                        # raise from
+                        new_e = FieldTypeError(field, value, typ)
+                        new_e.__cause__ = e
+                        raise new_e
+                else:
+                    # iterate and try them all
+                    e = None
+                    for t in t_gen:
+                        try:
+                            check_type(field.qualname, value, typ)
+                            return  # success !!!!
+                        except Exception as e:
+                            pass    # failed: lets try another one
 
-            :param field:
-            :param value:
-            :param typ:
-            :return:
-            """
-            try:
-                check_type(field.qualname, value, typ)
-            except Exception as e:
-                # raise from
-                new_e = FieldTypeError(field, value, typ)
-                new_e.__cause__ = e
-                raise new_e
+                    # raise from
+                    if e is not None:
+                        new_e = FieldTypeError(field, value, typ)
+                        new_e.__cause__ = e
+                        raise new_e
+
+        else:
+            # (b) typing is available, use a Union
+            def assert_is_of_type(field, value, typ):
+                """
+                Type checker relying on `typeguard` (python 3.5+)
+
+                :param field:
+                :param value:
+                :param typ:
+                :return:
+                """
+                try:
+                    check_type(field.qualname, value, Union[typ])
+                except Exception as e:
+                    # raise from
+                    new_e = FieldTypeError(field, value, typ)
+                    new_e.__cause__ = e
+                    raise new_e
 
     except ImportError:
         try:
