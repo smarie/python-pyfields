@@ -262,7 +262,7 @@ class Field(object):
                 # only use type hint if not empty
                 self.type_hint = t
                 # update the 'nonable' status
-                if self.nonable in (UNKNOWN, GUESS):
+                if self.nonable is UNKNOWN:
                     if is_pep484_nonable(t):
                         self.nonable = True
                     else:
