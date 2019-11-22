@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.0.2 - bugfixes
+
+ * User-provided `nonable` status was wrongly overriden automatically when the field was attached to the class. Fixed [#51](https://github.com/smarie/python-pyfields/issues/51) 
+ * Fixed an issue with type validation when `typeguard` is used and a tuple of types is provided instead of a `Union`. Fixed [#52](https://github.com/smarie/python-pyfields/issues/52)
+
 ### 1.0.1 - `pyproject.toml`
 
 Added `pyproject.toml`
