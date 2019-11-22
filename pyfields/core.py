@@ -262,10 +262,11 @@ class Field(object):
                 # only use type hint if not empty
                 self.type_hint = t
                 # update the 'nonable' status
-                if is_pep484_nonable(t):
-                    self.nonable = True
-                else:
-                    self.nonable = UNKNOWN
+                if self.nonable in (UNKNOWN, GUESS):
+                    if is_pep484_nonable(t):
+                        self.nonable = True
+                    else:
+                        self.nonable = UNKNOWN
 
         # detect a validator or a converter on a native field
         if self.pending_validators is not None or self.pending_converters is not None:
