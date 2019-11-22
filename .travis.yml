@@ -25,10 +25,10 @@ matrix:
       env: TYPE_CHECKER="none"
       dist: xenial
       sudo: true
-    - python: 3.7
-      env: TYPE_CHECKER="pytypes"
-      dist: xenial
-      sudo: true
+#    - python: 3.7
+#      env: TYPE_CHECKER="pytypes"
+#      dist: xenial
+#      sudo: true
     - python: 3.7
       env: TYPE_CHECKER="typeguard"
       dist: xenial
