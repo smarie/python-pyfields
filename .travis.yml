@@ -6,9 +6,31 @@ matrix:
   fast_finish: true
   include:
     - python: 2.7
+      env: TYPE_CHECKER="none"
+    - python: 2.7
+      env: TYPE_CHECKER="pytypes"
     - python: 3.5
+      env: TYPE_CHECKER="none"
+    - python: 3.5
+      env: TYPE_CHECKER="pytypes"
+    - python: 3.5
+      env: TYPE_CHECKER="typeguard"
     - python: 3.6
+      env: TYPE_CHECKER="none"
+    - python: 3.6
+      env: TYPE_CHECKER="pytypes"
+    - python: 3.6
+      env: TYPE_CHECKER="typeguard"
     - python: 3.7
+      env: TYPE_CHECKER="none"
+      dist: xenial
+      sudo: true
+    - python: 3.7
+      env: TYPE_CHECKER="pytypes"
+      dist: xenial
+      sudo: true
+    - python: 3.7
+      env: TYPE_CHECKER="typeguard"
       dist: xenial
       sudo: true
 
@@ -26,7 +48,6 @@ install:
   - pip list
   - pip install six setuptools_scm  # apparently python 2 requires this
   - python ci_tools/py_install.py pip ci_tools/requirements-pip.txt
-  - if [ ! "${TRAVIS_PYTHON_VERSION}" = "2.7" ]; then pip install doit; fi;
   # travis-specific installs
   - pip install PyGithub  # for ci_tools/github_release.py
   - pip install codecov  # See https://github.com/codecov/example-python.
@@ -36,12 +57,12 @@ script:
 #  - coverage run tests.py
   - pip install .
   - python -c "import os; os.chdir('..'); import pyfields"
-  - pip uninstall -y pyfields  # so that the setuptools_scm test can be executed
 # ***tests***
 #  - coverage run tests.py
 #  - pytest --junitxml=reports/junit/junit.xml --html=reports/junit/report.html --cov-report term-missing --cov=./pyfields -v pyfields/tests/
 # now done in a dedicated script to capture exit code 1 and transform it to 0
   - chmod a+x ./ci_tools/run_tests.sh
+  - if [ ! "${TYPE_CHECKER}" = "none" ]; then pip install "${TYPE_CHECKER}"; fi;
   - sh ./ci_tools/run_tests.sh
   - python ci_tools/generate-junit-badge.py 100  # generates the badge for the test results and fail build if less than x%
 
