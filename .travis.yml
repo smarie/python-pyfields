@@ -106,7 +106,7 @@ deploy:
     on:
       tags: true
       python: 3.5  #only one of the builds have to be deployed
-      # condition: $PYTEST_VERSION = "<3"
+      condition: $TYPE_CHECKER = "none"
     # server: https://test.pypi.org/legacy/
     distributions: "sdist bdist_wheel"
 
@@ -117,7 +117,7 @@ deploy:
     on:
       tags: true
       python: 3.5  #only one of the builds have to be deployed
-      # condition: $PYTEST_VERSION = "<3"
+      condition: $TYPE_CHECKER = "none"
 
 notifications:
   email:
