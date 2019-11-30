@@ -533,14 +533,14 @@
                 <h1 id="api-reference">API reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h1>
 <p>In general, <code>help(symbol)</code> will provide the latest up-to-date documentation.</p>
 <h2 id="field"><em><code>field</code></em><a class="headerlink" href="#field" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>        <span class="c1"># type: Type[T]</span>
-          <span class="n">check_type</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>      <span class="c1"># type: bool</span>
+<div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>        <span class="c1"># type: Type[T]</span>
+          <span class="n">check_type</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>      <span class="c1"># type: bool</span>
           <span class="n">default</span><span class="o">=</span><span class="n">EMPTY</span><span class="p">,</span>         <span class="c1"># type: T</span>
-          <span class="n">default_factory</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>  <span class="c1"># type: Callable[[], T]</span>
-          <span class="n">validators</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>       <span class="c1"># type: Validators</span>
-          <span class="n">doc</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>              <span class="c1"># type: str</span>
-          <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>             <span class="c1"># type: str</span>
-          <span class="n">native</span><span class="o">=</span><span class="bp">None</span>            <span class="c1"># type: bool</span>
+          <span class="n">default_factory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: Callable[[], T]</span>
+          <span class="n">validators</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>       <span class="c1"># type: Validators</span>
+          <span class="n">doc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>              <span class="c1"># type: str</span>
+          <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>             <span class="c1"># type: str</span>
+          <span class="n">native</span><span class="o">=</span><span class="kc">None</span>            <span class="c1"># type: bool</span>
           <span class="p">):</span>
     <span class="c1"># type: (...) -&gt; T</span>
 </pre></div>
@@ -565,7 +565,7 @@ until it is first read or written.</p>
 <span class="o">...</span>     <span class="n">od</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;This is an optional field with a default value&quot;</span><span class="p">)</span>
 <span class="o">...</span>     <span class="n">odf</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span> <span class="n">obj</span><span class="p">:</span> <span class="p">[],</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;This is an optional with a default value factory&quot;</span><span class="p">)</span>
 <span class="o">...</span>     <span class="n">m</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;This is a mandatory field&quot;</span><span class="p">)</span>
-<span class="o">...</span>     <span class="n">mt</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">check_type</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;This is a type-checked mandatory field&quot;</span><span class="p">)</span>
+<span class="o">...</span>     <span class="n">mt</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">check_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;This is a type-checked mandatory field&quot;</span><span class="p">)</span>
 <span class="o">...</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">o</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">()</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">o</span><span class="o">.</span><span class="n">od</span>   <span class="c1"># read access with default value</span>
@@ -579,9 +579,9 @@ until it is first read or written.</p>
 <span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
     <span class="o">...</span>
 <span class="n">pyfields</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">MandatoryFieldInitError</span><span class="p">:</span> <span class="n">Mandatory</span> <span class="n">field</span> <span class="s1">&#39;m&#39;</span> <span class="n">has</span> <span class="ow">not</span> <span class="n">been</span> <span class="n">initialized</span> <span class="n">yet</span> <span class="n">on</span> <span class="n">instance</span><span class="o">...</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">o</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">o</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">o</span><span class="o">.</span><span class="n">m</span>  <span class="c1"># read access for mandatory attr after init</span>
-<span class="bp">True</span>
+<span class="kc">True</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="k">del</span> <span class="n">o</span><span class="o">.</span><span class="n">m</span>  <span class="c1"># all attributes can be deleted, same behaviour than new object</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">o</span><span class="o">.</span><span class="n">m</span>
 <span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
@@ -628,9 +628,9 @@ default.</p>
 <div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Pocket</span><span class="p">:</span>
 <span class="o">...</span>     <span class="n">items</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
 <span class="o">...</span>
-<span class="o">...</span>     <span class="nd">@items.default_factory</span>
+<span class="o">...</span>     <span class="nd">@items</span><span class="o">.</span><span class="n">default_factory</span>
 <span class="o">...</span>     <span class="k">def</span> <span class="nf">default_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="o">...</span>         <span class="k">print</span><span class="p">(</span><span class="s2">&quot;generating default value for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">)</span>
+<span class="o">...</span>         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;generating default value for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">)</span>
 <span class="o">...</span>         <span class="k">return</span> <span class="p">[]</span>
 <span class="o">...</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">Pocket</span><span class="p">()</span>
@@ -657,7 +657,7 @@ default.</p>
 <p>A decorator to add a validator to a field.</p>
 <div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="o">...</span>     <span class="n">m</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
-<span class="o">...</span>     <span class="nd">@m.validator</span>
+<span class="o">...</span>     <span class="nd">@m</span><span class="o">.</span><span class="n">validator</span>
 <span class="o">...</span>     <span class="k">def</span> <span class="nf">m_is_positive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m_value</span><span class="p">):</span>
 <span class="o">...</span>         <span class="k">return</span> <span class="n">m_value</span> <span class="o">&gt;</span> <span class="mi">0</span>
 <span class="o">...</span>
@@ -666,7 +666,7 @@ default.</p>
 <span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
 <span class="o">...</span>
 <span class="n">valid8</span><span class="o">.</span><span class="n">entry_points</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">[</span><span class="ne">ValueError</span><span class="p">]:</span> <span class="n">Error</span> <span class="n">validating</span> <span class="p">[</span><span class="n">Foo</span><span class="o">.</span><span class="n">m</span><span class="o">=</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span> <span class="n">InvalidValue</span><span class="p">:</span>
-    <span class="n">Function</span> <span class="p">[</span><span class="n">m_is_positive</span><span class="p">]</span> <span class="n">returned</span> <span class="p">[</span><span class="bp">False</span><span class="p">]</span> <span class="k">for</span> <span class="n">value</span> <span class="mf">0.</span>
+    <span class="n">Function</span> <span class="p">[</span><span class="n">m_is_positive</span><span class="p">]</span> <span class="n">returned</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="k">for</span> <span class="n">value</span> <span class="mf">0.</span>
 </pre></div>
 
 
@@ -677,10 +677,10 @@ fields:</p>
 <span class="o">...</span>     <span class="n">m</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
 <span class="o">...</span>     <span class="n">m2</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
 <span class="o">...</span>
-<span class="o">...</span>     <span class="nd">@m.validator</span>
-<span class="o">...</span>     <span class="nd">@m2.validator</span>
+<span class="o">...</span>     <span class="nd">@m</span><span class="o">.</span><span class="n">validator</span>
+<span class="o">...</span>     <span class="nd">@m2</span><span class="o">.</span><span class="n">validator</span>
 <span class="o">...</span>     <span class="k">def</span> <span class="nf">is_positive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="o">...</span>         <span class="k">print</span><span class="p">(</span><span class="s2">&quot;validating </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">field</span><span class="o">.</span><span class="n">qualname</span><span class="p">)</span>
+<span class="o">...</span>         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;validating </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">field</span><span class="o">.</span><span class="n">qualname</span><span class="p">)</span>
 <span class="o">...</span>         <span class="k">return</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span>
 <span class="o">...</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">o</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">()</span>
@@ -690,15 +690,15 @@ fields:</p>
 <span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
 <span class="o">...</span>
 <span class="n">valid8</span><span class="o">.</span><span class="n">entry_points</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">[</span><span class="ne">ValueError</span><span class="p">]:</span> <span class="n">Error</span> <span class="n">validating</span> <span class="p">[</span><span class="n">Foo</span><span class="o">.</span><span class="n">m</span><span class="o">=</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span> <span class="n">InvalidValue</span><span class="p">:</span>
-    <span class="n">Function</span> <span class="p">[</span><span class="n">is_positive</span><span class="p">]</span> <span class="n">returned</span> <span class="p">[</span><span class="bp">False</span><span class="p">]</span> <span class="k">for</span> <span class="n">value</span> <span class="mf">0.</span>
+    <span class="n">Function</span> <span class="p">[</span><span class="n">is_positive</span><span class="p">]</span> <span class="n">returned</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="k">for</span> <span class="n">value</span> <span class="mf">0.</span>
 </pre></div>
 
 
 <h2 id="constructors">Constructors<a class="headerlink" href="#constructors" title="Permanent link">&para;</a></h2>
 <h3 id="make_init"><code>make_init</code><a class="headerlink" href="#make_init" title="Permanent link">&para;</a></h3>
 <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">make_init</span><span class="p">(</span><span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Field</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-              <span class="n">post_init_fun</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
-              <span class="n">post_init_args_before</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">True</span>
+              <span class="n">post_init_fun</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+              <span class="n">post_init_args_before</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
               <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
 </pre></div>
 
@@ -747,7 +747,7 @@ fields:</p>
 <span class="o">...</span>     <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Color of the wall.&quot;</span><span class="p">)</span>
 <span class="o">...</span>
 <span class="o">...</span>     <span class="k">def</span> <span class="nf">post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;hello&#39;</span><span class="p">):</span>
-<span class="o">...</span>         <span class="k">print</span><span class="p">(</span><span class="s2">&quot;post init ! height=</span><span class="si">%s</span><span class="s2">, color=</span><span class="si">%s</span><span class="s2">, msg=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
+<span class="o">...</span>         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;post init ! height=</span><span class="si">%s</span><span class="s2">, color=</span><span class="si">%s</span><span class="s2">, msg=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
 <span class="o">...</span>         <span class="bp">self</span><span class="o">.</span><span class="n">non_field_attr</span> <span class="o">=</span> <span class="n">msg</span>
 <span class="o">...</span>
 <span class="o">...</span>     <span class="c1"># only `height` and `foo` will be in the constructor</span>
@@ -768,7 +768,7 @@ fields:</p>
 <p><strong>Outputs:</strong> a constructor method to be used as <code>__init__</code></p>
 <h3 id="init_fields"><code>@init_fields</code><a class="headerlink" href="#init_fields" title="Permanent link">&para;</a></h3>
 <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">init_fields</span><span class="p">(</span><span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Field</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-                <span class="n">init_args_before</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">init_args_before</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="p">):</span>
 </pre></div>
 
@@ -782,15 +782,15 @@ fields:</p>
 <span class="o">...</span>
 <span class="o">...</span>     <span class="nd">@init_fields</span>
 <span class="o">...</span>     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;hello&#39;</span><span class="p">):</span>
-<span class="o">...</span>         <span class="k">print</span><span class="p">(</span><span class="s2">&quot;post init ! height=</span><span class="si">%s</span><span class="s2">, color=</span><span class="si">%s</span><span class="s2">, msg=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
+<span class="o">...</span>         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;post init ! height=</span><span class="si">%s</span><span class="s2">, color=</span><span class="si">%s</span><span class="s2">, msg=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
 <span class="o">...</span>         <span class="bp">self</span><span class="o">.</span><span class="n">non_field_attr</span> <span class="o">=</span> <span class="n">msg</span>
 <span class="o">...</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">help</span><span class="p">(</span><span class="n">Wall</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span>
 <span class="n">Help</span> <span class="n">on</span> <span class="n">function</span> <span class="fm">__init__</span> <span class="ow">in</span> <span class="n">module</span> <span class="n">pyfields</span><span class="o">.</span><span class="n">init_makers</span><span class="p">:</span>
 <span class="o">&lt;</span><span class="n">BLANKLINE</span><span class="o">&gt;</span>
 <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;white&#39;</span><span class="p">)</span>
-    <span class="n">The</span> <span class="sb">`__init__`</span> <span class="n">method</span> <span class="n">generated</span> <span class="k">for</span> <span class="n">you</span> <span class="n">when</span> <span class="n">you</span> <span class="n">use</span> <span class="sb">`@init_fields`</span>
-    <span class="ow">or</span> <span class="sb">`make_init`</span> <span class="k">with</span> <span class="n">a</span> <span class="n">non</span><span class="o">-</span><span class="bp">None</span> <span class="sb">`post_init_fun`</span> <span class="n">method</span><span class="o">.</span>
+    <span class="n">The</span> <span class="err">`</span><span class="fm">__init__</span><span class="err">`</span> <span class="n">method</span> <span class="n">generated</span> <span class="k">for</span> <span class="n">you</span> <span class="n">when</span> <span class="n">you</span> <span class="n">use</span> <span class="err">`</span><span class="nd">@init_fields</span><span class="err">`</span>
+    <span class="ow">or</span> <span class="err">`</span><span class="n">make_init</span><span class="err">`</span> <span class="k">with</span> <span class="n">a</span> <span class="n">non</span><span class="o">-</span><span class="kc">None</span> <span class="err">`</span><span class="n">post_init_fun</span><span class="err">`</span> <span class="n">method</span><span class="o">.</span>
 <span class="o">&lt;</span><span class="n">BLANKLINE</span><span class="o">&gt;</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">w</span> <span class="o">=</span> <span class="n">Wall</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">post</span> <span class="n">init</span> <span class="err">!</span> <span class="n">height</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">white</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">hello</span>
@@ -843,7 +843,7 @@ object so that users can manually execute the fields initialization. This is don
 <h2 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
 <h3 id="has_fields"><code>has_fields</code><a class="headerlink" href="#has_fields" title="Permanent link">&para;</a></h3>
 <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">has_fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
-               <span class="n">include_inherited</span><span class="o">=</span><span class="bp">True</span>  <span class="c1"># type: bool</span>
+               <span class="n">include_inherited</span><span class="o">=</span><span class="kc">True</span>  <span class="c1"># type: bool</span>
                <span class="p">)</span>
 </pre></div>
 
@@ -852,9 +852,9 @@ object so that users can manually execute the fields initialization. This is don
 If <code>include_inherited</code> is <code>True</code> (default), the method will return <code>True</code> if at least a field is defined in the class or one of its ancestors. If <code>False</code>, the fields need to be defined on the class itself.</p>
 <h3 id="get_fields"><code>get_fields</code><a class="headerlink" href="#get_fields" title="Permanent link">&para;</a></h3>
 <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
-               <span class="n">include_inherited</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>  <span class="c1"># type: bool</span>
-               <span class="n">remove_duplicates</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>  <span class="c1"># type: bool</span>
-               <span class="n">ancestors_first</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>    <span class="c1"># type: bool</span>
+               <span class="n">include_inherited</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># type: bool</span>
+               <span class="n">remove_duplicates</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># type: bool</span>
+               <span class="n">ancestors_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>    <span class="c1"># type: bool</span>
                <span class="n">container_type</span><span class="o">=</span><span class="nb">tuple</span><span class="p">,</span>    <span class="c1"># type: Type[T]</span>
                <span class="p">)</span>
 </pre></div>
@@ -864,9 +864,9 @@ If <code>include_inherited</code> is <code>True</code> (default), the method wil
 By default duplicates are removed and ancestor fields are included and appear first. If a field is overridden, it will appear at the position of the overridden field in the order.</p>
 <h3 id="yield_fields"><code>yield_fields</code><a class="headerlink" href="#yield_fields" title="Permanent link">&para;</a></h3>
 <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">yield_fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
-                 <span class="n">include_inherited</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>  <span class="c1"># type: bool</span>
-                 <span class="n">remove_duplicates</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>  <span class="c1"># type: bool</span>
-                 <span class="n">ancestors_first</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>    <span class="c1"># type: bool</span>
+                 <span class="n">include_inherited</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># type: bool</span>
+                 <span class="n">remove_duplicates</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># type: bool</span>
+                 <span class="n">ancestors_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>    <span class="c1"># type: bool</span>
                  <span class="p">)</span>
 </pre></div>
 
