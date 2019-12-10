@@ -21,4 +21,5 @@ def test_issue_53():
         def __init__(self):
             super(B, self).__init__(a=self.a)
 
+    # note that with the issue, this was raising an exception
     print(B('a', 'b'))

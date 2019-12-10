@@ -2,7 +2,7 @@
 #
 #  Copyright (c) Schneider Electric Industries, 2019. All right reserved.
 import sys
-from inspect import isfunction
+from inspect import isfunction, getmro
 from itertools import islice
 
 try:
@@ -296,6 +296,21 @@ class InitDescriptor(object):
         # see https://github.com/smarie/python-pyfields/issues/53
         if self.ownercls is not None:
             objtype = self.ownercls
+        elif objtype is not None:
+            # workaround in case of python < 3.6: at least, when a subclass init is created, make sure that all super
+            # classes init have their owner class properly set, .
+            # That way, when the subclass __init__ will be called, containing potential calls to super(), the parents'
+            # __init__ method descriptors will be correctly configured.
+            for _c in reversed(getmro(objtype)[1:-1]):
+                try:
+                    _init_member = _c.__dict__['__init__']
+                except KeyError:
+                    continue
+                else:
+                    if isinstance(_init_member, InitDescriptor):
+                        if _init_member.ownercls is None:
+                            # call __set_name__ explicitly (python < 3.6) to register the descriptor with the class
+                            _init_member.__set_name__(_c, '__init__')
 
         # <objtype>.__init__ has been accessed. Create the modified init
         fields = self.fields
