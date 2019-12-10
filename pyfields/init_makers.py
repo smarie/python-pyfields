@@ -2,7 +2,7 @@
 #
 #  Copyright (c) Schneider Electric Industries, 2019. All right reserved.
 import sys
-from inspect import isfunction
+from inspect import isfunction, getmro
 from itertools import islice
 
 try:
@@ -258,7 +258,8 @@ class InitDescriptor(object):
 
     Inspired by https://stackoverflow.com/a/3412743/7262247
     """
-    __slots__ = 'fields', 'user_init_is_injected', 'user_init_fun', 'user_init_args_before', 'ancestor_fields_first'
+    __slots__ = 'fields', 'user_init_is_injected', 'user_init_fun', 'user_init_args_before', 'ancestor_fields_first', \
+                'ownercls'
 
     def __init__(self, fields=None, user_init_is_injected=False, user_init_fun=None, user_init_args_before=True,
                  ancestor_fields_first=None):
@@ -273,11 +274,15 @@ class InitDescriptor(object):
         elif fields is not None:
             raise ValueError("`ancestor_fields_first` is only applicable when `fields` is empty")
         self.ancestor_fields_first = ancestor_fields_first
+        self.ownercls = None
 
-    # not useful and may slow things down anyway
-    # def __set_name__(self, owner, name):
-    #     if name != '__init__':
-    #         raise ValueError("this should not happen")
+    def __set_name__(self, owner, name):
+        """
+        There is a python issue with init descriptors with super() access. To fix it we need to
+        remember the owner class type separately as we cant' trust the one received in __get__.
+        See https://github.com/smarie/python-pyfields/issues/53
+        """
+        self.ownercls = owner
 
     def __get__(self, obj, objtype):
         # type: (...) -> Callable
@@ -287,28 +292,47 @@ class InitDescriptor(object):
         it creates the `__init__` method, replaces itself with it, and returns it. Subsequent calls will directly
         be routed to the new init method and not here.
         """
-        if objtype is not None:
-            # <objtype>.__init__ has been accessed. Create the modified init
-            fields = self.fields
-            if fields is None:
-                # fields have not been provided explicitly, collect them all.
-                fields = get_fields(objtype, include_inherited=True, ancestors_first=self.ancestor_fields_first,
-                                    _auto_fix_fields=not PY36)
-            elif not PY36:
-                # take this opportunity to apply all field names including inherited
-                # TODO set back inherited = False when the bug with class-level access is solved -> make_init will be ok
-                get_fields(objtype, include_inherited=True, ancestors_first=self.ancestor_fields_first,
-                           _auto_fix_fields=True)
+        # objtype is not reliable: when called through super() it does not contain the right class.
+        # see https://github.com/smarie/python-pyfields/issues/53
+        if self.ownercls is not None:
+            objtype = self.ownercls
+        elif objtype is not None:
+            # workaround in case of python < 3.6: at least, when a subclass init is created, make sure that all super
+            # classes init have their owner class properly set, .
+            # That way, when the subclass __init__ will be called, containing potential calls to super(), the parents'
+            # __init__ method descriptors will be correctly configured.
+            for _c in reversed(getmro(objtype)[1:-1]):
+                try:
+                    _init_member = _c.__dict__['__init__']
+                except KeyError:
+                    continue
+                else:
+                    if isinstance(_init_member, InitDescriptor):
+                        if _init_member.ownercls is None:
+                            # call __set_name__ explicitly (python < 3.6) to register the descriptor with the class
+                            _init_member.__set_name__(_c, '__init__')
 
-            # create the init method
-            new_init = create_init(fields=fields, inject_fields=self.user_init_is_injected,
-                                   user_init_fun=self.user_init_fun, user_init_args_before=self.user_init_args_before)
+        # <objtype>.__init__ has been accessed. Create the modified init
+        fields = self.fields
+        if fields is None:
+            # fields have not been provided explicitly, collect them all.
+            fields = get_fields(objtype, include_inherited=True, ancestors_first=self.ancestor_fields_first,
+                                _auto_fix_fields=not PY36)
+        elif not PY36:
+            # take this opportunity to apply all field names including inherited
+            # TODO set back inherited = False when the bug with class-level access is solved -> make_init will be ok
+            get_fields(objtype, include_inherited=True, ancestors_first=self.ancestor_fields_first,
+                       _auto_fix_fields=True)
 
-            # replace it forever in the class
-            setattr(objtype, '__init__', new_init)
+        # create the init method
+        new_init = create_init(fields=fields, inject_fields=self.user_init_is_injected,
+                               user_init_fun=self.user_init_fun, user_init_args_before=self.user_init_args_before)
 
-            # return the new init
-            return new_init.__get__(obj, objtype)
+        # replace it forever in the class
+        setattr(objtype, '__init__', new_init)
+
+        # return the new init
+        return new_init.__get__(obj, objtype)
 
 
 class InjectedInitFieldsArg(object):

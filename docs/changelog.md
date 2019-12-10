@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.0.3 - bugfix
+
+ * Fixed bug with `super().__init__` not behaving as expected. Fixed [#53](https://github.com/smarie/python-pyfields/issues/53)
+
 ### 1.0.2 - bugfixes
 
  * User-provided `nonable` status was wrongly overriden automatically when the field was attached to the class. Fixed [#51](https://github.com/smarie/python-pyfields/issues/51) 
