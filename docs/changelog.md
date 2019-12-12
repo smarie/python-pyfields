@@ -1,5 +1,11 @@
 # Changelog
 
+### 1.0.4 in progress - ...
+
+**Misc**
+
+ - removed `makefun` usage in validate_n_convert.py : was overkill. Also fixed a few type hints.
+
 ### 1.0.3 - bugfix
 
  * Fixed bug with `super().__init__` not behaving as expected. Fixed [#53](https://github.com/smarie/python-pyfields/issues/53)
