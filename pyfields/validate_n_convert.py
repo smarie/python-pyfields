@@ -4,8 +4,6 @@
 import sys
 from collections import OrderedDict
 
-from makefun import with_signature
-
 from valid8 import Validator, failure_raiser, ValidationError, ValidationFailure
 from valid8.base import getfullargspec as v8_getfullargspec, get_callable_name, is_mini_lambda
 from valid8.common_syntax import FunctionDefinitionError, make_validation_func_callables
@@ -16,7 +14,7 @@ from valid8.validation_lib import instance_of
 
 try:  # python 3.5+
     # noinspection PyUnresolvedReferences
-    from typing import Callable, Type, Any, TypeVar, Union, Iterable, Tuple, Mapping, Optional
+    from typing import Callable, Type, Any, TypeVar, Union, Iterable, Tuple, Mapping, Optional, Dict
     from valid8.common_syntax import ValidationFuncs
     use_type_hints = sys.version_info > (3, 0)
 except ImportError:
@@ -65,29 +63,15 @@ if use_type_hints:
     Validators = OneOrSeveralVFDefinitions
 
 
-# Python 3+: load the 'more explicit api'
-if use_type_hints:
-    new_sig = """(self,
-                  validated_field: 'DescriptorField',
-                  *validation_func: ValidationFuncs,
-                  error_type: 'Type[ValidationError]' = None,
-                  help_msg: str = None,
-                  none_policy: int = None,
-                  **kw_context_args):"""
-else:
-    new_sig = None
-
-
 class FieldValidator(Validator):
     """
     Represents a `Validator` responsible to validate a `field`
     """
     __slots__ = '__weakref__', 'validated_field', 'base_validation_funcs'
 
-    @with_signature(new_sig)
     def __init__(self,
                  validated_field,   # type: 'DescriptorField'
-                 validators,
+                 validators,        # type: Validators
                  **kwargs
                  ):
         """
@@ -210,11 +194,13 @@ class FieldValidator(Validator):
         return make_validator_callable
 
     def get_additional_info_for_repr(self):
+        # type: (...) -> str
         return 'validated_field=%s' % self.validated_field.qualname
 
     def _get_name_for_errors(self,
                              name  # type: str
                              ):
+        # type: (...) -> str
         """ override this so that qualname is only called if an error is raised, not before """
         return self.validated_field.qualname
 
