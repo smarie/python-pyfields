@@ -92,7 +92,7 @@ def yield_fields(cls,
 
                 if _auto_fix_fields:
                     # take this opportunity to set the name and type hints
-                    field.set_as_cls_member(_cls, member_name, _cls_pep484_member_type_hints)
+                    field.set_as_cls_member(_cls, member_name, owner_cls_type_hints=_cls_pep484_member_type_hints)
 
                 if remove_duplicates:
                     if member_name in _already_found_names:

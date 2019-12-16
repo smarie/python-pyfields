@@ -217,7 +217,8 @@ class Field(object):
     def set_as_cls_member(self,
                           owner_cls,
                           name,
-                          owner_cls_type_hints
+                          owner_cls_type_hints=None,
+                          type_hint=None
                           ):
         """
         Updates a field with all information available concerning how it is attached to the class.
@@ -237,6 +238,7 @@ class Field(object):
         :param owner_cls:
         :param name:
         :param owner_cls_type_hints:
+        :param type_hint: you can provide the type hint directly
         :return:
         """
         # set the owner class
@@ -256,14 +258,18 @@ class Field(object):
             self.name = name
 
         # if not already manually overridden, get the type hints if there are some in the owner class annotations
-        if self.type_hint is EMPTY and owner_cls_type_hints is not None:
-            t = owner_cls_type_hints.get(name)
-            if t is not None:
+        if self.type_hint is EMPTY:
+            if owner_cls_type_hints is not None:
+                if type_hint is not None:
+                    raise ValueError("Provide either owner_cls_type_hints or type_hint, not both")
+                type_hint = owner_cls_type_hints.get(name)
+
+            if type_hint is not None:
                 # only use type hint if not empty
-                self.type_hint = t
+                self.type_hint = type_hint
                 # update the 'nonable' status
                 if self.nonable is UNKNOWN:
-                    if is_pep484_nonable(t):
+                    if is_pep484_nonable(type_hint):
                         self.nonable = True
                     else:
                         self.nonable = UNKNOWN
@@ -291,7 +297,7 @@ class Field(object):
         if owner is not None:
             # fill all the information about how it is attached to the class
             cls_type_hints = get_type_hints(owner)
-            self.set_as_cls_member(owner, name, cls_type_hints)
+            self.set_as_cls_member(owner, name, owner_cls_type_hints=cls_type_hints)
 
     @property
     def qualname(self):
@@ -1118,7 +1124,7 @@ def fix_field(cls,                     # type: Type[Any]
             # if not member_name.startswith('__'):   not stated in the doc: too dangerous to have such implicit filter
             if member is field:
                 # do the same than in __set_name__
-                field.set_as_cls_member(_cls, member_name, cls_type_hints)
+                field.set_as_cls_member(_cls, member_name, owner_cls_type_hints=cls_type_hints)
                 # found: no need to look further
                 found = True
                 break
