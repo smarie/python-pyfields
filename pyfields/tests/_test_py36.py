@@ -6,7 +6,7 @@
 #
 import pytest
 
-from pyfields import field, inject_fields, MandatoryFieldInitError, make_init
+from pyfields import field, inject_fields, MandatoryFieldInitError, make_init, autofields
 
 
 def _test_class_annotations():
@@ -109,3 +109,19 @@ def _test_readme_constructor(explicit_fields_list, init_type, native):
         raise ValueError(init_type)
 
     return Wall
+
+
+def _test_autofields():
+    @autofields
+    class Foo:
+        CONSTANT: str = 's'
+        __a__: int = 0
+
+        foo: int
+        bar = 0
+        barbar: str = 'yo'
+
+        def fct(self):
+            pass
+
+    return Foo
