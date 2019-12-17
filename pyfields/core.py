@@ -110,7 +110,7 @@ class Symbols(Enum):
     """
     GUESS = 0
     UNKNOWN = 1
-    EMPTY = 2
+    EMPTY = 2  # type: Any
     USE_FACTORY = 3
     _unset = 4
 
