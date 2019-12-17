@@ -115,3 +115,6 @@ reports
 
 # version
 _version.py
+
+# pip wheel
+pip-wheel-metadata
