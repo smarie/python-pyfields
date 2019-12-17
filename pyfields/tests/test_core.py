@@ -646,3 +646,78 @@ def test_pickle():
     serialized = pickle.dumps(f)
     g = pickle.loads(serialized)
     assert vars(g) == vars(f)
+
+
+@pytest.mark.parametrize("check_type", [False, True], ids="check_type={}".format)
+@pytest.mark.parametrize("default_flavor", ["simple", "copy_value", "factory_function"], ids="use_factory={}".format)
+def test_default_validated(default_flavor, check_type):
+    """ Tests that the default value of a DescriptorField is validated """
+
+    # --- How the default value is created
+    def make_def_kwargs():
+        if default_flavor == "simple":
+            def_kwargs = dict(default=0)
+        elif default_flavor == "copy_value":
+            def_kwargs = dict(default_factory=copy_value(0))
+        elif default_flavor == "factory_function":
+            def custom_factory(obj):
+                # important note: this could be something dependent
+                return 0
+            def_kwargs = dict(default_factory=custom_factory)
+        else:
+            raise ValueError(default_flavor)
+        return def_kwargs
+
+    def_kwargs = make_def_kwargs()
+
+    # --- validation can be a type check or a validator
+    if check_type:
+        validator = None
+    else:
+        # a validator that validates the same thing than the type hint
+        def validator(x):
+            return isinstance(x, str)
+
+    # nominal: the converter is used correctly on the default value so this is ok
+    class Foo(object):
+        bar = field(type_hint=str, check_type=check_type, validators=validator, converters=str, **def_kwargs)
+
+    # default value check
+    bar_field = Foo.__dict__['bar']
+    if default_flavor == "simple":
+        assert bar_field.default == 0
+        assert bar_field._default_is_safe is False
+    elif default_flavor == "copy_value":
+        assert bar_field.default.get_copied_value() == 0
+        assert bar_field._default_is_safe is False
+    elif default_flavor == "factory_function":
+        assert bar_field._default_is_safe is None
+
+    # instance creation and default value access
+    f = Foo()
+    assert f.bar == '0'
+
+    # we can check that the default value is modified
+    if default_flavor == "simple":
+        assert bar_field.default == '0'
+        assert bar_field._default_is_safe is True
+    elif default_flavor == "copy_value":
+        assert bar_field.default.get_copied_value() == '0'
+        assert bar_field._default_is_safe is True
+    elif default_flavor == "factory_function":
+        assert bar_field._default_is_safe is None
+
+    # make sure it works fine several times :)
+    del f.bar
+    assert f.bar == '0'
+    g = Foo()
+    assert g.bar == '0'
+
+    # no converter: does not work, the default value is not valid
+    def_kwargs = make_def_kwargs()
+    class Foo(object):
+        bar = field(type_hint=str, check_type=check_type, validators=validator, **def_kwargs)
+
+    f = Foo()
+    with pytest.raises(FieldTypeError if check_type else ValidationError):
+        f.bar

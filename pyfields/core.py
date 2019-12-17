@@ -870,11 +870,17 @@ class NoneError(TypeError, ValueError, FieldError):
                % (self.field.qualname, )
 
 
+# default value policies
+_NO = None
+_NO_BUT_CAN_CACHE_FIRST_RESULT = False
+_YES = True
+
+
 class DescriptorField(Field):
     """
     General-purpose implementation for fields that require type-checking or validation or converter
     """
-    __slots__ = 'root_validator', 'check_type', 'converters', 'read_only'
+    __slots__ = 'root_validator', 'check_type', 'converters', 'read_only', '_default_is_safe'
 
     @classmethod
     def create_from_field(cls,
@@ -940,6 +946,28 @@ class DescriptorField(Field):
         # read-only
         self.read_only = read_only
 
+        # self._default_is_safe is used to know if we should validate/convert the default value before use
+        #  - None means "always". This is the case when there is a default factory we can't modify
+        #  - False means "once", and then True means "not anymore" (after first validation). This is the case
+        #    when we can modify the default value so that we can replace it with the possibly converted one
+        if default is not EMPTY:
+            # a fixed default value is here, we'll validate it once and for all
+            self._default_is_safe = _NO_BUT_CAN_CACHE_FIRST_RESULT
+        elif default_factory is not None:
+            # noinspection PyBroadException
+            try:
+                # is this the `copy_value` factory ?
+                default_factory.set_copied_value
+            except Exception:
+                # No: the factory can be anything else
+                self._default_is_safe = _NO
+            else:
+                # Yes: we can replace the value that it uses on first
+                self._default_is_safe = _NO_BUT_CAN_CACHE_FIRST_RESULT
+        else:
+            # no default at all
+            self._default_is_safe = _NO
+
     def add_validator(self,
                       validator  # type: ValidatorDef
                       ):
@@ -997,7 +1025,32 @@ class DescriptorField(Field):
                 value = self.default
 
             # nominal initialization on first read: we set the attribute in the object
-            setattr(obj, private_name, value)
+            if self._default_is_safe is _YES:
+                # no need to validate/convert the default value, fast track (use the private name directly)
+                setattr(obj, private_name, value)
+            else:
+                # we need conversion and validation - go through the setter (same as using the public name)
+                possibly_converted_value = self.__set__(obj, value, _return=True)
+
+                if self._default_is_safe is _NO_BUT_CAN_CACHE_FIRST_RESULT:
+                    # there is a possibility to remember the new default and skip this next time
+
+                    # If there was a conversion, use the converted value as the new default
+                    if possibly_converted_value is not value:
+                        if self.is_default_factory:
+                            # Modify the `copy_value` factory
+                            self.default.set_copied_value(possibly_converted_value)
+                        else:
+                            # Modify the value
+                            self.default = possibly_converted_value
+                    # else:
+                    #     # no conversion: we can continue to use the same default value, it is valid
+                    #     pass
+
+                    # mark the default as safe now, so that this is skipped next time
+                    self._default_is_safe = _YES
+
+                return possibly_converted_value
 
         return value
 
@@ -1007,7 +1060,8 @@ class DescriptorField(Field):
 
     def __set__(self,
                 obj,
-                value  # type: T
+                value,         # type: T
+                _return=False  # type: bool
                 ):
 
         # do this first, because a field might be referenced from its class the first time it will be used
@@ -1090,6 +1144,10 @@ class DescriptorField(Field):
 
         # set the new value
         setattr(obj, private_name, value)
+
+        # return it for the callers that need it
+        if _return:
+            return value
 
     def __delete__(self, obj):
         # private_name = "_" + self.name
