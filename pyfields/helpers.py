@@ -201,6 +201,15 @@ def copy_value(val,
         def create_default(obj):
             return copy(val)
 
+    # attach a method to easily get a new factory with a new value
+    def get_copied_value():
+        return val
+
+    def clone_with_new_val(newval):
+        return copy_value(newval, deep)
+
+    create_default.get_copied_value = get_copied_value
+    create_default.clone_with_new_val = clone_with_new_val
     return create_default
 
 
