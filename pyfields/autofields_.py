@@ -78,6 +78,15 @@ def autofields(check_types=True,
                 for common_name in in_types:
                     types_gen.send(common_name)
                     values_gen.send((common_name, cls_annotations[common_name]))
+                # last one
+                try:
+                    types_gen.send(None)
+                except StopIteration:
+                    pass
+                try:
+                    values_gen.send((None, None))
+                except StopIteration:
+                    pass
 
         for member_name, type_hint, default_value in members_defs:
             # Main loop : for each

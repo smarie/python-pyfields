@@ -119,7 +119,7 @@ def _test_autofields():
 
         foo: int
         bar = 0
-        barbar: str = 'yo'
+        barbar: str
 
         def fct(self):
             pass

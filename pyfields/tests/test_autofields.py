@@ -21,7 +21,7 @@ def test_autofields_basic(with_type_hints):
         Foo = _test_autofields()
 
         # test it
-        f = Foo(foo=1)
+        f = Foo(foo=1, barbar='yo')
         with pytest.raises(FieldTypeError):
             f.foo = 'ha'
 
