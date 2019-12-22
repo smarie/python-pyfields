@@ -9,12 +9,61 @@ from pyfields import Field, field, make_init, copy_value
 PY36 = sys.version_info >= (3, 6)
 
 
-def autofields(check_types=True,
-               include_upper=False,
-               include_dunder=False):
+def autofields(check_types=True,      # type: bool
+               include_upper=False,   # type: bool
+               include_dunder=False,  # type: bool
+               autoinit=True          # type: bool
+               ):
     """
+    Decorator to automatically create fields and constructor on a class.
 
-    :param cls:
+    When a class is decorated with `@autofields`, all of its members are automatically transformed to fields.
+    More precisely: members that only contain a type annotation become mandatory fields, while members that contain a
+    value (with or without type annotation) become optional fields with a `copy_value` default_factory.
+
+    By default, the following members are NOT transformed into fields:
+
+     * members with upper-case names. This is because this kind of name formatting usually denotes class constants. They
+       can be transformed to fields by setting `include_upper=True`.
+     * members with dunder-like names. They can be included using `include_dunder=True`. Note that reserved python
+       dunder names such as `__name__`, `__setattr__`, etc. can not be transformed to fields, even when
+       `include_dunder=True`.
+     * members that are classes or methods defined in the class (that is, where their `.__name__` is the same name than
+       the member name).
+
+    All created fields have their `type_hint` filled with the type hint associated with the member, and have
+    `check-type=True` by default. This can be changed by setting `check_types=False`.
+
+    Finally, in addition, an init method (constructor) is generated for the class, using `make_init()`. This may be
+    disabled by setting `autoinit=False`..
+
+    >>> import sys, pytest
+    >>> if sys.version_info < (3, 6): pytest.skip("doctest skipped for python < 3.6")
+    ...
+    >>> @autofields
+    ... class Pocket:
+    ...     SENTENCE = "hello world"
+    ...     size: int
+    ...     items = []
+    ...
+    >>> p = Pocket(size=10)
+    >>> p.items
+    []
+    >>> Pocket(size=10, SENTENCE="hello")
+    Traceback (most recent call last):
+    ...
+    TypeError: __init__() got an unexpected keyword argument 'SENTENCE'
+
+
+    :param check_types: boolean flag (default: True) indicating the value of `check_type` for created fields. Note that
+        the type hint of each created field is copied from the type hint of the member it originates from.
+    :param include_upper: boolean flag (default: False) indicating whether upper-case class members should be also
+        transformed to fields.
+    :param include_dunder: boolean flag (default: False) indicating whether dunder-named class members should be also
+        transformed to fields. Note that even if you set this to True, members with reserved python dunder names will
+        not be transformed. See `is_reserved_dunder` for the list of reserved names.
+    :param autoinit: boolean flag (default: True) indicating whether a constructor should be created for the class if
+        no `__init__` method is present. Such constructor will be created using `__init__ = make_init()`.
     :return:
     """
     def _autofields(cls):
@@ -32,18 +81,19 @@ def autofields(check_types=True,
             cls_dict = cls.__dict__
 
             if not PY36:
-                # TODO is this even possible ? does not seem so
-                # dont care about the order, it is not preserved
-                # -- fields with type hint
-                for member_name, type_hint in cls_annotations.items():
-                    members_defs.append((member_name, type_hint, cls_dict.get(member_name, NO_DEFAULT)))
-
-                # -- fields without type hint
-                members_with_type = set(cls_annotations.keys())
-                for member_name, default_value in cls_dict.items():
-                    if member_name not in members_with_type:
-                        members_defs.append((member_name, None, default_value))
-
+                # Is this even possible ? does not seem so. Raising an error until this is reported
+                raise ValueError("Unsupported case: `__annotations__` is present while python is < 3.6 - please report")
+            #     # dont care about the order, it is not preserved
+            #     # -- fields with type hint
+            #     for member_name, type_hint in cls_annotations.items():
+            #         members_defs.append((member_name, type_hint, cls_dict.get(member_name, NO_DEFAULT)))
+            #
+            #     # -- fields without type hint
+            #     members_with_type = set(cls_annotations.keys())
+            #     for member_name, default_value in cls_dict.items():
+            #         if member_name not in members_with_type:
+            #             members_defs.append((member_name, None, default_value))
+            #
             else:
                 # create a list of members with consistent order
                 members_with_type_and_value = set(cls_annotations.keys()).intersection(cls_dict.keys())
@@ -88,14 +138,21 @@ def autofields(check_types=True,
                 except StopIteration:
                     pass
 
+        # Main loop : for each member, possibly create a field()
         for member_name, type_hint, default_value in members_defs:
-            # Main loop : for each
             if not include_upper and member_name == member_name.upper():
+                # excluded uppercase
                 continue
             elif (include_dunder and is_reserved_dunder(member_name)) \
                     or is_dunder(member_name):
+                # excluded dunder
                 continue
-            elif callable(default_value) or isinstance(default_value, Field):
+            elif isinstance(default_value, Field):
+                # already a field, no need to create
+                continue
+            elif (isinstance(default_value, type) or callable(default_value)) \
+                    and getattr(default_value, '__name__', None) == member_name:
+                # a function/class defined in the class > exclude
                 continue
             else:
                 # Create a field !!
@@ -111,14 +168,17 @@ def autofields(check_types=True,
                 setattr(cls, member_name, new_field)
                 new_field.set_as_cls_member(cls, member_name, type_hint=type_hint)
 
-        # Finally, make init if not present
-        if '__init__' not in cls.__dict__:
+        # Finally, make init if not already explicitly present
+        if autoinit and ('__init__' not in cls.__dict__):
             new_init = make_init()
             cls.__init__ = new_init
+            # attach explicitly to the class so that the descriptor is correctly completed.
             new_init.__set_name__(cls, '__init__')
 
         return cls
+    # end of _autofields(cls)
 
+    # Main logic of autofield(**kwargs)
     if check_types is not True and check_types is not False and isinstance(check_types, type):
         # called without arguments @autofields: check_types is the decorated class
         assert include_upper is False
