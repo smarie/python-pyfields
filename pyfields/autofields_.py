@@ -30,6 +30,8 @@ def autofields(check_types=True,      # type: bool
        `include_dunder=True`.
      * members that are classes or methods defined in the class (that is, where their `.__name__` is the same name than
        the member name).
+     * members that are already fields. Therefore you can continue to use `field()` on certain members explicitly if
+       you need to add custom validators, converters, etc.
 
     All created fields have their `type_hint` filled with the type hint associated with the member, and have
     `check-type=True` by default. This can be changed by setting `check_types=False`.
