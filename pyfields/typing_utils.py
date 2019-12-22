@@ -145,8 +145,17 @@ def _make_assert_is_of_type():
                 :return:
                 """
                 types = resolve_union_and_typevar(typ)
-                if not isinstance(value, types):
-                    raise FieldTypeError(field, value, typ)
+                try:
+                    is_ok = isinstance(value, types)
+                except TypeError as e:
+                    if e.args[0].startswith("Subscripted generics cannot"):
+                        raise TypeError("Neither typeguard not pytypes is installed - therefore it is not possible to "
+                                        "validate subscripted typing structures such as %s" % types)
+                    else:
+                        raise
+                else:
+                    if not is_ok:
+                        raise FieldTypeError(field, value, typ)
 
     return assert_is_of_type
 
