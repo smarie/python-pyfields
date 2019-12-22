@@ -604,7 +604,45 @@ post init ! height=1, color=white, msg=hey
 Note on the order of arguments in the resulting `__init__` signature: as you can see, `msg` appears between `height` and `color` in the signature. This corresponds to the 
 
 
-### 3. Misc.
+### 3. Making it even easier
+
+Do you think that the above is still too verbose to define a class ? You can use `@autofields` to create fields and the constructor for you :
+
+```python
+from pyfields import autofields
+from typing import List
+
+@autofields
+class Item:
+    name: str
+
+@autofields
+class Pocket:
+    size: int
+    items: List[Item] = []
+
+# test that the constructor works correctly
+p = Pocket(size=2)
+assert p.size == 2
+p.items.append(Item(name="a_name"))
+```
+
+Note that members that are already fields are not further transformed. Therefore you can still use `field()` on some members, for example if you need to specify custom validators, converters, or default factory.
+
+`@autofields` is just syntactic sugar for `field()` and `make_init()` - for example the `Pocket` class defined above is completely equivalent to: 
+
+```python
+from pyfields import field, copy_value, make_init
+
+class Pocket:
+    size = field(type_hint=int, check_type=True)
+    items = field(type_hint=List[Item], check_type=True, 
+                  default_factory=copy_value([]))
+    __init__ = make_init()
+```
+
+
+### 4. Misc.
 
 #### API
 

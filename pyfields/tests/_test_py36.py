@@ -128,3 +128,26 @@ def _test_autofields():
             return 1
 
     return Foo
+
+
+def _test_autofields_readme():
+    from pyfields import autofields
+    from typing import List
+
+    @autofields(autoinit=True)
+    class Item:
+        name: str
+
+    @autofields
+    class Pocket:
+        size: int
+        items: List[Item] = []
+
+    @autofields
+    class Pocket2:
+        size: int
+        items: List[Item] = []
+        def __init__(self, who):
+            print("hello, %s" % who)
+
+    return Pocket, Item, Pocket2

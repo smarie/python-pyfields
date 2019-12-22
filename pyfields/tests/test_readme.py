@@ -382,3 +382,29 @@ def test_init_fields():
 
     w = Wall(msg='hey', color='blue', height=12)
     assert vars(w) == {'color': 'blue', 'height': 12, 'non_field_attr': 'hey'}
+
+
+@pytest.mark.skipif(sys.version_info < (3, 6), reason="python < 3.6 does not support class member type hints")
+def test_autofields_readme():
+    """Test for readme on autofields"""
+
+    from ._test_py36 import _test_autofields_readme
+    Pocket, Item, Pocket2 = _test_autofields_readme()
+
+    with pytest.raises(TypeError):
+        Item()
+
+    item1 = Item(name='1')
+    pocket1 = Pocket(size=2)
+    pocket2 = Pocket(size=2)
+
+    # make sure that custom constructor is not overridden by @autofields
+    pocket3 = Pocket2("world")
+    with pytest.raises(MandatoryFieldInitError):
+        pocket3.size
+
+    # make sure the items list is not the same in both (if we add the item to one, they do not appear in the 2d)
+    assert pocket1.size == 2
+    assert pocket1.items is not pocket2.items
+    pocket1.items.append(item1)
+    assert len(pocket2.items) == 0
