@@ -2,8 +2,6 @@
 #
 #  Copyright (c) Schneider Electric Industries, 2019. All right reserved.
 
-#  Authors: Sylvain Marie <sylvain.marie@se.com>
-#
 import pytest
 
 from pyfields import field, inject_fields, MandatoryFieldInitError, make_init, autofields
@@ -119,9 +117,14 @@ def _test_autofields():
 
         foo: int
         bar = 0
+        barcls = int
+        barfunc = lambda x: x
         barbar: str
 
-        def fct(self):
+        class cls:
             pass
+
+        def fct(self):
+            return 1
 
     return Foo

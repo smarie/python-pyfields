@@ -5,7 +5,7 @@ import sys
 
 import pytest
 
-from pyfields import autofields, field, FieldTypeError
+from pyfields import autofields, field, FieldTypeError, Field
 
 
 @pytest.mark.parametrize("with_type_hints", [False, True],
@@ -21,11 +21,19 @@ def test_autofields_basic(with_type_hints):
         Foo = _test_autofields()
 
         # test it
-        f = Foo(foo=1, barbar='yo')
+        assert isinstance(Foo.__dict__['barcls'], Field)
+        assert isinstance(Foo.__dict__['barfunc'], Field)
+        assert not isinstance(Foo.__dict__['fct'], Field)
+        assert not isinstance(Foo.__dict__['cls'], Field)
+
+        f = Foo(foo=1, barbar='yo', barfunc=lambda x: 2, barcls=str)
         with pytest.raises(FieldTypeError):
             f.foo = 'ha'
 
         assert f.bar == 0
+        assert f.fct() == 1
+        assert f.barfunc(1) == 2
+        assert f.barcls == str
 
     else:
         # retrocompatbility mode for python < 3.6
@@ -37,11 +45,24 @@ def test_autofields_basic(with_type_hints):
 
             foo = field()
             bar = 0     # type: int
+            barcls = float
+            barfunc = lambda x: x
             barbar = 0  # type: str
 
-            def fct(self):
+            class cls:
                 pass
 
+            def fct(self):
+                return 1
+
         # test it
-        f = Foo(foo=1)
+        assert isinstance(Foo.__dict__['barcls'], Field)
+        assert isinstance(Foo.__dict__['barfunc'], Field)
+        assert not isinstance(Foo.__dict__['fct'], Field)
+        assert not isinstance(Foo.__dict__['cls'], Field)
+
+        f = Foo(foo=1, barfunc=lambda x: 2, barcls=str)
         assert f.bar == 0
+        assert f.fct() == 1
+        assert f.barfunc(1) == 2
+        assert f.barcls == str
