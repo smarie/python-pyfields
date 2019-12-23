@@ -384,7 +384,18 @@ def test_init_fields():
     assert vars(w) == {'color': 'blue', 'height': 12, 'non_field_attr': 'hey'}
 
 
+no_type_checker = False
+try:
+    import typeguard
+except ImportError:
+    try:
+        import pytypes
+    except ImportError:
+        no_type_checker = True
+
+
 @pytest.mark.skipif(sys.version_info < (3, 6), reason="python < 3.6 does not support class member type hints")
+@pytest.mark.skipif(no_type_checker, reason="no type checker is installed")
 def test_autofields_readme():
     """Test for readme on autofields"""
 
