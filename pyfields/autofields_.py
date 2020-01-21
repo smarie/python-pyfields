@@ -3,7 +3,7 @@
 #  Copyright (c) Schneider Electric Industries, 2019. All right reserved.
 import sys
 
-from pyfields import Field, field, make_init, copy_value
+from pyfields import Field, field, make_init as mkinit, copy_value
 
 
 PY36 = sys.version_info >= (3, 6)
@@ -12,7 +12,7 @@ PY36 = sys.version_info >= (3, 6)
 def autofields(check_types=False,     # type: bool
                include_upper=False,   # type: bool
                include_dunder=False,  # type: bool
-               autoinit=True          # type: bool
+               make_init=True         # type: bool
                ):
     """
     Decorator to automatically create fields and constructor on a class.
@@ -34,19 +34,19 @@ def autofields(check_types=False,     # type: bool
        you need to add custom validators, converters, etc.
 
     All created fields have their `type_hint` filled with the type hint associated with the member, and have
-    `check-type=True` by default. This can be changed by setting `check_types=False`.
+    `check_type=False` by default. This can be changed by setting `check_types=True`.
 
     Finally, in addition, an init method (constructor) is generated for the class, using `make_init()`. This may be
-    disabled by setting `autoinit=False`..
+    disabled by setting `make_init=False`..
 
     >>> import sys, pytest
     >>> if sys.version_info < (3, 6): pytest.skip("doctest skipped for python < 3.6")
     ...
     >>> @autofields
     ... class Pocket:
-    ...     SENTENCE = "hello world"
-    ...     size: int
-    ...     items = []
+    ...     SENTENCE = "hello world"  # uppercase: not a field
+    ...     size: int   # mandatory field
+    ...     items = []  # optional - default value will be a factory
     ...
     >>> p = Pocket(size=10)
     >>> p.items
@@ -64,7 +64,7 @@ def autofields(check_types=False,     # type: bool
     :param include_dunder: boolean flag (default: False) indicating whether dunder-named class members should be also
         transformed to fields. Note that even if you set this to True, members with reserved python dunder names will
         not be transformed. See `is_reserved_dunder` for the list of reserved names.
-    :param autoinit: boolean flag (default: True) indicating whether a constructor should be created for the class if
+    :param make_init: boolean flag (default: True) indicating whether a constructor should be created for the class if
         no `__init__` method is present. Such constructor will be created using `__init__ = make_init()`.
     :return:
     """
@@ -171,8 +171,8 @@ def autofields(check_types=False,     # type: bool
                 new_field.set_as_cls_member(cls, member_name, type_hint=type_hint)
 
         # Finally, make init if not already explicitly present
-        if autoinit and ('__init__' not in cls.__dict__):
-            new_init = make_init()
+        if make_init and ('__init__' not in cls.__dict__):
+            new_init = mkinit()
             cls.__init__ = new_init
             # attach explicitly to the class so that the descriptor is correctly completed.
             new_init.__set_name__(cls, '__init__')
