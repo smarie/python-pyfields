@@ -353,6 +353,56 @@ Wall<height=1, color='white'>
  - `fields`: list of fields to initialize before entering the decorated `__init__` method. For each of these fields a corresponding argument will be added in the method's signature. If an empty list is provided, all fields from the class will be used including inherited fields following the mro.
 
 
+## `@autofields`
+
+```python
+def autofields(check_types=False,     # type: bool
+               include_upper=False,   # type: bool
+               include_dunder=False,  # type: bool
+               make_init=True         # type: bool
+               ):
+```
+
+Decorator to automatically create fields and constructor on a class.
+
+When a class is decorated with `@autofields`, all of its members are automatically transformed to fields.
+More precisely: members that only contain a type annotation become mandatory fields, while members that contain a value (with or without type annotation) become optional fields with a `copy_value` default_factory.
+
+By default, the following members are NOT transformed into fields:
+
+ * members with upper-case names. This is because this kind of name formatting usually denotes class constants. They
+   can be transformed to fields by setting `include_upper=True`.
+ * members with dunder-like names. They can be included using `include_dunder=True`. Note that reserved python
+   dunder names such as `__name__`, `__setattr__`, etc. can not be transformed to fields, even when
+   `include_dunder=True`.
+ * members that are classes or methods defined in the class (that is, where their `.__name__` is the same name than
+   the member name).
+ * members that are already fields. Therefore you can continue to use `field()` on certain members explicitly if
+   you need to add custom validators, converters, etc.
+
+All created fields have their `type_hint` filled with the type hint associated with the member, and have
+`check_type=False` by default. This can be changed by setting `check_types=True`.
+
+Finally, in addition, an init method (constructor) is generated for the class, using `make_init()`. This may be
+disabled by setting `make_init=False`.
+
+```python
+>>> @autofields
+... class Pocket:
+...     SENTENCE = "hello world"  # uppercase: not a field
+...     size: int   # mandatory field
+...     items = []  # optional - default value will be a factory
+...
+>>> p = Pocket(size=10)
+>>> p.items
+[]
+>>> Pocket(size=10, SENTENCE="hello")
+Traceback (most recent call last):
+...
+TypeError: __init__() got an unexpected keyword argument 'SENTENCE'
+```
+
+
 ## API
 
 ### `has_fields`
