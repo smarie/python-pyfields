@@ -325,7 +325,7 @@ function filter_table(elem) {
     not_found_message.hidden = !all_rows_hidden;
 }
 </script>
-    <p>Report generated on 23-Dec-2019 at 14:35:47</p>
+    <p>Report generated on 21-Jan-2020 at 15:56:30</p>
     <h2>Environment</h2>
     <table id="environment">
       <tr>
@@ -335,8 +335,8 @@ function filter_table(elem) {
         <td>Python</td>
         <td>3.5.6</td></tr></table>
     <h2>Summary</h2>
-    <p>141 tests ran in 4.48 seconds. </p>
-    <p>(Un)check the boxes to filter the results.</p><input checked="true" data-test-result="passed" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="passed">141 passed</span> <input checked="true" data-test-result="skipped" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="skipped">27 skipped</span> <input checked="true" data-test-result="failed" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="failed">0 failed</span> <input checked="true" data-test-result="error" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="error">0 errors</span> <input checked="true" data-test-result="xfailed" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xfailed">0 expected failures</span> <input checked="true" data-test-result="xpassed" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span> <input checked="true" data-test-result="rerun" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="rerun">0 rerun</span> 
+    <p>141 tests ran in 4.49 seconds. </p>
+    <p>(Un)check the boxes to filter the results.</p><input checked="true" data-test-result="passed" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="passed">141 passed</span> <input checked="true" data-test-result="skipped" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="skipped">28 skipped</span> <input checked="true" data-test-result="failed" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="failed">0 failed</span> <input checked="true" data-test-result="error" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="error">0 errors</span> <input checked="true" data-test-result="xfailed" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xfailed">0 expected failures</span> <input checked="true" data-test-result="xpassed" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span> <input checked="true" data-test-result="rerun" disabled="true" name="filter_checkbox" onChange="filter_table(this)" type="checkbox"/><span class="rerun">0 rerun</span> 
     <h2>Results</h2>
     <table id="results-table">
       <thead id="results-table-head">
@@ -422,7 +422,7 @@ function filter_table(elem) {
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">pyfields/tests/test_autofields.py::test_autofields_basic[with_type_hints=False]</td>
+          <td class="col-name">pyfields/tests/test_autofields.py::test_autofields_basic[False-False]</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
@@ -431,7 +431,16 @@ function filter_table(elem) {
       <tbody class="skipped results-table-row">
         <tr>
           <td class="col-result">Skipped</td>
-          <td class="col-name">pyfields/tests/test_autofields.py::test_autofields_basic[with_type_hints=True]</td>
+          <td class="col-name">pyfields/tests/test_autofields.py::test_autofields_basic[True-False]</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="5">
+            <div class="log">(&#x27;/home/travis/build/smarie/python-pyfields/pyfields/tests/test_autofields.py&#x27;, 18, &#x27;Skipped: Type annotations are not supported in python &lt; 3.6&#x27;)<br/></div></td></tr></tbody>
+      <tbody class="skipped results-table-row">
+        <tr>
+          <td class="col-result">Skipped</td>
+          <td class="col-name">pyfields/tests/test_autofields.py::test_autofields_basic[True-True]</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
@@ -1710,7 +1719,7 @@ function filter_table(elem) {
         <tr>
           <td class="col-result">Passed</td>
           <td class="col-name">pyfields/tests/test_readme.py::test_native_descriptors</td>
-          <td class="col-duration">3.30</td>
+          <td class="col-duration">3.27</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="5">
