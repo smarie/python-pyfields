@@ -9,7 +9,7 @@ from pyfields import Field, field, make_init, copy_value
 PY36 = sys.version_info >= (3, 6)
 
 
-def autofields(check_types=True,      # type: bool
+def autofields(check_types=False,     # type: bool
                include_upper=False,   # type: bool
                include_dunder=False,  # type: bool
                autoinit=True          # type: bool
@@ -57,7 +57,7 @@ def autofields(check_types=True,      # type: bool
     TypeError: __init__() got an unexpected keyword argument 'SENTENCE'
 
 
-    :param check_types: boolean flag (default: True) indicating the value of `check_type` for created fields. Note that
+    :param check_types: boolean flag (default: False) indicating the value of `check_type` for created fields. Note that
         the type hint of each created field is copied from the type hint of the member it originates from.
     :param include_upper: boolean flag (default: False) indicating whether upper-case class members should be also
         transformed to fields.
@@ -185,7 +185,10 @@ def autofields(check_types=True,      # type: bool
         # called without arguments @autofields: check_types is the decorated class
         assert include_upper is False
         assert include_dunder is False
-        return _autofields(cls=check_types)
+        # use the parameter and use the correct check_types default value now
+        _cls = check_types
+        check_types = False  # <-- important: variable is in the local context of _autofields
+        return _autofields(cls=_cls)
     else:
         # called with arguments @autofields(...): return the decorator
         return _autofields

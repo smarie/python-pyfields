@@ -4,6 +4,7 @@
 
 import pytest
 
+from typing import List
 from pyfields import field, inject_fields, MandatoryFieldInitError, make_init, autofields
 
 
@@ -109,8 +110,13 @@ def _test_readme_constructor(explicit_fields_list, init_type, native):
     return Wall
 
 
-def _test_autofields():
-    @autofields
+def _test_autofields(type_check):
+    if type_check:
+        _deco = autofields(check_types=True)
+    else:
+        _deco = autofields
+
+    @_deco
     class Foo:
         CONSTANT: str = 's'
         __a__: int = 0
@@ -131,8 +137,6 @@ def _test_autofields():
 
 
 def _test_autofields_readme():
-    from pyfields import autofields
-    from typing import List
 
     @autofields(autoinit=True)
     class Item:
