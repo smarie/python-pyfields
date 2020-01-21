@@ -138,7 +138,7 @@ def _test_autofields(type_check):
 
 def _test_autofields_readme():
 
-    @autofields(autoinit=True)
+    @autofields(make_init=True)
     class Item:
         name: str
 
