@@ -277,8 +277,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#104-in-progress-" class="md-nav__link">
-    1.0.4 in progress - ...
+  <a href="#110-autofields-and-default-values-improvements" class="md-nav__link">
+    1.1.0 - @autofields and default values improvements
   </a>
   
 </li>
@@ -427,8 +427,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#104-in-progress-" class="md-nav__link">
-    1.0.4 in progress - ...
+  <a href="#110-autofields-and-default-values-improvements" class="md-nav__link">
+    1.1.0 - @autofields and default values improvements
   </a>
   
 </li>
@@ -565,10 +565,17 @@
                 
                 
                 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
-<h3 id="104-in-progress-">1.0.4 in progress - ...<a class="headerlink" href="#104-in-progress-" title="Permanent link">&para;</a></h3>
-<p><strong>Misc</strong></p>
+<h3 id="110-autofields-and-default-values-improvements">1.1.0 - @autofields and default values improvements<a class="headerlink" href="#110-autofields-and-default-values-improvements" title="Permanent link">&para;</a></h3>
 <ul>
-<li>removed <code>makefun</code> usage in validate_n_convert.py : was overkill. Also fixed a few type hints.</li>
+<li>
+<p><strong>New <code>@autofields</code> decorator</strong>. This decorator can be used to drastically reduce boilerplate code, similar to <code>pydantic</code> and <code>attrs</code>. This is compliant with python 2.7 and 3.5+ but is more useful when the type hints can be provided in class member annotations, so from 3.6+. Fixed <a href="https://github.com/smarie/python-pyfields/issues/55">#55</a></p>
+</li>
+<li>
+<p><strong>Default values are now validated/converted as normal values</strong>. If the default value is provided in <code>default=&lt;value&gt;</code> or as a <code>default_factory=copy_value(&lt;value&gt;)</code>, this is done only <strong>once per field</strong>, to accelerate future access. If the value was converted on the way, the converted value is used to replace the default value, or the default value copied by the factory. Fixed <a href="https://github.com/smarie/python-pyfields/issues/57">#57</a></p>
+</li>
+<li>
+<p><strong>Misc</strong>: removed <code>makefun</code> usage in <code>validate_n_convert.py</code> : was overkill. Also fixed a few type hints.</p>
+</li>
 </ul>
 <h3 id="103-bugfix">1.0.3 - bugfix<a class="headerlink" href="#103-bugfix" title="Permanent link">&para;</a></h3>
 <ul>

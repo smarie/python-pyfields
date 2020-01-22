@@ -264,57 +264,57 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#field-vs-python-attribute" class="md-nav__link">
-    Field vs. Python attribute
+  <a href="#a-field-vs-python-attr" class="md-nav__link">
+    a - Field vs. Python attr
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#default-value-factory" class="md-nav__link">
-    Default value factory
+  <a href="#b-default-value-factory" class="md-nav__link">
+    b - Default value factory
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#read-only-fields" class="md-nav__link">
-    Read-only fields
+  <a href="#c-read-only-fields" class="md-nav__link">
+    c - Read-only fields
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#type-validation" class="md-nav__link">
-    Type validation
+  <a href="#d-type-validation" class="md-nav__link">
+    d - Type validation
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#nonable-fields" class="md-nav__link">
-    Nonable fields
+  <a href="#e-nonable-fields" class="md-nav__link">
+    e - Nonable fields
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#value-validation" class="md-nav__link">
-    Value validation
+  <a href="#f-value-validation" class="md-nav__link">
+    f - Value validation
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#converters" class="md-nav__link">
-    Converters
+  <a href="#g-converters" class="md-nav__link">
+    g - Converters
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#native-vs-descriptor-fields" class="md-nav__link">
-    Native vs. Descriptor fields
+  <a href="#h-native-vs-descriptor" class="md-nav__link">
+    h - Native vs. Descriptor
   </a>
   
 </li>
@@ -352,8 +352,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-making-it-even-easier" class="md-nav__link">
-    3. Making it even easier
+  <a href="#3-autofields" class="md-nav__link">
+    3. @autofields
   </a>
   
 </li>
@@ -522,57 +522,57 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#field-vs-python-attribute" class="md-nav__link">
-    Field vs. Python attribute
+  <a href="#a-field-vs-python-attr" class="md-nav__link">
+    a - Field vs. Python attr
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#default-value-factory" class="md-nav__link">
-    Default value factory
+  <a href="#b-default-value-factory" class="md-nav__link">
+    b - Default value factory
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#read-only-fields" class="md-nav__link">
-    Read-only fields
+  <a href="#c-read-only-fields" class="md-nav__link">
+    c - Read-only fields
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#type-validation" class="md-nav__link">
-    Type validation
+  <a href="#d-type-validation" class="md-nav__link">
+    d - Type validation
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#nonable-fields" class="md-nav__link">
-    Nonable fields
+  <a href="#e-nonable-fields" class="md-nav__link">
+    e - Nonable fields
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#value-validation" class="md-nav__link">
-    Value validation
+  <a href="#f-value-validation" class="md-nav__link">
+    f - Value validation
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#converters" class="md-nav__link">
-    Converters
+  <a href="#g-converters" class="md-nav__link">
+    g - Converters
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#native-vs-descriptor-fields" class="md-nav__link">
-    Native vs. Descriptor fields
+  <a href="#h-native-vs-descriptor" class="md-nav__link">
+    h - Native vs. Descriptor
   </a>
   
 </li>
@@ -610,8 +610,8 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-making-it-even-easier" class="md-nav__link">
-    3. Making it even easier
+  <a href="#3-autofields" class="md-nav__link">
+    3. @autofields
   </a>
   
 </li>
@@ -715,7 +715,7 @@
 <div class="admonition success">
 <p class="admonition-title"><code>pyfields</code> is now automatically supported by <code>autoclass</code> ! See <a href="https://smarie.github.io/python-autoclass/#pyfields-combo">here</a> for details.</p>
 </div>
-<p><code>pyfields</code> provides a simple and elegant way to define fields in python classes. With <code>pyfields</code> you explicitly define all aspects of a field (default value, type, documentation...) in a single place, and can refer to it from other places.</p>
+<p><code>pyfields</code> provides a simple and elegant way to define fields in python classes. With <code>pyfields</code> you explicitly define all aspects of a field (default value/factory, type, validators, converters, documentation...) in a single place, and can refer to it from other places. </p>
 <p>It is designed with <strong>development freedom</strong> as primary target: </p>
 <ul>
 <li>
@@ -744,19 +744,25 @@
 </li>
 </ul>
 <p>Finally, it offers an API that other libraries can leverage to get the list of fields. For example <code>autoclass</code> now leverages <code>pyfields</code> to automatically add hash/dict/eq/repr to your class.</p>
-<p>If your first reaction is "what about <code>attrs</code> / <code>dataclasses</code> / <code>pydantic</code> / <code>characteristic</code> / <code>traits</code> / <code>traitlets</code> / ...", please have a look <a href="why/">here</a>.</p>
+<p>If your first reaction is "what about <code>attrs</code> / <code>dataclasses</code> / <code>pydantic</code> / <code>characteristic</code> / <code>traits</code> / <code>traitlets</code> / ...", well all of these inspired <code>pyfields</code> a great deal, but all of these have stronger constraints on the class - which I did not want. Please have a look <a href="why/">here</a> for a complete list of inspirators.</p>
 <h2 id="installing">Installing<a class="headerlink" href="#installing" title="Permanent link">&para;</a></h2>
 <div class="codehilite"><pre><span></span>&gt; pip install pyfields
 </pre></div>
 
 
+<p>For advanced type checking capabilities, <code>pyfields</code> requires that <code>typeguard</code> or <code>pytypes</code> is installed. Note that type checking performance (speed) mostly depends on the choice of type checking library. Not installing any will be faster, but will not support all of the <code>typing</code> constructs. Let's install <code>typeguard</code> for now:</p>
+<div class="codehilite"><pre><span></span>&gt; pip install typeguard
+</pre></div>
+
+
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
+<p>Below we show a few prototypical examples to illustrate how versatile <code>pyfields</code> is. See <a href="./usage.md">usage</a> for a more detailed, step-by-step explanation of all features.</p>
 <div class="admonition warning">
 <p class="admonition-title">compliance with python 2's old-style classes</p>
-<p>All examples below assume python 3 and therefore show new-style classes without explicit inheritance of <code>object</code>, for readability. If you're using python 2 do not forget to explicitly use a new-style class otherwise some features will not be available (the ones where a setter on the field is required: validation, conversion, read-only).</p>
+<p>All examples in this doc assume python 3 and therefore show new-style classes without explicit inheritance of <code>object</code>, for readability. If you use python 2 do not forget to explicitly use new-style classes otherwise some features will not be available (the ones where a setter on the field is required: validation, conversion, read-only).</p>
 </div>
 <h3 id="1-defining-a-field">1. Defining a field<a class="headerlink" href="#1-defining-a-field" title="Permanent link">&para;</a></h3>
-<p>A field is defined as a class member using the <code>field()</code> method. The idea (not new) is that you declare in a single place all aspects related to each field. For mandatory fields you do not need to provide any argument. For optional fields, you will typically provide a <code>default</code> value or a <code>default_factory</code> (we will see that later).</p>
+<p>A field is defined as a class member using the <code>field()</code> method. The idea (not new) is that you declare in a single place all aspects related to each field. For mandatory fields you do not need to provide any argument. For optional fields, you will typically provide a <code>default</code> value or a <code>default_factory</code> (we will see that <a href="#b-default-value-factory">later</a>).</p>
 <p>For example let's create a <code>Wall</code> class with one <em>mandatory</em> <code>height</code> and one <em>optional</em> <code>color</code> field:</p>
 <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span>
 
@@ -768,9 +774,9 @@
 
 <div class="admonition info">
 <p class="admonition-title">Compliance with python &lt; 3.6</p>
-<p>If you use python &lt; <code>3.6</code> you know that PEP484 type hints can not be declared as shown above. However you can provide them as <a href="https://www.python.org/dev/peps/pep-0484/#type-comments">type comments</a>, or using the <code>type_hint</code> argument.</p>
+<p>If you use python &lt; <code>3.6</code> you know that PEP484 type hints can not be declared as shown above. However you can provide them as <a href="https://www.python.org/dev/peps/pep-0484/#type-comments">type comments</a>, or using the <code>type_hint</code> argument (recommended if you wish to use <a href="#d-type-validation">type validation</a>).</p>
 </div>
-<h4 id="field-vs-python-attribute">Field vs. Python attribute<a class="headerlink" href="#field-vs-python-attribute" title="Permanent link">&para;</a></h4>
+<h4 id="a-field-vs-python-attr">a - Field vs. Python attr<a class="headerlink" href="#a-field-vs-python-attr" title="Permanent link">&para;</a></h4>
 <p>By default when you use <code>field()</code>, nothing more than a "lazy field" is created on your class. This field will only be activated when you access it on an instance. That means that you are free to implement <code>__init__</code> as you wish, or even to rely on the default <code>object</code> constructor to create instances:</p>
 <div class="codehilite"><pre><span></span><span class="c1"># instantiate using the default `object` constructor</span>
 <span class="n">w</span> <span class="o">=</span> <span class="n">Wall</span><span class="p">()</span>
@@ -787,7 +793,7 @@
 
 
 <p>As soon as you access it, a field is replaced with a standard native python attribute, visible in <code>vars</code>:</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">w</span><span class="o">.</span><span class="n">color</span>  <span class="c1"># optional field: tdefault value is used</span>
+<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">w</span><span class="o">.</span><span class="n">color</span>  <span class="c1"># optional field: the default value is used on first &#39;read&#39; access</span>
 <span class="s1">&#39;white&#39;</span>
 
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">vars</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
@@ -796,19 +802,19 @@
 
 
 <p>Of course mandatory fields must be initialized:</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">w</span><span class="o">.</span><span class="n">height</span>
+<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">w</span><span class="o">.</span><span class="n">height</span>  <span class="c1"># trying to read an uninitialized mandatory field</span>
 <span class="n">pyfields</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">MandatoryFieldInitError</span><span class="p">:</span> \
    <span class="n">Mandatory</span> <span class="n">field</span> <span class="s1">&#39;height&#39;</span> <span class="n">has</span> <span class="ow">not</span> <span class="n">been</span> <span class="n">initialized</span> <span class="n">yet</span> <span class="n">on</span> <span class="n">instance</span> <span class="o">&lt;...&gt;.</span>
 
-<span class="o">&gt;&gt;&gt;</span> <span class="n">w</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">w</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="mi">12</span>  <span class="c1"># initializing mandatory field explicitly</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">vars</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
 <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">}</span>
 </pre></div>
 
 
-<p>Your IDE (e.g. PyCharm) should recognize the name and type of the field, so you can already refer to it easily in other code using autocompletion:</p>
+<p>Your IDE (e.g. PyCharm) should recognize the name and type of the field, so you can already refer to it easily from other code using autocompletion:</p>
 <p><img alt="pycharm_autocomplete1.png" src="imgs/autocomplete1.png" /></p>
-<h4 id="default-value-factory">Default value factory<a class="headerlink" href="#default-value-factory" title="Permanent link">&para;</a></h4>
+<h4 id="b-default-value-factory">b - Default value factory<a class="headerlink" href="#b-default-value-factory" title="Permanent link">&para;</a></h4>
 <p>We have seen above how to define an optional field by providing a default value. The behaviour with default values is the same than python's default: the same value is used for all objects. Therefore if your default value is a mutable object (e.g. a list) you should not use this mechanism, otherwise the same value will be shared by all instances that use the default:</p>
 <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">BadPocket</span><span class="p">:</span>
     <span class="n">items</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">[])</span>
@@ -846,7 +852,7 @@
 <li><code>copy_field(&lt;field_or_name&gt;)</code> returns a factory that will create copies of the given object field</li>
 <li><code>copy_attr(&lt;attr_name&gt;)</code> returns a factory that will create copies of the given object attribute (not necessary a field)</li>
 </ul>
-<h4 id="read-only-fields">Read-only fields<a class="headerlink" href="#read-only-fields" title="Permanent link">&para;</a></h4>
+<h4 id="c-read-only-fields">c - Read-only fields<a class="headerlink" href="#c-read-only-fields" title="Permanent link">&para;</a></h4>
 <p>You can define fields that can only be set once:</p>
 <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">User</span><span class="p">:</span>
     <span class="n">name</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -888,7 +894,7 @@ pyfields.core.ReadOnlyFieldError:
 
 
 <p>In practice if you have your own constructor or if you generate one using the methods <a href="#2-adding-a-constructor">below</a>, it will work without problem. But when debugging your constructor with an IDE that automatically calls "repr" on your object you might have to remember it and take extra care.</p>
-<h4 id="type-validation">Type validation<a class="headerlink" href="#type-validation" title="Permanent link">&para;</a></h4>
+<h4 id="d-type-validation">d - Type validation<a class="headerlink" href="#d-type-validation" title="Permanent link">&para;</a></h4>
 <p>You can add type validation to a field by setting <code>check_type=True</code>.</p>
 <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">check_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
@@ -910,7 +916,7 @@ pyfields.core.ReadOnlyFieldError:
 <p class="admonition-title">PEP484 <code>typing</code> support</p>
 <p>Now type hints relying on the <code>typing</code> module (PEP484) are correctly checked using whatever 3d party type checking library is available (<code>typeguard</code> is first looked for, then <code>pytypes</code> as a fallback). If none of these providers are available, a fallback implementation is provided, basically flattening <code>Union</code>s and replacing <code>TypeVar</code>s before doing <code>is_instance</code>. It is not guaranteed to support all <code>typing</code> subtleties.</p>
 </div>
-<h4 id="nonable-fields">Nonable fields<a class="headerlink" href="#nonable-fields" title="Permanent link">&para;</a></h4>
+<h4 id="e-nonable-fields">e - Nonable fields<a class="headerlink" href="#e-nonable-fields" title="Permanent link">&para;</a></h4>
 <p><strong>Definition</strong></p>
 <p>A <em>nonable</em> field is a field that can be set to <code>None</code>. It can be mandatory, or optional. By default, <code>pyfields</code> tries to guess if a field is <em>nonable</em> :</p>
 <ul>
@@ -929,7 +935,7 @@ pyfields.core.ReadOnlyFieldError:
 <p><strong>Effect</strong></p>
 <p>When a field is known to be <em>nonable</em>, all of its type checks and validators are skipped when <code>None</code> is received.</p>
 <p>When a field is forced explicitly to <code>nonable=False</code>, by default nothing happens, this is just declarative. However as soon as the field has type checking or validation activated, then a <code>NoneError</code> will be raised when <code>None</code> is received.</p>
-<h4 id="value-validation">Value validation<a class="headerlink" href="#value-validation" title="Permanent link">&para;</a></h4>
+<h4 id="f-value-validation">f - Value validation<a class="headerlink" href="#f-value-validation" title="Permanent link">&para;</a></h4>
 <p>You can add value (and type) validation to a field by providing <code>validators</code>. <code>pyfields</code> relies on <code>valid8</code> for validation, so the basic definition of a validation function is the same: it should be a <code>&lt;callable&gt;</code> with signature <code>f(value)</code>, returning <code>True</code> or <code>None</code> in case of success. </p>
 <p>A validator consists in a base validation function, with an optional error message and an optional failure type. To specify all these elements, the supported syntax is the same than in <code>valid8</code>:</p>
 <ul>
@@ -1018,9 +1024,9 @@ pyfields.core.ReadOnlyFieldError:
 </pre></div>
 
 
-<p>See <code>API reference</code> for details on <a href="#ltfieldgtvalidator"><code>@&lt;field&gt;.validator</code></a>.</p>
+<p>See <code>API reference</code> for details on <a href="api_reference/#ltfieldgtvalidator"><code>@&lt;field&gt;.validator</code></a>.</p>
 <p>See <code>valid8</code> documentation for details about the <a href="https://smarie.github.io/python-valid8/validation_funcs/c_simple_syntax/">syntax</a> and available <a href="https://smarie.github.io/python-valid8/validation_funcs/b_base_validation_lib/">validation lib</a>.</p>
-<h4 id="converters">Converters<a class="headerlink" href="#converters" title="Permanent link">&para;</a></h4>
+<h4 id="g-converters">g - Converters<a class="headerlink" href="#g-converters" title="Permanent link">&para;</a></h4>
 <p>You can add converters to a field by providing <code>converters</code>. </p>
 <p>A <code>Converter</code> consists in a <em>conversion function</em>, with an optional <em>name</em>, and an optional <em>acceptance criterion</em>. </p>
 <ul>
@@ -1085,7 +1091,7 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 </pre></div>
 
 
-<h4 id="native-vs-descriptor-fields">Native vs. Descriptor fields<a class="headerlink" href="#native-vs-descriptor-fields" title="Permanent link">&para;</a></h4>
+<h4 id="h-native-vs-descriptor">h - Native vs. Descriptor<a class="headerlink" href="#h-native-vs-descriptor" title="Permanent link">&para;</a></h4>
 <p><code>field()</code> by default creates a so-called <strong>native field</strong>. This special construct is designed to be as fast as a normal python attribute after the first access, so that performance is not impacted. This high level of performance has a drawback: validation and conversion are not possible on a native field. </p>
 <p>So when you add type or value validation, or conversion, to a field, <code>field()</code> will automatically create a <strong>descriptor field</strong> instead of a native field. This is an object relying on the <a href="https://docs.python.org/howto/descriptor.html">python descriptor protocol</a>. Such objects have slower access time than native python attributes but provide convenient hooks necessary to perform validation and conversion.</p>
 <p>For experiments, you can force a field to be a descriptor by setting <code>native=False</code>:</p>
@@ -1251,7 +1257,7 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 
 
 <p>Note on the order of arguments in the resulting <code>__init__</code> signature: as you can see, <code>msg</code> appears between <code>height</code> and <code>color</code> in the signature. This corresponds to the </p>
-<h3 id="3-making-it-even-easier">3. Making it even easier<a class="headerlink" href="#3-making-it-even-easier" title="Permanent link">&para;</a></h3>
+<h3 id="3-autofields">3. <code>@autofields</code><a class="headerlink" href="#3-autofields" title="Permanent link">&para;</a></h3>
 <p>Do you think that the above is still too verbose to define a class ? You can use <code>@autofields</code> to create fields and the constructor for you :</p>
 <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">autofields</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
@@ -1277,13 +1283,14 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">copy_value</span><span class="p">,</span> <span class="n">make_init</span>
 
 <span class="k">class</span> <span class="nc">Pocket</span><span class="p">:</span>
-    <span class="n">size</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">check_type</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">items</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="n">List</span><span class="p">[</span><span class="n">Item</span><span class="p">],</span> <span class="n">check_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+    <span class="n">size</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="n">List</span><span class="p">[</span><span class="n">Item</span><span class="p">],</span> 
                   <span class="n">default_factory</span><span class="o">=</span><span class="n">copy_value</span><span class="p">([]))</span>
     <span class="fm">__init__</span> <span class="o">=</span> <span class="n">make_init</span><span class="p">()</span>
 </pre></div>
 
 
+<p>By default type checking is not enabled on the generated fields, but you can enable it with <code>@autofields(check_types=True)</code>. You can also disable constructor creation with <code>@autofields(make_init=False)</code>. See <a href="https://smarie.github.io/python-pyfields/api_reference/#api">API reference</a> for details.</p>
 <h3 id="4-misc">4. Misc.<a class="headerlink" href="#4-misc" title="Permanent link">&para;</a></h3>
 <h4 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h4>
 <p><code>pyfields</code> offers an API so that other libraries can inspect the fields: <code>get_fields</code>, <code>yield_fields</code>, <code>has_fields</code>, <code>get_field</code>. See <a href="https://smarie.github.io/python-pyfields/api_reference/#api">API reference</a> for details.</p>
@@ -1300,7 +1307,7 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 <p>Since from <a href="https://docs.python.org/3/reference/datamodel.html#slots">python documentation</a>, <em>"class attributes cannot be used to set default values for instance variables defined by <code>__slots__</code>"</em>, <strong>native fields are not supported with <code>__slots__</code></strong>. If you run python <code>3.6</code> or greater, <code>field</code> will automatically detect that a field is used on a class with <code>__slots__</code> and will replace the native field with a descriptor field. However with older python versions this is not always possible, so it is recommended that you explicitly state <code>native=False</code>.</p>
 <p>Note that if your class is a dual class (meaning that it declares a slot named <code>__dict__</code>), then <strong>native fields are supported</strong> and you do not have anything special to do (not even declaring a slot for the field).</p>
 <h2 id="main-features-benefits">Main features / benefits<a class="headerlink" href="#main-features-benefits" title="Permanent link">&para;</a></h2>
-<p><strong>TODO</strong></p>
+<p>See <a href=".">top of the page</a></p>
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <p>This library was inspired by:</p>
 <ul>

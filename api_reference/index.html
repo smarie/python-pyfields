@@ -326,6 +326,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#autofields" class="md-nav__link">
+    @autofields
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#api" class="md-nav__link">
     API
   </a>
@@ -467,6 +474,13 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#autofields" class="md-nav__link">
+    @autofields
+  </a>
   
 </li>
       
@@ -840,6 +854,50 @@ object so that users can manually execute the fields initialization. This is don
 <ul>
 <li><code>fields</code>: list of fields to initialize before entering the decorated <code>__init__</code> method. For each of these fields a corresponding argument will be added in the method's signature. If an empty list is provided, all fields from the class will be used including inherited fields following the mro.</li>
 </ul>
+<h2 id="autofields"><code>@autofields</code><a class="headerlink" href="#autofields" title="Permanent link">&para;</a></h2>
+<div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">autofields</span><span class="p">(</span><span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>     <span class="c1"># type: bool</span>
+               <span class="n">include_upper</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>   <span class="c1"># type: bool</span>
+               <span class="n">include_dunder</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># type: bool</span>
+               <span class="n">make_init</span><span class="o">=</span><span class="kc">True</span>         <span class="c1"># type: bool</span>
+               <span class="p">):</span>
+</pre></div>
+
+
+<p>Decorator to automatically create fields and constructor on a class.</p>
+<p>When a class is decorated with <code>@autofields</code>, all of its members are automatically transformed to fields.
+More precisely: members that only contain a type annotation become mandatory fields, while members that contain a value (with or without type annotation) become optional fields with a <code>copy_value</code> default_factory.</p>
+<p>By default, the following members are NOT transformed into fields:</p>
+<ul>
+<li>members with upper-case names. This is because this kind of name formatting usually denotes class constants. They
+   can be transformed to fields by setting <code>include_upper=True</code>.</li>
+<li>members with dunder-like names. They can be included using <code>include_dunder=True</code>. Note that reserved python
+   dunder names such as <code>__name__</code>, <code>__setattr__</code>, etc. can not be transformed to fields, even when
+   <code>include_dunder=True</code>.</li>
+<li>members that are classes or methods defined in the class (that is, where their <code>.__name__</code> is the same name than
+   the member name).</li>
+<li>members that are already fields. Therefore you can continue to use <code>field()</code> on certain members explicitly if
+   you need to add custom validators, converters, etc.</li>
+</ul>
+<p>All created fields have their <code>type_hint</code> filled with the type hint associated with the member, and have
+<code>check_type=False</code> by default. This can be changed by setting <code>check_types=True</code>.</p>
+<p>Finally, in addition, an init method (constructor) is generated for the class, using <code>make_init()</code>. This may be
+disabled by setting <code>make_init=False</code>.</p>
+<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="nd">@autofields</span>
+<span class="o">...</span> <span class="k">class</span> <span class="nc">Pocket</span><span class="p">:</span>
+<span class="o">...</span>     <span class="n">SENTENCE</span> <span class="o">=</span> <span class="s2">&quot;hello world&quot;</span>  <span class="c1"># uppercase: not a field</span>
+<span class="o">...</span>     <span class="n">size</span><span class="p">:</span> <span class="nb">int</span>   <span class="c1"># mandatory field</span>
+<span class="o">...</span>     <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># optional - default value will be a factory</span>
+<span class="o">...</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">Pocket</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">items</span>
+<span class="p">[]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">Pocket</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">SENTENCE</span><span class="o">=</span><span class="s2">&quot;hello&quot;</span><span class="p">)</span>
+<span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+<span class="o">...</span>
+<span class="ne">TypeError</span><span class="p">:</span> <span class="fm">__init__</span><span class="p">()</span> <span class="n">got</span> <span class="n">an</span> <span class="n">unexpected</span> <span class="n">keyword</span> <span class="n">argument</span> <span class="s1">&#39;SENTENCE&#39;</span>
+</pre></div>
+
+
 <h2 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
 <h3 id="has_fields"><code>has_fields</code><a class="headerlink" href="#has_fields" title="Permanent link">&para;</a></h3>
 <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">has_fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
