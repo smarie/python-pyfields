@@ -6,9 +6,10 @@
 
 [![Documentation](https://img.shields.io/badge/doc-latest-blue.svg)](https://smarie.github.io/python-pyfields/) [![PyPI](https://img.shields.io/pypi/v/pyfields.svg)](https://pypi.python.org/pypi/pyfields/) [![Downloads](https://pepy.tech/badge/pyfields)](https://pepy.tech/project/pyfields) [![Downloads per week](https://pepy.tech/badge/pyfields/week)](https://pepy.tech/project/pyfields) [![GitHub stars](https://img.shields.io/github/stars/smarie/python-pyfields.svg)](https://github.com/smarie/python-pyfields/stargazers)
 
+!!! new `@autofields` feature, [check it out](#3-autofields) !
 !!! success "`pyfields` is now automatically supported by `autoclass` ! See [here](https://smarie.github.io/python-autoclass/#pyfields-combo) for details."
 
-`pyfields` provides a simple and elegant way to define fields in python classes. With `pyfields` you explicitly define all aspects of a field (default value, type, documentation...) in a single place, and can refer to it from other places.
+`pyfields` provides a simple and elegant way to define fields in python classes. With `pyfields` you explicitly define all aspects of a field (default value/factory, type, validators, converters, documentation...) in a single place, and can refer to it from other places. 
 
 It is designed with **development freedom** as primary target: 
 
@@ -30,8 +31,7 @@ It provides **many optional features** that will make your object-oriented devel
 
 Finally, it offers an API that other libraries can leverage to get the list of fields. For example `autoclass` now leverages `pyfields` to automatically add hash/dict/eq/repr to your class.
 
-If your first reaction is "what about `attrs` / `dataclasses` / `pydantic` / `characteristic` / `traits` / `traitlets` / ...", please have a look [here](why.md).
-
+If your first reaction is "what about `attrs` / `dataclasses` / `pydantic` / `characteristic` / `traits` / `traitlets` / ...", well all of these inspired `pyfields` a great deal, but all of these have stronger constraints on the class - which I did not want. Please have a look [here](why.md) for a complete list of inspirators.
 
 ## Installing
 
@@ -39,14 +39,22 @@ If your first reaction is "what about `attrs` / `dataclasses` / `pydantic` / `ch
 > pip install pyfields
 ```
 
+For advanced type checking capabilities, `pyfields` requires that `typeguard` or `pytypes` is installed. Note that type checking performance (speed) mostly depends on the choice of type checking library. Not installing any will be faster, but will not support all of the `typing` constructs. Let's install `typeguard` for now:
+
+```bash
+> pip install typeguard
+```
+
 ## Usage
 
+Below we show a few prototypical examples to illustrate how versatile `pyfields` is. See [usage](./usage.md) for a more detailed, step-by-step explanation of all features.
+
 !!! warning  "compliance with python 2's old-style classes"
-    All examples below assume python 3 and therefore show new-style classes without explicit inheritance of `object`, for readability. If you're using python 2 do not forget to explicitly use a new-style class otherwise some features will not be available (the ones where a setter on the field is required: validation, conversion, read-only).
+    All examples in this doc assume python 3 and therefore show new-style classes without explicit inheritance of `object`, for readability. If you use python 2 do not forget to explicitly use new-style classes otherwise some features will not be available (the ones where a setter on the field is required: validation, conversion, read-only).
 
 ### 1. Defining a field
 
-A field is defined as a class member using the `field()` method. The idea (not new) is that you declare in a single place all aspects related to each field. For mandatory fields you do not need to provide any argument. For optional fields, you will typically provide a `default` value or a `default_factory` (we will see that later).
+A field is defined as a class member using the `field()` method. The idea (not new) is that you declare in a single place all aspects related to each field. For mandatory fields you do not need to provide any argument. For optional fields, you will typically provide a `default` value or a `default_factory` (we will see that [later](#b-default-value-factory)).
 
 For example let's create a `Wall` class with one *mandatory* `height` and one *optional* `color` field:
 
@@ -59,9 +67,9 @@ class Wall:
 ```
 
 !!! info "Compliance with python < 3.6"
-    If you use python < `3.6` you know that PEP484 type hints can not be declared as shown above. However you can provide them as [type comments](https://www.python.org/dev/peps/pep-0484/#type-comments), or using the `type_hint` argument.
+    If you use python < `3.6` you know that PEP484 type hints can not be declared as shown above. However you can provide them as [type comments](https://www.python.org/dev/peps/pep-0484/#type-comments), or using the `type_hint` argument (recommended if you wish to use [type validation](#d-type-validation)).
 
-#### Field vs. Python attribute
+#### a - Field vs. Python attr
 
 By default when you use `field()`, nothing more than a "lazy field" is created on your class. This field will only be activated when you access it on an instance. That means that you are free to implement `__init__` as you wish, or even to rely on the default `object` constructor to create instances:
 
@@ -84,7 +92,7 @@ Until it is accessed for the first time, a field is visible on an instance with 
 As soon as you access it, a field is replaced with a standard native python attribute, visible in `vars`:
 
 ```python
->>> w.color  # optional field: tdefault value is used
+>>> w.color  # optional field: the default value is used on first 'read' access
 'white'
 
 >>> vars(w)
@@ -94,20 +102,20 @@ As soon as you access it, a field is replaced with a standard native python attr
 Of course mandatory fields must be initialized:
 
 ```python
->>> w.height
+>>> w.height  # trying to read an uninitialized mandatory field
 pyfields.core.MandatoryFieldInitError: \
    Mandatory field 'height' has not been initialized yet on instance <...>.
 
->>> w.height = 12
+>>> w.height = 12  # initializing mandatory field explicitly
 >>> vars(w)
 {'color': 'white', 'height': 12}
 ```
 
-Your IDE (e.g. PyCharm) should recognize the name and type of the field, so you can already refer to it easily in other code using autocompletion:
+Your IDE (e.g. PyCharm) should recognize the name and type of the field, so you can already refer to it easily from other code using autocompletion:
 
 ![pycharm_autocomplete1.png](imgs/autocomplete1.png)
 
-#### Default value factory
+#### b - Default value factory
 
 We have seen above how to define an optional field by providing a default value. The behaviour with default values is the same than python's default: the same value is used for all objects. Therefore if your default value is a mutable object (e.g. a list) you should not use this mechanism, otherwise the same value will be shared by all instances that use the default:
 
@@ -149,7 +157,7 @@ Finally, you can use the following built-in helper functions to cover most commo
  - `copy_field(<field_or_name>)` returns a factory that will create copies of the given object field
  - `copy_attr(<attr_name>)` returns a factory that will create copies of the given object attribute (not necessary a field)
 
-#### Read-only fields
+#### c - Read-only fields
 
 You can define fields that can only be set once:
 
@@ -198,7 +206,7 @@ pyfields.core.ReadOnlyFieldError:
 
 In practice if you have your own constructor or if you generate one using the methods [below](#2-adding-a-constructor), it will work without problem. But when debugging your constructor with an IDE that automatically calls "repr" on your object you might have to remember it and take extra care.
 
-#### Type validation
+#### d - Type validation
 
 You can add type validation to a field by setting `check_type=True`.
 
@@ -223,7 +231,7 @@ By default the type used for validation is the one provided in the annotation. I
 !!! success "PEP484 `typing` support"
     Now type hints relying on the `typing` module (PEP484) are correctly checked using whatever 3d party type checking library is available (`typeguard` is first looked for, then `pytypes` as a fallback). If none of these providers are available, a fallback implementation is provided, basically flattening `Union`s and replacing `TypeVar`s before doing `is_instance`. It is not guaranteed to support all `typing` subtleties.
 
-#### Nonable fields
+#### e - Nonable fields
 
 **Definition**
 
@@ -245,7 +253,7 @@ When a field is known to be *nonable*, all of its type checks and validators are
 
 When a field is forced explicitly to `nonable=False`, by default nothing happens, this is just declarative. However as soon as the field has type checking or validation activated, then a `NoneError` will be raised when `None` is received.
 
-#### Value validation
+#### f - Value validation
 
 You can add value (and type) validation to a field by providing `validators`. `pyfields` relies on `valid8` for validation, so the basic definition of a validation function is the same: it should be a `<callable>` with signature `f(value)`, returning `True` or `None` in case of success. 
 
@@ -340,12 +348,12 @@ class Wall:
             raise InvalidWidth(width_value, height=self.height)
 ```
 
-See `API reference` for details on [`@<field>.validator`](#ltfieldgtvalidator).
+See `API reference` for details on [`@<field>.validator`](api_reference.md#ltfieldgtvalidator).
 
 See `valid8` documentation for details about the [syntax](https://smarie.github.io/python-valid8/validation_funcs/c_simple_syntax/) and available [validation lib](https://smarie.github.io/python-valid8/validation_funcs/b_base_validation_lib/).
 
 
-#### Converters
+#### g - Converters
 
 You can add converters to a field by providing `converters`. 
 
@@ -414,7 +422,7 @@ print(details)
 ```
 
 
-#### Native vs. Descriptor fields
+#### h - Native vs. Descriptor
 
 `field()` by default creates a so-called **native field**. This special construct is designed to be as fast as a normal python attribute after the first access, so that performance is not impacted. This high level of performance has a drawback: validation and conversion are not possible on a native field. 
 
@@ -604,7 +612,7 @@ post init ! height=1, color=white, msg=hey
 Note on the order of arguments in the resulting `__init__` signature: as you can see, `msg` appears between `height` and `color` in the signature. This corresponds to the 
 
 
-### 3. Making it even easier
+### 3. `@autofields`
 
 Do you think that the above is still too verbose to define a class ? You can use `@autofields` to create fields and the constructor for you :
 
@@ -635,11 +643,13 @@ Note that members that are already fields are not further transformed. Therefore
 from pyfields import field, copy_value, make_init
 
 class Pocket:
-    size = field(type_hint=int, check_type=True)
-    items = field(type_hint=List[Item], check_type=True, 
+    size = field(type_hint=int)
+    items = field(type_hint=List[Item], 
                   default_factory=copy_value([]))
     __init__ = make_init()
 ```
+
+By default type checking is not enabled on the generated fields, but you can enable it with `@autofields(check_types=True)`. You can also disable constructor creation with `@autofields(make_init=False)`. See [API reference](https://smarie.github.io/python-pyfields/api_reference/#api) for details.
 
 
 ### 4. Misc.
@@ -668,8 +678,7 @@ Note that if your class is a dual class (meaning that it declares a slot named `
 
 ## Main features / benefits
 
-**TODO**
- 
+See [top of the page](./index.md)
 
 ## See Also
 
