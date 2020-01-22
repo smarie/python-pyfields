@@ -3,10 +3,15 @@ See:
 https://packaging.python.org/en/latest/distributing.html
 https://github.com/pypa/sampleproject
 """
+import os
+import sys
+from glob import glob
+from warnings import warn
+
 from six import raise_from
 from os import path
 
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, Extension  # do not delete Extension it might break cythonization?
 
 here = path.abspath(path.dirname(__file__))
 
@@ -47,6 +52,72 @@ with open(path.join(here, 'docs', 'long_description.md')) as f:
 # with open(path.join(here, 'VERSION')) as version_file:
 #    VERSION = version_file.read().strip()
 # OBSOLETES = []
+# from Cython.Distutils import build_ext
+# ext_modules = [Extension(module, sources=[module + ".pyx"],
+#               include_dirs=['path1','path2'], # put include paths here
+#               library_dirs=[], # usually need your Windows SDK stuff here
+#               language='c++')]
+
+
+# TODO understand how to do this as an optional thing https://github.com/samuelcolvin/pydantic/pull/548/files
+# OR simply fork an independent pyfields_cy project
+ext_modules = None
+if not any(arg in sys.argv for arg in ['clean', 'check']) and 'SKIP_CYTHON' not in os.environ:
+    try:
+        from Cython.Build import cythonize
+    except ImportError:
+        warn("Cython not present - not cythonizing pyfields")
+    else:
+        # For cython test coverage install with `make build-cython-trace`
+        compiler_directives = {}
+        if 'CYTHON_TRACE' in sys.argv:
+            compiler_directives['linetrace'] = True
+        # compiler_directives['MD'] = True
+        os.environ['CFLAGS'] = '-O3'
+
+        # C compilation options: {'language_level': 3, 'compiler_directives': {}, 'include_path': ['.']}
+        # include_path = '.'
+
+        ext_modules = cythonize(
+            'pyfields/*.py',
+            exclude=['pyfields/tests/*.py', 'pyfields/__init__.py', 'pyfields/_version.py'],
+            nthreads=int(os.getenv('CYTHON_NTHREADS', 0)),
+            language_level=3,
+            compiler_directives=compiler_directives,  # todo /MT >> /MD
+        )
+        for e in ext_modules:
+            # 'py_limited_api': False,
+            # 'name': 'pyfields.core',
+            # 'sources': ['pyfields\\core.c'],
+            # 'include_dirs': [],
+            # 'define_macros': [],
+            # 'undef_macros': [],
+            # 'library_dirs': [],
+            # 'libraries': [],
+            # 'runtime_library_dirs': [],
+            # 'extra_objects': [],
+            # 'extra_compile_args': [],
+            # 'extra_link_args': [],
+            # 'export_symbols': [],
+            # 'swig_opts': [],
+            # 'depends': [],
+            # 'language': None,
+            # 'optional': None,
+            # 'np_pythran': False}
+            #
+            # See https://docs.microsoft.com/fr-fr/cpp/build/reference/md-mt-ld-use-run-time-library?view=vs-2019
+            # I could not find an easier way to use this flac (dynamic linkage to runtime) rather than the default /MT (static)
+            # but I understood that it was needed by looking at scikit-learn compilations
+            e.extra_compile_args.append('/MD')
+            print(vars(e))
+
+if 'clean' in sys.argv:
+    for c_file in glob("pyfields/*.c"):
+        print("Deleting %s" % c_file)
+        os.remove(c_file)
+    for pyd_file in glob("pyfields/*.pyd"):
+        print("Deleting %s" % pyd_file)
+        os.remove(pyd_file)
 
 setup(
     name=DISTNAME,
@@ -150,4 +221,5 @@ setup(
     #         'sample=sample:main',
     #     ],
     # },
+    ext_modules=ext_modules,
 )

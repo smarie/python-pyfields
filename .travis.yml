@@ -61,7 +61,11 @@ install:
 
 script:
 #  - coverage run tests.py
-  - pip install .
+  # cythonization step
+  - python setup.py build_ext --inplace  #  --compiler=msvc
+  - python setup.py bdist_wheel  # create the wheel including the cython files
+  - pip install --pre --no-index --find-links dist\ pyfields  # install existing wheels including pre-releases
+#  - pip install .
   - python -c "import os; os.chdir('..'); import pyfields"
 # ***tests***
 #  - coverage run tests.py
