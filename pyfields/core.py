@@ -957,7 +957,7 @@ class DescriptorField(Field):
             # noinspection PyBroadException
             try:
                 # is this the `copy_value` factory ?
-                default_factory.set_copied_value
+                default_factory.clone_with_new_val
             except Exception:
                 # No: the factory can be anything else
                 self._default_is_safe = _NO
@@ -1039,7 +1039,7 @@ class DescriptorField(Field):
                     if possibly_converted_value is not value:
                         if self.is_default_factory:
                             # Modify the `copy_value` factory
-                            self.default.set_copied_value(possibly_converted_value)
+                            self.default = self.default.clone_with_new_val(possibly_converted_value)
                         else:
                             # Modify the value
                             self.default = possibly_converted_value

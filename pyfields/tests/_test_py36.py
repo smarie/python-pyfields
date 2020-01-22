@@ -2,11 +2,10 @@
 #
 #  Copyright (c) Schneider Electric Industries, 2019. All right reserved.
 
-#  Authors: Sylvain Marie <sylvain.marie@se.com>
-#
 import pytest
 
-from pyfields import field, inject_fields, MandatoryFieldInitError, make_init
+from typing import List
+from pyfields import field, inject_fields, MandatoryFieldInitError, make_init, autofields
 
 
 def _test_class_annotations():
@@ -109,3 +108,50 @@ def _test_readme_constructor(explicit_fields_list, init_type, native):
         raise ValueError(init_type)
 
     return Wall
+
+
+def _test_autofields(type_check):
+    if type_check:
+        _deco = autofields(check_types=True)
+    else:
+        _deco = autofields
+
+    @_deco
+    class Foo:
+        CONSTANT: str = 's'
+        __a__: int = 0
+
+        foo: int
+        bar = 0
+        barcls = int
+        barfunc = lambda x: x
+        barbar: str
+
+        class cls:
+            pass
+
+        def fct(self):
+            return 1
+
+    return Foo
+
+
+def _test_autofields_readme():
+
+    @autofields(make_init=True)
+    class Item:
+        name: str
+
+    @autofields
+    class Pocket:
+        size: int
+        items: List[Item] = []
+
+    @autofields
+    class Pocket2:
+        size: int
+        items: List[Item] = []
+        def __init__(self, who):
+            print("hello, %s" % who)
+
+    return Pocket, Item, Pocket2

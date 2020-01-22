@@ -9,6 +9,12 @@ matrix:
       env: TYPE_CHECKER="none"
     - python: 2.7
       env: TYPE_CHECKER="pytypes"
+    - python: 3.5.3
+      env: TYPE_CHECKER="none"
+    - python: 3.5.3
+      env: TYPE_CHECKER="pytypes"
+    - python: 3.5.3
+      env: TYPE_CHECKER="typeguard"
     - python: 3.5
       env: TYPE_CHECKER="none"
     - python: 3.5

@@ -97,14 +97,14 @@ class FieldValidator(Validator):
 
         try:  # dict ?
             validators.keys()
-        except (AttributeError, FunctionDefinitionError):
+        except (AttributeError, FunctionDefinitionError):  # FunctionDefinitionError when mini_lambda
             if isinstance(validators, tuple):
                 # single tuple
                 validators = (validators,)
             else:
                 try:  # iterable
                     iter(validators)
-                except (TypeError, FunctionDefinitionError):
+                except (TypeError, FunctionDefinitionError):  # FunctionDefinitionError when mini_lambda
                     # single
                     validators = (validators,)
         else:

@@ -1,10 +1,12 @@
 # Changelog
 
-### 1.0.4 in progress - ...
+### 1.1.0 - @autofields and default values improvements
 
-**Misc**
-
- - removed `makefun` usage in validate_n_convert.py : was overkill. Also fixed a few type hints.
+ - **New `@autofields` decorator**. This decorator can be used to drastically reduce boilerplate code, similar to `pydantic` and `attrs`. This is compliant with python 2.7 and 3.5+ but is more useful when the type hints can be provided in class member annotations, so from 3.6+. Fixed [#55](https://github.com/smarie/python-pyfields/issues/55)
+ 
+ - **Default values are now validated/converted as normal values**. If the default value is provided in `default=<value>` or as a `default_factory=copy_value(<value>)`, this is done only **once per field**, to accelerate future access. If the value was converted on the way, the converted value is used to replace the default value, or the default value copied by the factory. Fixed [#57](https://github.com/smarie/python-pyfields/issues/57)
+ 
+ - **Misc**: removed `makefun` usage in `validate_n_convert.py` : was overkill. Also fixed a few type hints.
 
 ### 1.0.3 - bugfix
 

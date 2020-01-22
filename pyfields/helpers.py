@@ -1,7 +1,6 @@
 #  Authors: Sylvain Marie <sylvain.marie@se.com>
 #
 #  Copyright (c) Schneider Electric Industries, 2019. All right reserved.
-import sys
 from copy import copy, deepcopy
 from inspect import getmro
 
@@ -182,71 +181,36 @@ def get_fields(cls,
 #             yield k
 
 
-if sys.version_info < (3, 7):
-    # in python < 3.7, closures cannot be modified, we have to use a mutable object (slightly slower)
-    def copy_value(val,
-                   deep=True  # type: bool
-                   ):
-        """
-        Returns a default value factory to be used in a `field(default_factory=...)`.
+def copy_value(val,
+               deep=True  # type: bool
+               ):
+    """
+    Returns a default value factory to be used in a `field(default_factory=...)`.
 
-        That factory will create a copy of the provided `val` everytime it is called. Handy if you wish to use mutable
-        objects as default values for your fields ; for example lists.
+    That factory will create a copy of the provided `val` everytime it is called. Handy if you wish to use mutable
+    objects as default values for your fields ; for example lists.
 
-        :param val: the (mutable) value to copy
-        :param deep: by default deep copies will be created. You can change this behaviour by setting this to `False`
-        :return:
-        """
-        the_val = [val]
-        if deep:
-            def create_default(obj):
-                return deepcopy(the_val[0])
-        else:
-            def create_default(obj):
-                return copy(the_val[0])
+    :param val: the (mutable) value to copy
+    :param deep: by default deep copies will be created. You can change this behaviour by setting this to `False`
+    :return:
+    """
+    if deep:
+        def create_default(obj):
+            return deepcopy(val)
+    else:
+        def create_default(obj):
+            return copy(val)
 
-        # attach two methods on the function to read and write in the closure
-        def get_copied_value():
-            return the_val[0]
+    # attach a method to easily get a new factory with a new value
+    def get_copied_value():
+        return val
 
-        def set_copied_value(new_default):
-            the_val[0] = new_default
+    def clone_with_new_val(newval):
+        return copy_value(newval, deep)
 
-        create_default.get_copied_value = get_copied_value
-        create_default.set_copied_value = set_copied_value
-        return create_default
-else:
-    # in python >= 3.7, closures can be modified
-    def copy_value(val,
-                   deep=True  # type: bool
-                   ):
-        """
-        Returns a default value factory to be used in a `field(default_factory=...)`.
-
-        That factory will create a copy of the provided `val` everytime it is called. Handy if you wish to use mutable
-        objects as default values for your fields ; for example lists.
-
-        :param val: the (mutable) value to copy
-        :param deep: by default deep copies will be created. You can change this behaviour by setting this to `False`
-        :return:
-        """
-        if deep:
-            def create_default(obj):
-                return deepcopy(val)
-        else:
-            def create_default(obj):
-                return copy(val)
-
-        # attach two methods on the function to read and write in the closure
-        def get_copied_value():
-            return create_default.__closure__[0].cell_contents
-
-        def set_copied_value(new_default):
-            create_default.__closure__[0].cell_contents = new_default
-
-        create_default.get_copied_value = get_copied_value
-        create_default.set_copied_value = set_copied_value
-        return create_default
+    create_default.get_copied_value = get_copied_value
+    create_default.clone_with_new_val = clone_with_new_val
+    return create_default
 
 
 def copy_field(field_or_name,  # type: Union[str, Field]
