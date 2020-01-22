@@ -713,6 +713,9 @@
 <p><a href="https://pypi.python.org/pypi/pyfields/"><img alt="Python versions" src="https://img.shields.io/pypi/pyversions/pyfields.svg" /></a> <a href="https://travis-ci.org/smarie/python-pyfields"><img alt="Build Status" src="https://travis-ci.org/smarie/python-pyfields.svg?branch=master" /></a> <a href="https://smarie.github.io/python-pyfields/junit/report.html"><img alt="Tests Status" src="https://smarie.github.io/python-pyfields/junit/junit-badge.svg?dummy=8484744" /></a> <a href="https://codecov.io/gh/smarie/python-pyfields"><img alt="codecov" src="https://codecov.io/gh/smarie/python-pyfields/branch/master/graph/badge.svg" /></a></p>
 <p><a href="https://smarie.github.io/python-pyfields/"><img alt="Documentation" src="https://img.shields.io/badge/doc-latest-blue.svg" /></a> <a href="https://pypi.python.org/pypi/pyfields/"><img alt="PyPI" src="https://img.shields.io/pypi/v/pyfields.svg" /></a> <a href="https://pepy.tech/project/pyfields"><img alt="Downloads" src="https://pepy.tech/badge/pyfields" /></a> <a href="https://pepy.tech/project/pyfields"><img alt="Downloads per week" src="https://pepy.tech/badge/pyfields/week" /></a> <a href="https://github.com/smarie/python-pyfields/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/smarie/python-pyfields.svg" /></a></p>
 <div class="admonition success">
+<p class="admonition-title">new <code>@autofields</code> feature, <a href="#3-autofields">check it out</a> !</p>
+</div>
+<div class="admonition success">
 <p class="admonition-title"><code>pyfields</code> is now automatically supported by <code>autoclass</code> ! See <a href="https://smarie.github.io/python-autoclass/#pyfields-combo">here</a> for details.</p>
 </div>
 <p><code>pyfields</code> provides a simple and elegant way to define fields in python classes. With <code>pyfields</code> you explicitly define all aspects of a field (default value/factory, type, validators, converters, documentation...) in a single place, and can refer to it from other places. </p>
@@ -1256,7 +1259,7 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 </pre></div>
 
 
-<p>Note on the order of arguments in the resulting <code>__init__</code> signature: as you can see, <code>msg</code> appears between <code>height</code> and <code>color</code> in the signature. This corresponds to the </p>
+<p>Note on the order of arguments in the resulting <code>__init__</code> signature: as you can see, <code>msg</code> appears between <code>height</code> and <code>color</code> in the signature. This is because all mandatory arguments appear first, then the optionals - and within each group, the user-provided ones (e.g. <code>msg</code>) appear first. You can change this behaviour by setting <code>init_args_before=False</code>. See <a href="api_reference/">API reference</a> for details.</p>
 <h3 id="3-autofields">3. <code>@autofields</code><a class="headerlink" href="#3-autofields" title="Permanent link">&para;</a></h3>
 <p>Do you think that the above is still too verbose to define a class ? You can use <code>@autofields</code> to create fields and the constructor for you :</p>
 <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">autofields</span>
