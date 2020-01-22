@@ -6,7 +6,7 @@
 
 [![Documentation](https://img.shields.io/badge/doc-latest-blue.svg)](https://smarie.github.io/python-pyfields/) [![PyPI](https://img.shields.io/pypi/v/pyfields.svg)](https://pypi.python.org/pypi/pyfields/) [![Downloads](https://pepy.tech/badge/pyfields)](https://pepy.tech/project/pyfields) [![Downloads per week](https://pepy.tech/badge/pyfields/week)](https://pepy.tech/project/pyfields) [![GitHub stars](https://img.shields.io/github/stars/smarie/python-pyfields.svg)](https://github.com/smarie/python-pyfields/stargazers)
 
-!!! new `@autofields` feature, [check it out](#3-autofields) !
+!!! success "new `@autofields` feature, [check it out](#3-autofields) !"
 !!! success "`pyfields` is now automatically supported by `autoclass` ! See [here](https://smarie.github.io/python-autoclass/#pyfields-combo) for details."
 
 `pyfields` provides a simple and elegant way to define fields in python classes. With `pyfields` you explicitly define all aspects of a field (default value/factory, type, validators, converters, documentation...) in a single place, and can refer to it from other places. 
@@ -609,7 +609,7 @@ post init ! height=1, color=white, msg=hey
 {'height': 1, 'color': 'white', 'non_field_attr': 'hey'}
 ```
 
-Note on the order of arguments in the resulting `__init__` signature: as you can see, `msg` appears between `height` and `color` in the signature. This corresponds to the 
+Note on the order of arguments in the resulting `__init__` signature: as you can see, `msg` appears between `height` and `color` in the signature. This is because all mandatory arguments appear first, then the optionals - and within each group, the user-provided ones (e.g. `msg`) appear first. You can change this behaviour by setting `init_args_before=False`. See [API reference](api_reference.md) for details.
 
 
 ### 3. `@autofields`
