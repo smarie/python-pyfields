@@ -155,3 +155,17 @@ def _test_autofields_readme():
             print("hello, %s" % who)
 
     return Pocket, Item, Pocket2
+
+
+def _test_autofields_vtypes_readme():
+    from vtypes import VType
+
+    class PositiveInt(int, VType):
+        __validators__ = {'should be positive': lambda x: x >= 0}
+
+    @autofields(check_types=True)
+    class Rectangle:
+        x: PositiveInt
+        y: PositiveInt
+
+    return Rectangle

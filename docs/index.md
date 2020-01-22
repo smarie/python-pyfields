@@ -6,7 +6,7 @@
 
 [![Documentation](https://img.shields.io/badge/doc-latest-blue.svg)](https://smarie.github.io/python-pyfields/) [![PyPI](https://img.shields.io/pypi/v/pyfields.svg)](https://pypi.python.org/pypi/pyfields/) [![Downloads](https://pepy.tech/badge/pyfields)](https://pepy.tech/project/pyfields) [![Downloads per week](https://pepy.tech/badge/pyfields/week)](https://pepy.tech/project/pyfields) [![GitHub stars](https://img.shields.io/github/stars/smarie/python-pyfields.svg)](https://github.com/smarie/python-pyfields/stargazers)
 
-!!! new `@autofields` feature, [check it out](#3-autofields) !
+!!! new `@autofields` feature, [check it out](#a-autofields) !
 !!! success "`pyfields` is now automatically supported by `autoclass` ! See [here](https://smarie.github.io/python-autoclass/#pyfields-combo) for details."
 
 `pyfields` provides a simple and elegant way to define fields in python classes. With `pyfields` you explicitly define all aspects of a field (default value/factory, type, validators, converters, documentation...) in a single place, and can refer to it from other places. 
@@ -612,7 +612,9 @@ post init ! height=1, color=white, msg=hey
 Note on the order of arguments in the resulting `__init__` signature: as you can see, `msg` appears between `height` and `color` in the signature. This corresponds to the 
 
 
-### 3. `@autofields`
+### 3. Simplifying
+
+#### a - `@autofields`
 
 Do you think that the above is still too verbose to define a class ? You can use `@autofields` to create fields and the constructor for you :
 
@@ -651,6 +653,35 @@ class Pocket:
 
 By default type checking is not enabled on the generated fields, but you can enable it with `@autofields(check_types=True)`. You can also disable constructor creation with `@autofields(make_init=False)`. See [API reference](https://smarie.github.io/python-pyfields/api_reference/#api) for details.
 
+#### b - `VType`s
+
+Instead of registering validators in the field, you can now use `vtypes`. That way, everything is in the type: type checking AND value validation. 
+
+```python
+from pyfields import field
+from vtypes import VType
+
+class NonEmpty(VType):
+    """A 'non empty' validation type"""
+    __validators__ = {'should be non empty': lambda x: len(x) > 0}
+
+class NonEmptyStr(NonEmpty, str):
+    """A 'non empty string' validation type"""
+    pass
+
+class Item:
+    name: NonEmptyStr = field(doc="the field name")
+```
+
+Of course you can combine it with `@autofields` - do not forget `check_types=True` so that typechecking is enabled:
+
+```python
+from pyfields import autofields
+
+@autofields(check_types=True)
+class Item:
+    name: NonEmptyStr
+```
 
 ### 4. Misc.
 

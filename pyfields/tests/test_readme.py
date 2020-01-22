@@ -5,7 +5,8 @@ import timeit
 import pytest
 from valid8 import ValidationError, ValidationFailure
 
-from pyfields import field, MandatoryFieldInitError, make_init, init_fields, ReadOnlyFieldError, NoneError
+from pyfields import field, MandatoryFieldInitError, make_init, init_fields, ReadOnlyFieldError, NoneError, \
+    FieldTypeError
 
 
 def runs_on_travis():
@@ -419,3 +420,16 @@ def test_autofields_readme():
     assert pocket1.items is not pocket2.items
     pocket1.items.append(item1)
     assert len(pocket2.items) == 0
+
+
+@pytest.mark.skipif(sys.version_info < (3, 6), reason="python < 3.6 does not support class member type hints")
+def test_autofields_vtypes_readme():
+
+    from ._test_py36 import _test_autofields_vtypes_readme
+    Rectangle = _test_autofields_vtypes_readme()
+
+    r = Rectangle(1, 2)
+    with pytest.raises(FieldTypeError):
+        Rectangle(1, -2)
+    with pytest.raises(FieldTypeError):
+        Rectangle('1', 2)
