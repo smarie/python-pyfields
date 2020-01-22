@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.1.1 - PEP561 compatibility
+
+ - **Misc**: Package is now PEP561 compatible. Fixed [#61](https://github.com/smarie/python-pyfields/issues/61)
+
 ### 1.1.0 - @autofields and default values improvements
 
  - **New `@autofields` decorator**. This decorator can be used to drastically reduce boilerplate code, similar to `pydantic` and `attrs`. This is compliant with python 2.7 and 3.5+ but is more useful when the type hints can be provided in class member annotations, so from 3.6+. Fixed [#55](https://github.com/smarie/python-pyfields/issues/55)
