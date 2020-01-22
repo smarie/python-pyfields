@@ -132,9 +132,8 @@ setup(
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
-    # package_data={
-    #     'sample': ['package_data.dat'],
-    # },
+    # Note: we use the empty string so that this also works with submodules
+    package_data={"": ['py.typed', '*.pyi']},
 
     # Although 'package_data' is the preferred approach, in some case you may
     # need to place data files outside of your packages. See:
@@ -150,4 +149,10 @@ setup(
     #         'sample=sample:main',
     #     ],
     # },
+
+    # explicitly setting the flag to avoid `ply` being downloaded
+    # see https://github.com/smarie/python-getversion/pull/5
+    # and to make mypy happy
+    # see https://mypy.readthedocs.io/en/latest/installed_packages.html
+    zip_safe=False,
 )
