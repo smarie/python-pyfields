@@ -7,6 +7,7 @@ six
 # sentinel
 valid8>=5.0
 makefun
+vtypes
 
 # --- to run the tests
 pytest>=4.4  #$PYTEST_VERSION
@@ -19,5 +20,6 @@ pytest-html==1.9.0  # otherwise requires pytest 5
 xunitparser
 
 # --- to generate the doc (see .travis)
-mkdocs-material  # ==2.7.3
-mkdocs  # ==0.17.3  # this is to prevent a version non-compliant with mkdocs-material to be installed.
+# does not work anymore on python 2
+# mkdocs-material  # ==2.7.3
+# mkdocs  # ==0.17.3  # this is to prevent a version non-compliant with mkdocs-material to be installed.

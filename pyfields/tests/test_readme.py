@@ -5,7 +5,8 @@ import timeit
 import pytest
 from valid8 import ValidationError, ValidationFailure
 
-from pyfields import field, MandatoryFieldInitError, make_init, init_fields, ReadOnlyFieldError, NoneError
+from pyfields import field, MandatoryFieldInitError, make_init, init_fields, ReadOnlyFieldError, NoneError, \
+    FieldTypeError
 
 
 def runs_on_travis():
@@ -273,7 +274,7 @@ def test_native_descriptors():
     # for reproducibility on travis, we have to get rid of the first init
     if runs_on_travis():
         print("increasing tolerance on travis.")
-        assert ta / tc <= 1.5
+        assert ta / tc <= 2.0
     else:
         assert ta / tc <= 1.1
     # assert abs(round(t_field_native * 10) - round(t_native * 10)) <= 1
@@ -419,3 +420,26 @@ def test_autofields_readme():
     assert pocket1.items is not pocket2.items
     pocket1.items.append(item1)
     assert len(pocket2.items) == 0
+
+
+try:
+    import pytypes
+except ImportError:
+    has_pytypes = False
+else:
+    has_pytypes = True
+
+
+@pytest.mark.skipif(has_pytypes, reason="pytypes does not correctly support vtypes - "
+                                        "see https://github.com/Stewori/pytypes/issues/86")
+@pytest.mark.skipif(sys.version_info < (3, 6), reason="python < 3.6 does not support class member type hints")
+def test_autofields_vtypes_readme():
+
+    from ._test_py36 import _test_autofields_vtypes_readme
+    Rectangle = _test_autofields_vtypes_readme()
+
+    r = Rectangle(1, 2)
+    with pytest.raises(FieldTypeError):
+        Rectangle(1, -2)
+    with pytest.raises(FieldTypeError):
+        Rectangle('1', 2)
