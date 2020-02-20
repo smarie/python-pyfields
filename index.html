@@ -32,7 +32,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.6.0">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.6.3">
     
     
       
@@ -40,12 +40,12 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/application.1b62728e.css">
+      <link rel="stylesheet" href="assets/stylesheets/application.adb8469c.css">
       
       
     
     
-      <script src="assets/javascripts/modernizr.268332fc.js"></script>
+      <script src="assets/javascripts/modernizr.86422ebf.js"></script>
     
     
       
@@ -77,7 +77,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#pyfields" tabindex="1" class="md-skip">
+      <a href="#pyfields" tabindex="0" class="md-skip">
         Skip to content
       </a>
     
@@ -86,7 +86,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="." title="pyfields" class="md-header-nav__button md-logo">
+        <a href="." title="pyfields" aria-label="pyfields" class="md-header-nav__button md-logo">
           
             <i class="md-icon"></i>
           
@@ -117,7 +117,7 @@
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <input type="text" class="md-search__input" aria-label="search" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
       <label class="md-icon md-search__icon" for="__search"></label>
       <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
         &#xE5CD;
@@ -352,9 +352,29 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-autofields" class="md-nav__link">
-    3. @autofields
+  <a href="#3-simplifying" class="md-nav__link">
+    3. Simplifying
   </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-autofields" class="md-nav__link">
+    a - @autofields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-vtypes" class="md-nav__link">
+    b - VTypes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -610,9 +630,29 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-autofields" class="md-nav__link">
-    3. @autofields
+  <a href="#3-simplifying" class="md-nav__link">
+    3. Simplifying
   </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-autofields" class="md-nav__link">
+    a - @autofields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b-vtypes" class="md-nav__link">
+    b - VTypes
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -713,9 +753,6 @@
 <p><a href="https://pypi.python.org/pypi/pyfields/"><img alt="Python versions" src="https://img.shields.io/pypi/pyversions/pyfields.svg" /></a> <a href="https://travis-ci.org/smarie/python-pyfields"><img alt="Build Status" src="https://travis-ci.org/smarie/python-pyfields.svg?branch=master" /></a> <a href="https://smarie.github.io/python-pyfields/junit/report.html"><img alt="Tests Status" src="https://smarie.github.io/python-pyfields/junit/junit-badge.svg?dummy=8484744" /></a> <a href="https://codecov.io/gh/smarie/python-pyfields"><img alt="codecov" src="https://codecov.io/gh/smarie/python-pyfields/branch/master/graph/badge.svg" /></a></p>
 <p><a href="https://smarie.github.io/python-pyfields/"><img alt="Documentation" src="https://img.shields.io/badge/doc-latest-blue.svg" /></a> <a href="https://pypi.python.org/pypi/pyfields/"><img alt="PyPI" src="https://img.shields.io/pypi/v/pyfields.svg" /></a> <a href="https://pepy.tech/project/pyfields"><img alt="Downloads" src="https://pepy.tech/badge/pyfields" /></a> <a href="https://pepy.tech/project/pyfields"><img alt="Downloads per week" src="https://pepy.tech/badge/pyfields/week" /></a> <a href="https://github.com/smarie/python-pyfields/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/smarie/python-pyfields.svg" /></a></p>
 <div class="admonition success">
-<p class="admonition-title">new <code>@autofields</code> feature, <a href="#3-autofields">check it out</a> !</p>
-</div>
-<div class="admonition success">
 <p class="admonition-title"><code>pyfields</code> is now automatically supported by <code>autoclass</code> ! See <a href="https://smarie.github.io/python-autoclass/#pyfields-combo">here</a> for details.</p>
 </div>
 <p><code>pyfields</code> provides a simple and elegant way to define fields in python classes. With <code>pyfields</code> you explicitly define all aspects of a field (default value/factory, type, validators, converters, documentation...) in a single place, and can refer to it from other places. </p>
@@ -749,13 +786,13 @@
 <p>Finally, it offers an API that other libraries can leverage to get the list of fields. For example <code>autoclass</code> now leverages <code>pyfields</code> to automatically add hash/dict/eq/repr to your class.</p>
 <p>If your first reaction is "what about <code>attrs</code> / <code>dataclasses</code> / <code>pydantic</code> / <code>characteristic</code> / <code>traits</code> / <code>traitlets</code> / ...", well all of these inspired <code>pyfields</code> a great deal, but all of these have stronger constraints on the class - which I did not want. Please have a look <a href="why/">here</a> for a complete list of inspirators.</p>
 <h2 id="installing">Installing<a class="headerlink" href="#installing" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span>&gt; pip install pyfields
-</pre></div>
+<div class="codehilite"><pre><span></span><code>&gt; pip install pyfields
+</code></pre></div>
 
 
 <p>For advanced type checking capabilities, <code>pyfields</code> requires that <code>typeguard</code> or <code>pytypes</code> is installed. Note that type checking performance (speed) mostly depends on the choice of type checking library. Not installing any will be faster, but will not support all of the <code>typing</code> constructs. Let's install <code>typeguard</code> for now:</p>
-<div class="codehilite"><pre><span></span>&gt; pip install typeguard
-</pre></div>
+<div class="codehilite"><pre><span></span><code>&gt; pip install typeguard
+</code></pre></div>
 
 
 <h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
@@ -767,12 +804,12 @@
 <h3 id="1-defining-a-field">1. Defining a field<a class="headerlink" href="#1-defining-a-field" title="Permanent link">&para;</a></h3>
 <p>A field is defined as a class member using the <code>field()</code> method. The idea (not new) is that you declare in a single place all aspects related to each field. For mandatory fields you do not need to provide any argument. For optional fields, you will typically provide a <code>default</code> value or a <code>default_factory</code> (we will see that <a href="#b-default-value-factory">later</a>).</p>
 <p>For example let's create a <code>Wall</code> class with one <em>mandatory</em> <code>height</code> and one <em>optional</em> <code>color</code> field:</p>
-<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span>
 
 <span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
     <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Color of the wall.&quot;</span><span class="p">)</span>
-</pre></div>
+</code></pre></div>
 
 
 <div class="admonition info">
@@ -781,45 +818,45 @@
 </div>
 <h4 id="a-field-vs-python-attr">a - Field vs. Python attr<a class="headerlink" href="#a-field-vs-python-attr" title="Permanent link">&para;</a></h4>
 <p>By default when you use <code>field()</code>, nothing more than a "lazy field" is created on your class. This field will only be activated when you access it on an instance. That means that you are free to implement <code>__init__</code> as you wish, or even to rely on the default <code>object</code> constructor to create instances:</p>
-<div class="codehilite"><pre><span></span><span class="c1"># instantiate using the default `object` constructor</span>
+<div class="codehilite"><pre><span></span><code><span class="c1"># instantiate using the default `object` constructor</span>
 <span class="n">w</span> <span class="o">=</span> <span class="n">Wall</span><span class="p">()</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>No exception here even if we did not provide any value for the mandatory field <code>height</code> ! Although this default behaviour can look surprising, you will find that this feature is quite handy to define mix-in classes <em>with</em> attributes but <em>without</em> constructor. See <a href="https://smarie.github.io/python-mixture/">mixture</a> for discussion. Of course if you do not like this behaviour you can very easily <a href="#2-adding-a-constructor">add a constructor</a>.</p>
 <p>Until it is accessed for the first time, a field is visible on an instance with <code>dir()</code> (because its definition is inherited from the class) but not with <code>vars()</code> (because it has not been initialized on the object):</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="nb">dir</span><span class="p">(</span><span class="n">w</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">dir</span><span class="p">(</span><span class="n">w</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
 <span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">]</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">vars</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
 <span class="p">{}</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>As soon as you access it, a field is replaced with a standard native python attribute, visible in <code>vars</code>:</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">w</span><span class="o">.</span><span class="n">color</span>  <span class="c1"># optional field: the default value is used on first &#39;read&#39; access</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">w</span><span class="o">.</span><span class="n">color</span>  <span class="c1"># optional field: the default value is used on first &#39;read&#39; access</span>
 <span class="s1">&#39;white&#39;</span>
 
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">vars</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
 <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;white&#39;</span><span class="p">}</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>Of course mandatory fields must be initialized:</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">w</span><span class="o">.</span><span class="n">height</span>  <span class="c1"># trying to read an uninitialized mandatory field</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">w</span><span class="o">.</span><span class="n">height</span>  <span class="c1"># trying to read an uninitialized mandatory field</span>
 <span class="n">pyfields</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">MandatoryFieldInitError</span><span class="p">:</span> \
    <span class="n">Mandatory</span> <span class="n">field</span> <span class="s1">&#39;height&#39;</span> <span class="n">has</span> <span class="ow">not</span> <span class="n">been</span> <span class="n">initialized</span> <span class="n">yet</span> <span class="n">on</span> <span class="n">instance</span> <span class="o">&lt;...&gt;.</span>
 
 <span class="o">&gt;&gt;&gt;</span> <span class="n">w</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="mi">12</span>  <span class="c1"># initializing mandatory field explicitly</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">vars</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
 <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">}</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>Your IDE (e.g. PyCharm) should recognize the name and type of the field, so you can already refer to it easily from other code using autocompletion:</p>
 <p><img alt="pycharm_autocomplete1.png" src="imgs/autocomplete1.png" /></p>
 <h4 id="b-default-value-factory">b - Default value factory<a class="headerlink" href="#b-default-value-factory" title="Permanent link">&para;</a></h4>
 <p>We have seen above how to define an optional field by providing a default value. The behaviour with default values is the same than python's default: the same value is used for all objects. Therefore if your default value is a mutable object (e.g. a list) you should not use this mechanism, otherwise the same value will be shared by all instances that use the default:</p>
-<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">BadPocket</span><span class="p">:</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">BadPocket</span><span class="p">:</span>
     <span class="n">items</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="p">[])</span>
 
 <span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">BadPocket</span><span class="p">()</span>
@@ -830,23 +867,23 @@
 <span class="o">&gt;&gt;&gt;</span> <span class="n">g</span> <span class="o">=</span> <span class="n">BadPocket</span><span class="p">()</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">g</span><span class="o">.</span><span class="n">items</span>
 <span class="p">[</span><span class="s1">&#39;thing&#39;</span><span class="p">]</span>   <span class="c1"># &lt;--- this is not right ! </span>
-</pre></div>
+</code></pre></div>
 
 
 <p>To cover this use case and many others, you can use a "default value factory". A default value factory is a callable with a single argument: the object instance. It will be called everytime a default value is needed for a field on an object. You can either provide your own in the constructor:</p>
-<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Pocket</span><span class="p">:</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Pocket</span><span class="p">:</span>
     <span class="n">items</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span> <span class="n">obj</span><span class="p">:</span> <span class="p">[])</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>or use the provided <code>@&lt;field&gt;.default_factory</code> decorator:</p>
-<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Pocket</span><span class="p">:</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Pocket</span><span class="p">:</span>
     <span class="n">items</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
 
     <span class="nd">@items</span><span class="o">.</span><span class="n">default_factory</span>
     <span class="k">def</span> <span class="nf">default_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[]</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>Finally, you can use the following built-in helper functions to cover most common cases:</p>
@@ -857,61 +894,61 @@
 </ul>
 <h4 id="c-read-only-fields">c - Read-only fields<a class="headerlink" href="#c-read-only-fields" title="Permanent link">&para;</a></h4>
 <p>You can define fields that can only be set once:</p>
-<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">User</span><span class="p">:</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">User</span><span class="p">:</span>
     <span class="n">name</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="n">u</span> <span class="o">=</span> <span class="n">User</span><span class="p">()</span>
 <span class="n">u</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;john&quot;</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;name: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">u</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 <span class="n">u</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;john2&quot;</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>yields</p>
-<div class="codehilite"><pre><span></span>name: john
+<div class="codehilite"><pre><span></span><code>name: john
 
 pyfields.core.ReadOnlyFieldError: 
    Read-only field <span class="s1">&#39;&lt;...&gt;.User.name&#39;</span> has already been initialized on instance 
    &lt;&lt;...&gt;.User object at 0x000001CA70FA25F8&gt; and cannot be modified anymore.
-</pre></div>
+</code></pre></div>
 
 
 <p>Of course this makes more sense when an appropriate constructor is defined on the class as we'll see <a href="#2-adding-a-constructor">below</a>, but it also works independently.</p>
 <p>Optional fields can also be "read-only" of course. But remember that in that case, <strong>reading</strong> the field on a brand new object will assign it to its default value - therefore is will not modifiable anymore:</p>
-<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">User</span><span class="p">:</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">User</span><span class="p">:</span>
     <span class="n">name</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;dummy&quot;</span><span class="p">)</span>
 
 <span class="n">u</span> <span class="o">=</span> <span class="n">User</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;name: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">u</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 <span class="n">u</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;john&quot;</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>yields</p>
-<div class="codehilite"><pre><span></span>name: dummy
+<div class="codehilite"><pre><span></span><code>name: dummy
 
 pyfields.core.ReadOnlyFieldError: 
    Read-only field <span class="s1">&#39;&lt;...&gt;.User.name&#39;</span> has already been initialized on instance 
    &lt;&lt;...&gt;.User object at 0x000001ED05E22CC0&gt; and cannot be modified anymore.
-</pre></div>
+</code></pre></div>
 
 
 <p>In practice if you have your own constructor or if you generate one using the methods <a href="#2-adding-a-constructor">below</a>, it will work without problem. But when debugging your constructor with an IDE that automatically calls "repr" on your object you might have to remember it and take extra care.</p>
 <h4 id="d-type-validation">d - Type validation<a class="headerlink" href="#d-type-validation" title="Permanent link">&para;</a></h4>
 <p>You can add type validation to a field by setting <code>check_type=True</code>.</p>
-<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">check_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
     <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">check_type</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Color of the wall.&quot;</span><span class="p">)</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>yields</p>
-<div class="codehilite"><pre><span></span><span class="err">&gt;&gt;&gt; w = Wall()</span>
+<div class="codehilite"><pre><span></span><code><span class="err">&gt;&gt;&gt; w = Wall()</span>
 <span class="err">&gt;&gt;&gt; w.height = 1</span>
 <span class="err">&gt;&gt;&gt; w.height = &#39;1&#39;</span>
 <span class="c">TypeError: Invalid value type provided for &#39;Wall.height&#39;. \ </span>
 <span class="c">  Value should be of type &#39;int&#39;. Instead, received a &#39;str&#39;: &#39;1&#39;</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>By default the type used for validation is the one provided in the annotation. If you use python &lt; <code>3.6</code> or wish to override the annotation, you can explicitly fill the <code>type_hint</code> argument in <code>field()</code>. It supports both a single type or an iterable of alternate types (e.g. <code>(int, str)</code>). Note that PEP484 type comments are not taken into account - indeed it is not possible for python code to access type comments without source code inspection.</p>
@@ -950,7 +987,7 @@ pyfields.core.ReadOnlyFieldError:
 </li>
 </ul>
 <p>An example is probably better to picture this:</p>
-<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">mini_lambda</span> <span class="kn">import</span> <span class="n">x</span>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">mini_lambda</span> <span class="kn">import</span> <span class="n">x</span>
 <span class="kn">from</span> <span class="nn">valid8.validation_lib</span> <span class="kn">import</span> <span class="n">is_in</span>
 
 <span class="n">colors</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;red&#39;</span><span class="p">}</span>
@@ -962,11 +999,11 @@ pyfields.core.ReadOnlyFieldError:
     <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">validators</span><span class="o">=</span><span class="n">is_in</span><span class="p">(</span><span class="n">colors</span><span class="p">),</span> 
                        <span class="n">default</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> 
                        <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Color of the wall.&quot;</span><span class="p">)</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>yields</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span><span class="w"> </span><span class="n">w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Wall</span><span class="p">()</span><span class="w"></span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span><span class="w"> </span><span class="n">w</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Wall</span><span class="p">()</span><span class="w"></span>
 <span class="o">&gt;&gt;&gt;</span><span class="w"> </span><span class="n">w</span><span class="p">.</span><span class="n">height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="w"></span>
 <span class="o">&gt;&gt;&gt;</span><span class="w"> </span><span class="n">w</span><span class="p">.</span><span class="n">height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
 <span class="n">valid8</span><span class="p">.</span><span class="n">entry_points</span><span class="p">.</span><span class="n">ValidationError</span><span class="o">[</span><span class="n">ValueError</span><span class="o">]</span><span class="err">:</span><span class="w"> </span>
@@ -980,12 +1017,12 @@ pyfields.core.ReadOnlyFieldError:
 <span class="w">    </span><span class="n">Error</span><span class="w"> </span><span class="n">validating</span><span class="w"> </span><span class="o">[</span><span class="n">&lt;...&gt;.Wall.color=magenta</span><span class="o">]</span><span class="p">.</span><span class="w"> </span>
 <span class="w">    </span><span class="nl">NotInAllowedValues</span><span class="p">:</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="err">{</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;red&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;white&#39;</span><span class="err">}</span><span class="w"> </span><span class="n">does</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="k">hold</span><span class="w"> </span>
 <span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">x</span><span class="o">=</span><span class="n">magenta</span><span class="p">.</span><span class="w"> </span><span class="n">Wrong</span><span class="w"> </span><span class="k">value</span><span class="err">:</span><span class="w"> </span><span class="s1">&#39;magenta&#39;</span><span class="p">.</span><span class="w"></span>
-</pre></div>
+</code></pre></div>
 
 
 <p>For advanced validation scenarios you might with your validation callables to receive a bit of context. <code>pyfields</code> supports that the callables accept one, two or three arguments for this (where <code>valid8</code> supports only 1): <code>f(val)</code>, <code>f(obj, val)</code>, and <code>f(obj, field, val)</code>.</p>
 <p>For example we can define walls where the width is a multiple of the length:</p>
-<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">valid8</span> <span class="kn">import</span> <span class="n">ValidationFailure</span>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">valid8</span> <span class="kn">import</span> <span class="n">ValidationFailure</span>
 
 <span class="k">class</span> <span class="nc">InvalidWidth</span><span class="p">(</span><span class="n">ValidationFailure</span><span class="p">):</span>
     <span class="n">help_msg</span> <span class="o">=</span> <span class="s1">&#39;should be a multiple of the height (</span><span class="si">{height}</span><span class="s1">)&#39;</span>
@@ -998,11 +1035,11 @@ pyfields.core.ReadOnlyFieldError:
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
     <span class="n">width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">validators</span><span class="o">=</span><span class="n">validate_width</span><span class="p">,</span>
                        <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Width of the wall in mm.&quot;</span><span class="p">)</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>Finally, in addition to the above syntax, <code>pyfields</code> support that you add validators to a field after creation, using the <code>@field.validator</code> decorator:</p>
-<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
     <span class="n">width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Width of the wall in mm.&quot;</span><span class="p">)</span>
 
@@ -1010,12 +1047,12 @@ pyfields.core.ReadOnlyFieldError:
     <span class="k">def</span> <span class="nf">width_is_proportional_to_height</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width_value</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">width_value</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidWidth</span><span class="p">(</span><span class="n">width_value</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>As for all validators, the signature of the decorated function should be either <code>(value)</code>, <code>(obj/self, value)</code>, or <code>(obj/self, field, value)</code>.</p>
 <p>Several such decorators can be applied on the same function, so as to mutualize implementation. In that case, you might wish to use the signature with 3 arguments so as to easily debug which field is being validated:</p>
-<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
     <span class="n">width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Width of the wall in mm.&quot;</span><span class="p">)</span>
 
@@ -1024,7 +1061,7 @@ pyfields.core.ReadOnlyFieldError:
     <span class="k">def</span> <span class="nf">width_is_proportional_to_height</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width_value</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">width_value</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidWidth</span><span class="p">(</span><span class="n">width_value</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>See <code>API reference</code> for details on <a href="api_reference/#ltfieldgtvalidator"><code>@&lt;field&gt;.validator</code></a>.</p>
@@ -1050,18 +1087,18 @@ pyfields.core.ReadOnlyFieldError:
 </li>
 </ul>
 <p>For example</p>
-<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span>
 <span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
     <span class="n">f</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">converters</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">g</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">converters</span><span class="o">=</span><span class="p">{</span><span class="nb">str</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> 
                                          <span class="s1">&#39;*&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">})</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>When a new value is set on a field, all of its converters are first scanned in order. Everytime a converter accepts a value, it is applied to convert it. The process stops at the first successful conversion, or after all converters have been tried. The obtained value (either the original one or the converted one) is then passed as usual to the validators (see previous section).</p>
 <p>As for validators, you can easily define converters using a decorator <code>@&lt;field&gt;.converter</code>. As for all converters, the signature of the decorated function should be either <code>(value)</code>, <code>(obj/self, value)</code>, or <code>(obj/self, field, value)</code>.</p>
 <p>Several such decorators can be applied on the same function, so as to mutualize implementation. In that case, you might wish to use the signature with 3 arguments so as to easily debug which field is being validated:</p>
-<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
     <span class="n">m</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">check_type</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">m2</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">check_type</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -1070,11 +1107,11 @@ pyfields.core.ReadOnlyFieldError:
     <span class="k">def</span> <span class="nf">from_anything</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;converting a value for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">field</span><span class="o">.</span><span class="n">qualname</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>You can check that everything works as expected:</p>
-<div class="codehilite"><pre><span></span>&gt;&gt;&gt; <span class="nv">o</span> <span class="o">=</span> Foo<span class="o">()</span>
+<div class="codehilite"><pre><span></span><code>&gt;&gt;&gt; <span class="nv">o</span> <span class="o">=</span> Foo<span class="o">()</span>
 &gt;&gt;&gt; o.m2 <span class="o">=</span> <span class="s1">&#39;12&#39;</span>
 converting a value <span class="k">for</span> Foo.m2
 &gt;&gt;&gt; o.m2 <span class="o">=</span> <span class="m">1</span>.5
@@ -1084,39 +1121,39 @@ Traceback <span class="o">(</span>most recent call last<span class="o">)</span>:
 ...
 TypeError: Invalid value <span class="nb">type</span> provided <span class="k">for</span> <span class="s1">&#39;Foo.m&#39;</span>. Value should be of <span class="nb">type</span> &lt;class <span class="s1">&#39;int&#39;</span>&gt;.
   Instead, received a <span class="s1">&#39;float&#39;</span>: <span class="m">1</span>.5
-</pre></div>
+</code></pre></div>
 
 
 <p>Finally since debugging conversion issues might not be straightforward, a special <code>trace_convert</code> function is provided to output details about the outcome of each converter's acceptance and conversion step. This function is also available as a method of the field objects (obtained from the class).</p>
-<div class="codehilite"><pre><span></span><span class="n">m_field</span> <span class="o">=</span> <span class="n">Foo</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;m&#39;</span><span class="p">]</span>
+<div class="codehilite"><pre><span></span><code><span class="n">m_field</span> <span class="o">=</span> <span class="n">Foo</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;m&#39;</span><span class="p">]</span>
 <span class="n">converted_value</span><span class="p">,</span> <span class="n">details</span> <span class="o">=</span> <span class="n">m_field</span><span class="o">.</span><span class="n">trace_convert</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">details</span><span class="p">)</span>
-</pre></div>
+</code></pre></div>
 
 
 <h4 id="h-native-vs-descriptor">h - Native vs. Descriptor<a class="headerlink" href="#h-native-vs-descriptor" title="Permanent link">&para;</a></h4>
 <p><code>field()</code> by default creates a so-called <strong>native field</strong>. This special construct is designed to be as fast as a normal python attribute after the first access, so that performance is not impacted. This high level of performance has a drawback: validation and conversion are not possible on a native field. </p>
 <p>So when you add type or value validation, or conversion, to a field, <code>field()</code> will automatically create a <strong>descriptor field</strong> instead of a native field. This is an object relying on the <a href="https://docs.python.org/howto/descriptor.html">python descriptor protocol</a>. Such objects have slower access time than native python attributes but provide convenient hooks necessary to perform validation and conversion.</p>
 <p>For experiments, you can force a field to be a descriptor by setting <code>native=False</code>:</p>
-<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span>
 
 <span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>               <span class="c1"># a native field</span>
     <span class="n">b</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">native</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>   <span class="c1"># a descriptor field</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>We can easily see the difference (note: direct class access <code>Foo.a</code> is currently forbidden because of <a href="https://github.com/smarie/python-pyfields/issues/12">this issue</a>):</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">Foo</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">Foo</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span>
 <span class="o">&lt;</span><span class="n">NativeField</span><span class="p">:</span> <span class="o">&lt;...&gt;.</span><span class="n">Foo</span><span class="o">.</span><span class="n">a</span><span class="o">&gt;</span>
 
 <span class="o">&gt;&gt;&gt;</span> <span class="n">Foo</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
 <span class="o">&lt;</span><span class="n">DescriptorField</span><span class="p">:</span> <span class="o">&lt;...&gt;.</span><span class="n">Foo</span><span class="o">.</span><span class="n">a</span><span class="o">&gt;</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>And measure the difference in access time:</p>
-<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">timeit</span>
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span> <span class="nn">timeit</span>
 
 <span class="n">f</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">()</span>
 
@@ -1133,13 +1170,13 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Average time (ns) setting the field:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%0.2f</span><span class="s2"> (normal python) ; </span><span class="si">%0.2f</span><span class="s2"> (native field) ;&quot;</span> 
       <span class="s2">&quot; </span><span class="si">%0.2f</span><span class="s2"> (descriptor field)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tc</span><span class="p">,</span> <span class="n">ta</span><span class="p">,</span> <span class="n">tb</span><span class="p">))</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>yields (results depend on your machine):</p>
-<div class="codehilite"><pre><span></span><span class="err">Average time (ns) setting the field:</span>
+<div class="codehilite"><pre><span></span><code><span class="err">Average time (ns) setting the field:</span>
 <span class="err">0.09 (normal python) ; 0.09 (native field) ; 0.44 (descriptor field)</span>
-</pre></div>
+</code></pre></div>
 
 
 <div class="admonition info">
@@ -1154,37 +1191,37 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 <p><code>pyfields</code> provides you with several alternatives to add a constructor to a class equipped with fields. The reason why we do not follow the <a href="https://www.python.org/dev/peps/pep-0020/#the-zen-of-python">Zen of python</a> here (<em>"There should be one-- and preferably only one --obvious way to do it."</em>) is to recognize that different developers may have different coding style or philosophies, and to be as much as possible agnostic in front of these.</p>
 <h4 id="a-make_init">a - <code>make_init</code><a class="headerlink" href="#a-make_init" title="Permanent link">&para;</a></h4>
 <p><code>make_init</code> is the <strong>most compact</strong> way to add a constructor to a class with fields. With it you create your <code>__init__</code> method in one line:</p>
-<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">make_init</span>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">make_init</span>
 
 <span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
     <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Color of the wall.&quot;</span><span class="p">)</span>
 <span class="hll">    <span class="fm">__init__</span> <span class="o">=</span> <span class="n">make_init</span><span class="p">()</span>
-</span></pre></div>
+</span></code></pre></div>
 
 
 <p>By default, all fields will appear in the constructor, in the order of appearance in the class and its parents, following the <code>mro</code> (method resolution order, the order in which python looks for a method in the hierarchy of classes). Since it is not possible for mandatory fields to appear <em>after</em> optional fields in the signature, all mandatory fields will appear first, and then all optional fields will follow.</p>
 <p>The easiest way to see the result is probably to look at the help on your class:</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">help</span><span class="p">(</span><span class="n">Wall</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">help</span><span class="p">(</span><span class="n">Wall</span><span class="p">)</span>
 <span class="n">Help</span> <span class="k">on</span> <span class="k">class</span> <span class="n">Wall</span> <span class="k">in</span> <span class="n">module</span> <span class="o">&lt;</span><span class="p">...</span><span class="o">&gt;</span><span class="p">:</span>
 
 <span class="k">class</span> <span class="n">Wall</span><span class="p">(</span><span class="n">builtins</span><span class="p">.</span><span class="k">object</span><span class="p">)</span>
 <span class="hll"> <span class="o">|</span>  <span class="n">Wall</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
 </span> <span class="o">|</span>  <span class="p">(...)</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>or you can inspect the method:</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="nf">help</span><span class="p">(</span><span class="n">Wall</span><span class="p">.</span><span class="n">__init__</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nf">help</span><span class="p">(</span><span class="n">Wall</span><span class="p">.</span><span class="n">__init__</span><span class="p">)</span>
 <span class="n">Help</span> <span class="k">on</span> <span class="n">function</span> <span class="n">__init__</span> <span class="k">in</span> <span class="n">module</span> <span class="o">&lt;</span><span class="p">...</span><span class="o">&gt;</span><span class="p">:</span>
 
 <span class="hll"><span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
 </span>    <span class="n">The</span> <span class="ss">`__init__`</span> <span class="n">method</span> <span class="n">generated</span> <span class="k">for</span> <span class="n">you</span> <span class="k">when</span> <span class="n">you</span> <span class="k">use</span> <span class="ss">`make_init`</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>You can check that your constructor works as expected:</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">w</span> <span class="o">=</span> <span class="n">Wall</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">w</span> <span class="o">=</span> <span class="n">Wall</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">vars</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
 <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
 
@@ -1194,11 +1231,11 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 
 <span class="o">&gt;&gt;&gt;</span> <span class="n">Wall</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
 <span class="ne">TypeError</span><span class="p">:</span> <span class="fm">__init__</span><span class="p">()</span> <span class="n">missing</span> <span class="mi">1</span> <span class="n">required</span> <span class="n">positional</span> <span class="n">argument</span><span class="p">:</span> <span class="s1">&#39;height&#39;</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>If you do not wish the generated constructor to expose all fields, you can customize it by providing an <strong>explicit</strong> ordered list of fields. For example below only <code>height</code> will be in the constructor:</p>
-<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">make_init</span>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">make_init</span>
 
 <span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
@@ -1206,11 +1243,11 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 
     <span class="c1"># only `height` will be in the constructor</span>
 <span class="hll">    <span class="fm">__init__</span> <span class="o">=</span> <span class="n">make_init</span><span class="p">(</span><span class="n">height</span><span class="p">)</span>
-</span></pre></div>
+</span></code></pre></div>
 
 
 <p>The list can contain fields defined in another class, typically a parent class: </p>
-<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">make_init</span>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">make_init</span>
 
 <span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
@@ -1218,14 +1255,14 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 <span class="k">class</span> <span class="nc">ColoredWall</span><span class="p">(</span><span class="n">Wall</span><span class="p">):</span>
     <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Color of the wall.&quot;</span><span class="p">)</span>
     <span class="fm">__init__</span> <span class="o">=</span> <span class="n">make_init</span><span class="p">(</span><span class="n">Wall</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>Note: a pending <a href="https://github.com/smarie/python-pyfields/issues/12">issue</a> prevents the above example to work, you have to use <code>Wall.__dict__['height']</code> instead of <code>Wall.height</code> to reference the field from the other class.</p>
 <p>Finally, you can customize the created constructor by declaring a post-init method as the <code>post_init_fun</code> argument. This is roughly equivalent to <code>@init_fields</code> so we do not present it here, see <a href="api_reference/#make_init">documentation</a>.</p>
 <h4 id="b-init_fields">b - <code>@init_fields</code><a class="headerlink" href="#b-init_fields" title="Permanent link">&para;</a></h4>
 <p>If you prefer to write an init function as usual, you can use the <code>@init_fields</code> decorator to augment this init function's signature with all or some fields.</p>
-<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">init_fields</span>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">init_fields</span>
 
 <span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
     <span class="n">height</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>  <span class="c1"># type: int</span>
@@ -1240,12 +1277,12 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;post init ! height=</span><span class="si">%s</span><span class="s2">, color=</span><span class="si">%s</span><span class="s2">, msg=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">non_field_attr</span> <span class="o">=</span> <span class="n">msg</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>Note: as you can see in this example, you can of course create other attributes in this init function (done in the last line here with <code>self.non_field_attr = msg</code>). Indeed, declaring fields in a class do not "pollute" the class, so you can do anything you like as usual.</p>
 <p>You can check that the resulting constructor works as expected:</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="n">help</span><span class="p">(</span><span class="n">Wall</span><span class="p">)</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">help</span><span class="p">(</span><span class="n">Wall</span><span class="p">)</span>
 <span class="n">Help</span> <span class="k">on</span> <span class="k">class</span> <span class="n">Wall</span> <span class="k">in</span> <span class="n">module</span> <span class="o">&lt;</span><span class="p">...</span><span class="o">&gt;</span><span class="p">:</span>
 <span class="k">class</span> <span class="n">Wall</span><span class="p">(</span><span class="n">builtins</span><span class="p">.</span><span class="k">object</span><span class="p">)</span>
  <span class="o">|</span>  <span class="n">Wall</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
@@ -1256,13 +1293,14 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 
 <span class="o">&gt;&gt;&gt;</span> <span class="n">vars</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
 <span class="err">{</span><span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;non_field_attr&#39;</span><span class="p">:</span> <span class="s1">&#39;hey&#39;</span><span class="err">}</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>Note on the order of arguments in the resulting <code>__init__</code> signature: as you can see, <code>msg</code> appears between <code>height</code> and <code>color</code> in the signature. This is because all mandatory arguments appear first, then the optionals - and within each group, the user-provided ones (e.g. <code>msg</code>) appear first. You can change this behaviour by setting <code>init_args_before=False</code>. See <a href="api_reference/">API reference</a> for details.</p>
-<h3 id="3-autofields">3. <code>@autofields</code><a class="headerlink" href="#3-autofields" title="Permanent link">&para;</a></h3>
+<h3 id="3-simplifying">3. Simplifying<a class="headerlink" href="#3-simplifying" title="Permanent link">&para;</a></h3>
+<h4 id="a-autofields">a - <code>@autofields</code><a class="headerlink" href="#a-autofields" title="Permanent link">&para;</a></h4>
 <p>Do you think that the above is still too verbose to define a class ? You can use <code>@autofields</code> to create fields and the constructor for you :</p>
-<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">autofields</span>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">autofields</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
 <span class="nd">@autofields</span>
@@ -1278,22 +1316,49 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 <span class="n">p</span> <span class="o">=</span> <span class="n">Pocket</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="k">assert</span> <span class="n">p</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">2</span>
 <span class="n">p</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Item</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;a_name&quot;</span><span class="p">))</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>Note that members that are already fields are not further transformed. Therefore you can still use <code>field()</code> on some members, for example if you need to specify custom validators, converters, or default factory.</p>
 <p><code>@autofields</code> is just syntactic sugar for <code>field()</code> and <code>make_init()</code> - for example the <code>Pocket</code> class defined above is completely equivalent to: </p>
-<div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">copy_value</span><span class="p">,</span> <span class="n">make_init</span>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">copy_value</span><span class="p">,</span> <span class="n">make_init</span>
 
 <span class="k">class</span> <span class="nc">Pocket</span><span class="p">:</span>
     <span class="n">size</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
     <span class="n">items</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="n">List</span><span class="p">[</span><span class="n">Item</span><span class="p">],</span> 
                   <span class="n">default_factory</span><span class="o">=</span><span class="n">copy_value</span><span class="p">([]))</span>
     <span class="fm">__init__</span> <span class="o">=</span> <span class="n">make_init</span><span class="p">()</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>By default type checking is not enabled on the generated fields, but you can enable it with <code>@autofields(check_types=True)</code>. You can also disable constructor creation with <code>@autofields(make_init=False)</code>. See <a href="https://smarie.github.io/python-pyfields/api_reference/#api">API reference</a> for details.</p>
+<h4 id="b-vtypes">b - <code>VType</code>s<a class="headerlink" href="#b-vtypes" title="Permanent link">&para;</a></h4>
+<p>Instead of registering validators in the field, you can now use <code>vtypes</code>. That way, everything is in the type: type checking AND value validation. </p>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">vtypes</span> <span class="kn">import</span> <span class="n">VType</span>
+
+<span class="k">class</span> <span class="nc">NonEmpty</span><span class="p">(</span><span class="n">VType</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A &#39;non empty&#39; validation type&quot;&quot;&quot;</span>
+    <span class="n">__validators__</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;should be non empty&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">NonEmptyStr</span><span class="p">(</span><span class="n">NonEmpty</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A &#39;non empty string&#39; validation type&quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+
+<span class="k">class</span> <span class="nc">Item</span><span class="p">:</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">NonEmptyStr</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;the field name&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p>Of course you can combine it with <code>@autofields</code> - do not forget <code>check_types=True</code> so that typechecking is enabled:</p>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">autofields</span>
+
+<span class="nd">@autofields</span><span class="p">(</span><span class="n">check_types</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Item</span><span class="p">:</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">NonEmptyStr</span>
+</code></pre></div>
+
+
 <h3 id="4-misc">4. Misc.<a class="headerlink" href="#4-misc" title="Permanent link">&para;</a></h3>
 <h4 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h4>
 <p><code>pyfields</code> offers an API so that other libraries can inspect the fields: <code>get_fields</code>, <code>yield_fields</code>, <code>has_fields</code>, <code>get_field</code>. See <a href="https://smarie.github.io/python-pyfields/api_reference/#api">API reference</a> for details.</p>
@@ -1301,10 +1366,10 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 <p><code>autoclass</code> is now compliant with <code>pyfields</code>. So you can use <code>@autoclass</code>, or <code>@autorepr</code>, <code>@autohash</code>, <code>@autodict</code>... on the decorated class. That way, your fields definition is directly reused for most of the class behaviour. See <a href="https://smarie.github.io/python-autoclass/#pyfields-combo">here</a> for details.</p>
 <h4 id="slots">Slots<a class="headerlink" href="#slots" title="Permanent link">&para;</a></h4>
 <p>You can use <code>pyfields</code> if your class has <code>__slots__</code>. You will simply have to use an underscore in the slot name corresponding to a field: <code>_&lt;field_name&gt;</code>. For example:</p>
-<div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">WithSlots</span><span class="p">:</span>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">WithSlots</span><span class="p">:</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;_a&#39;</span><span class="p">,)</span>
     <span class="n">a</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>Since from <a href="https://docs.python.org/3/reference/datamodel.html#slots">python documentation</a>, <em>"class attributes cannot be used to set default values for instance variables defined by <code>__slots__</code>"</em>, <strong>native fields are not supported with <code>__slots__</code></strong>. If you run python <code>3.6</code> or greater, <code>field</code> will automatically detect that a field is used on a class with <code>__slots__</code> and will replace the native field with a descriptor field. However with older python versions this is not always possible, so it is recommended that you explicitly state <code>native=False</code>.</p>
@@ -1368,9 +1433,9 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
       <div class="md-footer-copyright">
         
         powered by
-        <a href="https://www.mkdocs.org">MkDocs</a>
+        <a href="https://www.mkdocs.org" target="_blank" rel="noopener">MkDocs</a>
         and
-        <a href="https://squidfunk.github.io/mkdocs-material/">
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs</a>
       </div>
       
@@ -1380,7 +1445,7 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
       
     </div>
     
-      <script src="assets/javascripts/application.808e90bb.js"></script>
+      <script src="assets/javascripts/application.c33a9706.js"></script>
       
       <script>app.initialize({version:"1.0.4",url:{base:"."}})</script>
       

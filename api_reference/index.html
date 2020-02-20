@@ -32,7 +32,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.6.0">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.6.3">
     
     
       
@@ -40,12 +40,12 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/application.1b62728e.css">
+      <link rel="stylesheet" href="../assets/stylesheets/application.adb8469c.css">
       
       
     
     
-      <script src="../assets/javascripts/modernizr.268332fc.js"></script>
+      <script src="../assets/javascripts/modernizr.86422ebf.js"></script>
     
     
       
@@ -77,7 +77,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#api-reference" tabindex="1" class="md-skip">
+      <a href="#api-reference" tabindex="0" class="md-skip">
         Skip to content
       </a>
     
@@ -86,7 +86,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href=".." title="pyfields" class="md-header-nav__button md-logo">
+        <a href=".." title="pyfields" aria-label="pyfields" class="md-header-nav__button md-logo">
           
             <i class="md-icon"></i>
           
@@ -117,7 +117,7 @@
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
+      <input type="text" class="md-search__input" aria-label="search" name="query" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query" data-md-state="active">
       <label class="md-icon md-search__icon" for="__search"></label>
       <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
         &#xE5CD;
@@ -274,14 +274,14 @@
         
           <li class="md-nav__item">
   <a href="#ltfieldgtdefault_factory" class="md-nav__link">
-    @&lt;field&gt;.default_factory
+    @&amp;lt;field&amp;gt;.default_factory
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#ltfieldgtvalidator" class="md-nav__link">
-    @&lt;field&gt;.validator
+    @&amp;lt;field&amp;gt;.validator
   </a>
   
 </li>
@@ -426,14 +426,14 @@
         
           <li class="md-nav__item">
   <a href="#ltfieldgtdefault_factory" class="md-nav__link">
-    @&lt;field&gt;.default_factory
+    @&amp;lt;field&amp;gt;.default_factory
   </a>
   
 </li>
         
           <li class="md-nav__item">
   <a href="#ltfieldgtvalidator" class="md-nav__link">
-    @&lt;field&gt;.validator
+    @&amp;lt;field&amp;gt;.validator
   </a>
   
 </li>
@@ -547,7 +547,7 @@
                 <h1 id="api-reference">API reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h1>
 <p>In general, <code>help(symbol)</code> will provide the latest up-to-date documentation.</p>
 <h2 id="field"><em><code>field</code></em><a class="headerlink" href="#field" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>        <span class="c1"># type: Type[T]</span>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">field</span><span class="p">(</span><span class="n">type_hint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>        <span class="c1"># type: Type[T]</span>
           <span class="n">check_type</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>      <span class="c1"># type: bool</span>
           <span class="n">default</span><span class="o">=</span><span class="n">EMPTY</span><span class="p">,</span>         <span class="c1"># type: T</span>
           <span class="n">default_factory</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: Callable[[], T]</span>
@@ -557,7 +557,7 @@
           <span class="n">native</span><span class="o">=</span><span class="kc">None</span>            <span class="c1"># type: bool</span>
           <span class="p">):</span>
     <span class="c1"># type: (...) -&gt; T</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>Returns a class-level attribute definition. It allows developers to define an attribute without writing an 
@@ -574,7 +574,7 @@ until it is first read or written.</p>
 <p><strong>Documentation</strong></p>
 <p>A docstring can be provided in <code>doc</code>for code readability.</p>
 <p><strong>Example</strong></p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="o">...</span>     <span class="n">od</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;This is an optional field with a default value&quot;</span><span class="p">)</span>
 <span class="o">...</span>     <span class="n">odf</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span> <span class="n">obj</span><span class="p">:</span> <span class="p">[],</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;This is an optional with a default value factory&quot;</span><span class="p">)</span>
@@ -606,7 +606,7 @@ until it is first read or written.</p>
 <span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
     <span class="o">...</span>
 <span class="ne">TypeError</span><span class="p">:</span> <span class="n">Invalid</span> <span class="n">value</span> <span class="nb">type</span> <span class="o">...</span>
-</pre></div>
+</code></pre></div>
 
 
 <p><strong>Limitations</strong></p>
@@ -639,7 +639,7 @@ This was inspired by <a href="https://tedboy.github.io/flask/generated/generated
 default factory will be overridden.</p>
 <p>The decorated function should accept a single argument <code>(obj/self)</code>, and should return a value to use as the
 default.</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Pocket</span><span class="p">:</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Pocket</span><span class="p">:</span>
 <span class="o">...</span>     <span class="n">items</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
 <span class="o">...</span>
 <span class="o">...</span>     <span class="nd">@items</span><span class="o">.</span><span class="n">default_factory</span>
@@ -651,7 +651,7 @@ default.</p>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">items</span>
 <span class="n">generating</span> <span class="n">default</span> <span class="n">value</span> <span class="k">for</span> <span class="o">&lt;</span><span class="n">pyfields</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">Pocket</span> <span class="nb">object</span> <span class="o">...</span>
 <span class="p">[]</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>Several helper functions are available to create default factories:</p>
@@ -669,7 +669,7 @@ default.</p>
 </ul>
 <h3 id="ltfieldgtvalidator"><code>@&lt;field&gt;.validator</code><a class="headerlink" href="#ltfieldgtvalidator" title="Permanent link">&para;</a></h3>
 <p>A decorator to add a validator to a field.</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="o">...</span>     <span class="n">m</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
 <span class="o">...</span>     <span class="nd">@m</span><span class="o">.</span><span class="n">validator</span>
 <span class="o">...</span>     <span class="k">def</span> <span class="nf">m_is_positive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m_value</span><span class="p">):</span>
@@ -681,13 +681,13 @@ default.</p>
 <span class="o">...</span>
 <span class="n">valid8</span><span class="o">.</span><span class="n">entry_points</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">[</span><span class="ne">ValueError</span><span class="p">]:</span> <span class="n">Error</span> <span class="n">validating</span> <span class="p">[</span><span class="n">Foo</span><span class="o">.</span><span class="n">m</span><span class="o">=</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span> <span class="n">InvalidValue</span><span class="p">:</span>
     <span class="n">Function</span> <span class="p">[</span><span class="n">m_is_positive</span><span class="p">]</span> <span class="n">returned</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="k">for</span> <span class="n">value</span> <span class="mf">0.</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>The decorated function should have a signature of <code>(val)</code>, <code>(obj/self, val)</code>, or <code>(obj/self, field, val)</code>. It should return <code>True</code> or <code>None</code> in case of success.</p>
 <p>You can use several of these decorators on the same function so as to share implementation across multiple
 fields:</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Foo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="o">...</span>     <span class="n">m</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
 <span class="o">...</span>     <span class="n">m2</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
 <span class="o">...</span>
@@ -705,32 +705,32 @@ fields:</p>
 <span class="o">...</span>
 <span class="n">valid8</span><span class="o">.</span><span class="n">entry_points</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">[</span><span class="ne">ValueError</span><span class="p">]:</span> <span class="n">Error</span> <span class="n">validating</span> <span class="p">[</span><span class="n">Foo</span><span class="o">.</span><span class="n">m</span><span class="o">=</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span> <span class="n">InvalidValue</span><span class="p">:</span>
     <span class="n">Function</span> <span class="p">[</span><span class="n">is_positive</span><span class="p">]</span> <span class="n">returned</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="k">for</span> <span class="n">value</span> <span class="mf">0.</span>
-</pre></div>
+</code></pre></div>
 
 
 <h2 id="constructors">Constructors<a class="headerlink" href="#constructors" title="Permanent link">&para;</a></h2>
 <h3 id="make_init"><code>make_init</code><a class="headerlink" href="#make_init" title="Permanent link">&para;</a></h3>
-<div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">make_init</span><span class="p">(</span><span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Field</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">make_init</span><span class="p">(</span><span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Field</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
               <span class="n">post_init_fun</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
               <span class="n">post_init_args_before</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
               <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">:</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>Creates a constructor based on the provided fields.</p>
 <p>If <code>fields</code> is empty, all fields from the class will be used in order of appearance, then the ancestors (following the mro)</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">make_init</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">make_init</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
 <span class="o">...</span>     <span class="n">height</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
 <span class="o">...</span>     <span class="n">color</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Color of the wall.&quot;</span><span class="p">)</span>
 <span class="o">...</span>     <span class="fm">__init__</span> <span class="o">=</span> <span class="n">make_init</span><span class="p">()</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">w</span> <span class="o">=</span> <span class="n">Wall</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="k">assert</span> <span class="nb">vars</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>If <code>fields</code> is not empty, only the listed fields will appear in the constructor and will be initialized upon init.</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
 <span class="o">...</span>     <span class="n">height</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
 <span class="o">...</span>     <span class="n">color</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Color of the wall.&quot;</span><span class="p">)</span>
 <span class="o">...</span>     <span class="fm">__init__</span> <span class="o">=</span> <span class="n">make_init</span><span class="p">(</span><span class="n">height</span><span class="p">)</span>
@@ -738,11 +738,11 @@ fields:</p>
 <span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
 <span class="o">...</span>
 <span class="ne">TypeError</span><span class="p">:</span> <span class="fm">__init__</span><span class="p">()</span> <span class="n">got</span> <span class="n">an</span> <span class="n">unexpected</span> <span class="n">keyword</span> <span class="n">argument</span> <span class="s1">&#39;color&#39;</span>
-</pre></div>
+</code></pre></div>
 
 
 <p><code>fields</code> can contain fields that do not belong to this class: typically they can be fields defined in a parent class. Note however that any field can be used, it is not mandatory to use class or inherited fields.</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
 <span class="o">...</span>     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
 <span class="o">...</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">ColoredWall</span><span class="p">(</span><span class="n">Wall</span><span class="p">):</span>
@@ -752,11 +752,11 @@ fields:</p>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">w</span> <span class="o">=</span> <span class="n">ColoredWall</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="nb">vars</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
 <span class="p">{</span><span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>If a <code>post_init_fun</code> is provided, it should be a function with <code>self</code> as first argument. This function will be executed after all declared fields have been initialized. The signature of the resulting <code>__init__</code> function created will be constructed by blending all mandatory/optional fields with the mandatory/optional args in the <code>post_init_fun</code> signature. The ones from the <code>post_init_fun</code> will appear first except if <code>post_init_args_before</code> is set to <code>False</code></p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
 <span class="o">...</span>     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
 <span class="o">...</span>     <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Color of the wall.&quot;</span><span class="p">)</span>
 <span class="o">...</span>
@@ -770,7 +770,7 @@ fields:</p>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">w</span> <span class="o">=</span> <span class="n">Wall</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;hey&#39;</span><span class="p">)</span>
 <span class="n">post</span> <span class="n">init</span> <span class="err">!</span> <span class="n">height</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">white</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">hey</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="k">assert</span> <span class="nb">vars</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;non_field_attr&#39;</span><span class="p">:</span> <span class="s1">&#39;hey&#39;</span><span class="p">}</span>
-</pre></div>
+</code></pre></div>
 
 
 <p><strong>Parameters</strong></p>
@@ -781,15 +781,15 @@ fields:</p>
 </ul>
 <p><strong>Outputs:</strong> a constructor method to be used as <code>__init__</code></p>
 <h3 id="init_fields"><code>@init_fields</code><a class="headerlink" href="#init_fields" title="Permanent link">&para;</a></h3>
-<div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">init_fields</span><span class="p">(</span><span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Field</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">init_fields</span><span class="p">(</span><span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Field</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
                 <span class="n">init_args_before</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="p">):</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>Decorator for an init method, so that fields are initialized before entering the method.</p>
 <p>By default, when the decorator is used without arguments or when <code>fields</code> is empty, all fields defined in the class are initialized. Fields inherited from parent classes are included, following the mro. The signature of the init method is modified so that it can receive values for these fields:</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">init_fields</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">init_fields</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Wall</span><span class="p">:</span>
 <span class="o">...</span>     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
 <span class="o">...</span>     <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Color of the wall.&quot;</span><span class="p">)</span>
@@ -808,7 +808,7 @@ fields:</p>
 <span class="o">&lt;</span><span class="n">BLANKLINE</span><span class="o">&gt;</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">w</span> <span class="o">=</span> <span class="n">Wall</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">post</span> <span class="n">init</span> <span class="err">!</span> <span class="n">height</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">white</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">hello</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>The list of fields can be explicitly provided in <code>fields</code>.</p>
@@ -819,16 +819,16 @@ fields:</p>
 <li><code>init_args_before</code>: If set to <code>True</code> (default), arguments from the decorated init method will appear before the fields when possible. If set to <code>False</code> the contrary will happen.</li>
 </ul>
 <h3 id="inject_fields"><code>@inject_fields</code><a class="headerlink" href="#inject_fields" title="Permanent link">&para;</a></h3>
-<div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">inject_fields</span><span class="p">(</span><span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Field</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">inject_fields</span><span class="p">(</span><span class="o">*</span><span class="n">fields</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Field</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
                   <span class="p">):</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>A decorator for <code>__init__</code> methods, to make them automatically expose arguments corresponding to all <code>*fields</code>.
 It can be used with or without arguments. If the list of fields is empty, it means "all fields from the class".</p>
 <p>The decorated <code>__init__</code> method should have an argument named <code>'fields'</code>. This argument will be injected with an
 object so that users can manually execute the fields initialization. This is done with <code>fields.init()</code>.</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">inject_fields</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">inject_fields</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="k">class</span> <span class="nc">Wall</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="o">...</span>     <span class="n">height</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Height of the wall in mm.&quot;</span><span class="p">)</span>
 <span class="o">...</span>     <span class="n">color</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Color of the wall.&quot;</span><span class="p">)</span>
@@ -847,7 +847,7 @@ object so that users can manually execute the fields initialization. This is don
 <span class="ne">TypeError</span><span class="p">:</span> <span class="fm">__init__</span><span class="p">()</span> <span class="n">missing</span> <span class="mi">1</span> <span class="n">required</span> <span class="n">positional</span> <span class="n">argument</span><span class="p">:</span> <span class="s1">&#39;height&#39;</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">Wall</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">Wall</span><span class="o">&lt;</span><span class="n">height</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="o">&gt;</span>
-</pre></div>
+</code></pre></div>
 
 
 <p><strong>Parameters:</strong></p>
@@ -855,12 +855,12 @@ object so that users can manually execute the fields initialization. This is don
 <li><code>fields</code>: list of fields to initialize before entering the decorated <code>__init__</code> method. For each of these fields a corresponding argument will be added in the method's signature. If an empty list is provided, all fields from the class will be used including inherited fields following the mro.</li>
 </ul>
 <h2 id="autofields"><code>@autofields</code><a class="headerlink" href="#autofields" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">autofields</span><span class="p">(</span><span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>     <span class="c1"># type: bool</span>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">autofields</span><span class="p">(</span><span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>     <span class="c1"># type: bool</span>
                <span class="n">include_upper</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>   <span class="c1"># type: bool</span>
                <span class="n">include_dunder</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># type: bool</span>
                <span class="n">make_init</span><span class="o">=</span><span class="kc">True</span>         <span class="c1"># type: bool</span>
                <span class="p">):</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>Decorator to automatically create fields and constructor on a class.</p>
@@ -882,7 +882,7 @@ More precisely: members that only contain a type annotation become mandatory fie
 <code>check_type=False</code> by default. This can be changed by setting <code>check_types=True</code>.</p>
 <p>Finally, in addition, an init method (constructor) is generated for the class, using <code>make_init()</code>. This may be
 disabled by setting <code>make_init=False</code>.</p>
-<div class="codehilite"><pre><span></span><span class="o">&gt;&gt;&gt;</span> <span class="nd">@autofields</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nd">@autofields</span>
 <span class="o">...</span> <span class="k">class</span> <span class="nc">Pocket</span><span class="p">:</span>
 <span class="o">...</span>     <span class="n">SENTENCE</span> <span class="o">=</span> <span class="s2">&quot;hello world&quot;</span>  <span class="c1"># uppercase: not a field</span>
 <span class="o">...</span>     <span class="n">size</span><span class="p">:</span> <span class="nb">int</span>   <span class="c1"># mandatory field</span>
@@ -895,44 +895,44 @@ disabled by setting <code>make_init=False</code>.</p>
 <span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
 <span class="o">...</span>
 <span class="ne">TypeError</span><span class="p">:</span> <span class="fm">__init__</span><span class="p">()</span> <span class="n">got</span> <span class="n">an</span> <span class="n">unexpected</span> <span class="n">keyword</span> <span class="n">argument</span> <span class="s1">&#39;SENTENCE&#39;</span>
-</pre></div>
+</code></pre></div>
 
 
 <h2 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
 <h3 id="has_fields"><code>has_fields</code><a class="headerlink" href="#has_fields" title="Permanent link">&para;</a></h3>
-<div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">has_fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">has_fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
                <span class="n">include_inherited</span><span class="o">=</span><span class="kc">True</span>  <span class="c1"># type: bool</span>
                <span class="p">)</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>Returns True if class <code>cls</code> defines at least one <code>pyfields</code> field.
 If <code>include_inherited</code> is <code>True</code> (default), the method will return <code>True</code> if at least a field is defined in the class or one of its ancestors. If <code>False</code>, the fields need to be defined on the class itself.</p>
 <h3 id="get_fields"><code>get_fields</code><a class="headerlink" href="#get_fields" title="Permanent link">&para;</a></h3>
-<div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">get_fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
                <span class="n">include_inherited</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># type: bool</span>
                <span class="n">remove_duplicates</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># type: bool</span>
                <span class="n">ancestors_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>    <span class="c1"># type: bool</span>
                <span class="n">container_type</span><span class="o">=</span><span class="nb">tuple</span><span class="p">,</span>    <span class="c1"># type: Type[T]</span>
                <span class="p">)</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>Utility method to collect all fields defined in a class, including all inherited or not.
 By default duplicates are removed and ancestor fields are included and appear first. If a field is overridden, it will appear at the position of the overridden field in the order.</p>
 <h3 id="yield_fields"><code>yield_fields</code><a class="headerlink" href="#yield_fields" title="Permanent link">&para;</a></h3>
-<div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">yield_fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">yield_fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
                  <span class="n">include_inherited</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># type: bool</span>
                  <span class="n">remove_duplicates</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># type: bool</span>
                  <span class="n">ancestors_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>    <span class="c1"># type: bool</span>
                  <span class="p">)</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>Similar to <code>get_fields</code> but as a generator.</p>
 <h3 id="get_field"><code>get_field</code><a class="headerlink" href="#get_field" title="Permanent link">&para;</a></h3>
-<div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_field</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-</pre></div>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">get_field</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+</code></pre></div>
 
 
 <p>Utility method to return the field member with name <code>name</code> in class <code>cls</code>.
@@ -995,9 +995,9 @@ If the member is not a field, a <code>NotAFieldError</code> is raised.</p>
       <div class="md-footer-copyright">
         
         powered by
-        <a href="https://www.mkdocs.org">MkDocs</a>
+        <a href="https://www.mkdocs.org" target="_blank" rel="noopener">MkDocs</a>
         and
-        <a href="https://squidfunk.github.io/mkdocs-material/">
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
           Material for MkDocs</a>
       </div>
       
@@ -1007,7 +1007,7 @@ If the member is not a field, a <code>NotAFieldError</code> is raised.</p>
       
     </div>
     
-      <script src="../assets/javascripts/application.808e90bb.js"></script>
+      <script src="../assets/javascripts/application.c33a9706.js"></script>
       
       <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
       
