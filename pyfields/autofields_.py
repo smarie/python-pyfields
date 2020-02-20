@@ -3,17 +3,25 @@
 #  Copyright (c) Schneider Electric Industries, 2019. All right reserved.
 import sys
 
+try:
+    from typing import Union, Callable, Type, Any, TypeVar
+    DecoratedClass = TypeVar("DecoratedClass", bound=Type[Any])
+except ImportError:
+    pass
+
+
 from pyfields import Field, field, make_init as mkinit, copy_value
 
 
 PY36 = sys.version_info >= (3, 6)
 
 
-def autofields(check_types=False,     # type: bool
+def autofields(check_types=False,     # type: Union[bool, DecoratedClass]
                include_upper=False,   # type: bool
                include_dunder=False,  # type: bool
                make_init=True         # type: bool
                ):
+    # type: (...) -> Union[Callable[[DecoratedClass], DecoratedClass], DecoratedClass]
     """
     Decorator to automatically create fields and constructor on a class.
 

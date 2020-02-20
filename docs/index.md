@@ -609,7 +609,7 @@ post init ! height=1, color=white, msg=hey
 {'height': 1, 'color': 'white', 'non_field_attr': 'hey'}
 ```
 
-Note on the order of arguments in the resulting `__init__` signature: as you can see, `msg` appears between `height` and `color` in the signature. This corresponds to the 
+Note on the order of arguments in the resulting `__init__` signature: as you can see, `msg` appears between `height` and `color` in the signature. This is because all mandatory arguments appear first, then the optionals - and within each group, the user-provided ones (e.g. `msg`) appear first. You can change this behaviour by setting `init_args_before=False`. See [API reference](api_reference.md) for details.
 
 
 ### 3. Simplifying
