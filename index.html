@@ -1359,6 +1359,9 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 </code></pre></div>
 
 
+<div class="admonition note">
+<p class="admonition-title"><code>pytypes</code> does not currently support <code>vtype</code> so in order to benefit from this feature, you should either install <code>typeguard</code> or uninstall <code>pytypes</code> (to let the default <code>pyfields</code> type checker take over). See <a href="https://github.com/Stewori/pytypes/issues/86">this issue</a>.</p>
+</div>
 <h3 id="4-misc">4. Misc.<a class="headerlink" href="#4-misc" title="Permanent link">&para;</a></h3>
 <h4 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h4>
 <p><code>pyfields</code> offers an API so that other libraries can inspect the fields: <code>get_fields</code>, <code>yield_fields</code>, <code>has_fields</code>, <code>get_field</code>. See <a href="https://smarie.github.io/python-pyfields/api_reference/#api">API reference</a> for details.</p>
