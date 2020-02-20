@@ -683,6 +683,8 @@ class Item:
     name: NonEmptyStr
 ```
 
+!!! note "`pytypes` does not currently support `vtype` so in order to benefit from this feature, you should either install `typeguard` or uninstall `pytypes` (to let the default `pyfields` type checker take over). See [this issue](https://github.com/Stewori/pytypes/issues/86)."
+
 ### 4. Misc.
 
 #### API

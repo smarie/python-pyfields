@@ -422,6 +422,16 @@ def test_autofields_readme():
     assert len(pocket2.items) == 0
 
 
+try:
+    import pytypes
+except ImportError:
+    has_pytypes = False
+else:
+    has_pytypes = True
+
+
+@pytest.mark.skipif(has_pytypes, reason="pytypes does not correctly support vtypes - "
+                                        "see https://github.com/Stewori/pytypes/issues/86")
 @pytest.mark.skipif(sys.version_info < (3, 6), reason="python < 3.6 does not support class member type hints")
 def test_autofields_vtypes_readme():
 
