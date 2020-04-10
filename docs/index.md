@@ -705,13 +705,19 @@ class Foo:
     age: int = field(default=12)
 
 foo = Foo(msg='hello')
-print(foo)  # test the automatic string representation
+
+print(foo)          # automatic string representation
+print(dict(foo))    # automatic dict view
+
+assert foo == Foo(msg='hello', age=12)     # automatic equality comparison 
+assert foo == {'msg': 'hello', 'age': 12}  # automatic eq comparison with dicts
 ```
 
 yields
 
 ```
 Foo(msg='hello', age=12)
+{'msg': 'hello', 'age': 12}
 ```
 
 See [here](https://smarie.github.io/python-autoclass/#pyfields-combo) for details.

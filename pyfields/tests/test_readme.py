@@ -455,4 +455,11 @@ def test_autoclass():
         age = field(default=12, type_hint=int)
 
     foo = Foo(msg='hello')
-    print(foo)
+
+    print(foo)  # automatic string representation
+    print(dict(foo))  # dict view
+
+    assert str(foo) == "Foo(msg='hello', age=12)"
+    assert str(dict(foo)) == "{'msg': 'hello', 'age': 12}"
+    assert foo == Foo(msg='hello', age=12)  # comparison (equality)
+    assert foo == {'msg': 'hello', 'age': 12}  # comparison with dicts
