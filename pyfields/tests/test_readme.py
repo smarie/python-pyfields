@@ -460,6 +460,6 @@ def test_autoclass():
     print(dict(foo))  # dict view
 
     assert str(foo) == "Foo(msg='hello', age=12)"
-    assert str(dict(foo)) == "{'msg': 'hello', 'age': 12}"
+    assert str(dict(foo)) in ("{'msg': 'hello', 'age': 12}", "{'age': 12, 'msg': 'hello'}")
     assert foo == Foo(msg='hello', age=12)  # comparison (equality)
     assert foo == {'msg': 'hello', 'age': 12}  # comparison with dicts
