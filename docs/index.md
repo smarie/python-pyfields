@@ -7,7 +7,7 @@
 [![Documentation](https://img.shields.io/badge/doc-latest-blue.svg)](https://smarie.github.io/python-pyfields/) [![PyPI](https://img.shields.io/pypi/v/pyfields.svg)](https://pypi.python.org/pypi/pyfields/) [![Downloads](https://pepy.tech/badge/pyfields)](https://pepy.tech/project/pyfields) [![Downloads per week](https://pepy.tech/badge/pyfields/week)](https://pepy.tech/project/pyfields) [![GitHub stars](https://img.shields.io/github/stars/smarie/python-pyfields.svg)](https://github.com/smarie/python-pyfields/stargazers)
 
 !!! new `@autofields` feature, [check it out](#a-autofields) !
-!!! success "`pyfields` is now automatically supported by `autoclass` ! See [here](https://smarie.github.io/python-autoclass/#pyfields-combo) for details."
+!!! success "`pyfields` is now automatically supported by `autoclass` ! See [here](#hash-dict-eq-repr) for details."
 
 `pyfields` provides a simple and elegant way to define fields in python classes. With `pyfields` you explicitly define all aspects of a field (default value/factory, type, validators, converters, documentation...) in a single place, and can refer to it from other places. 
 
@@ -693,7 +693,28 @@ class Item:
 
 #### hash, dict, eq, repr 
 
-`autoclass` is now compliant with `pyfields`. So you can use `@autoclass`, or `@autorepr`, `@autohash`, `@autodict`... on the decorated class. That way, your fields definition is directly reused for most of the class behaviour. See [here](https://smarie.github.io/python-autoclass/#pyfields-combo) for details.
+`autoclass` is now compliant with `pyfields`. So you can use `@autoclass`, or `@autorepr`, `@autohash`, `@autodict`... on the decorated class. That way, your fields definition is directly reused for most of the class behaviour. 
+
+```python
+from autoclass import autoclass
+from pyfields import field
+
+@autoclass
+class Foo:
+    msg: str = field()
+    age: int = field(default=12)
+
+foo = Foo(msg='hello')
+print(foo)  # test the automatic string representation
+```
+
+yields
+
+```
+Foo(msg='hello', age=12)
+```
+
+See [here](https://smarie.github.io/python-autoclass/#pyfields-combo) for details.
 
 #### Slots
 

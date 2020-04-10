@@ -443,3 +443,16 @@ def test_autofields_vtypes_readme():
         Rectangle(1, -2)
     with pytest.raises(FieldTypeError):
         Rectangle('1', 2)
+
+
+def test_autoclass():
+    """ Tests the example with autoclass in the doc """
+    from autoclass import autoclass
+
+    @autoclass
+    class Foo:
+        msg = field(type_hint=str)
+        age = field(default=12, type_hint=int)
+
+    foo = Foo(msg='hello')
+    print(foo)

@@ -15,7 +15,7 @@ INSTALL_REQUIRES = ['valid8>=5.0', 'makefun',
                     'funcsigs;python_version<"3.3"', 'enum34;python_version<"3.4"']  # 'sentinel',
 DEPENDENCY_LINKS = []
 SETUP_REQUIRES = ['pytest-runner', 'setuptools_scm', 'six']
-TESTS_REQUIRE = ['pytest', 'pytest-logging', 'mini-lambda', 'typing;python_version<"3.5"', 'vtypes']
+TESTS_REQUIRE = ['pytest', 'pytest-logging', 'mini-lambda', 'typing;python_version<"3.5"', 'vtypes', 'autoclass']
 EXTRAS_REQUIRE = {}
 
 # simple check
