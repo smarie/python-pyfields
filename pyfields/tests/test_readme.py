@@ -450,7 +450,7 @@ def test_autoclass():
     from autoclass import autoclass
 
     @autoclass
-    class Foo:
+    class Foo(object):
         msg = field(type_hint=str)
         age = field(default=12, type_hint=int)
 
