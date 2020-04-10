@@ -1348,12 +1348,18 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
     <span class="n">age</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 
 <span class="n">foo</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;hello&#39;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span>  <span class="c1"># test the automatic string representation</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span>          <span class="c1"># automatic string representation</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">foo</span><span class="p">))</span>    <span class="c1"># automatic dict view</span>
+
+<span class="k">assert</span> <span class="n">foo</span> <span class="o">==</span> <span class="n">Foo</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>     <span class="c1"># automatic equality comparison </span>
+<span class="k">assert</span> <span class="n">foo</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">}</span>  <span class="c1"># automatic eq comparison with dicts</span>
 </code></pre></div>
 
 
 <p>yields</p>
 <div class="codehilite"><pre><span></span><code><span class="err">Foo(msg=&#39;hello&#39;, age=12)</span>
+<span class="err">{&#39;msg&#39;: &#39;hello&#39;, &#39;age&#39;: 12}</span>
 </code></pre></div>
 
 
@@ -1436,7 +1442,7 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
     </div>
     
       <script src="assets/javascripts/vendor.f45d2d8d.min.js"></script>
-      <script src="assets/javascripts/bundle.74d0b805.min.js"></script><script id="__lang" type="application/json">{"search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.none": "No matching documents"}</script>
+      <script src="assets/javascripts/bundle.74d0b805.min.js"></script><script id="__lang" type="application/json">{"search.result.none": "No matching documents", "search.config.lang": "en", "search.result.one": "1 matching document", "clipboard.copy": "Copy to clipboard", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "clipboard.copied": "Copied to clipboard", "search.result.placeholder": "Type to start searching", "search.result.other": "# matching documents"}</script>
       
       <script>
         app = initialize({
