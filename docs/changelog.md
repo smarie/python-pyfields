@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.1.2 - type hint fix (minor)
+
+ - Now `converters={'*': ...}` does not appear as a type hint error. Fixed [#64](https://github.com/smarie/python-pyfields/issues/64)
+
 ### 1.1.1 - PEP561 compatibility
 
  - **Misc**: Package is now PEP561 compatible. Fixed [#61](https://github.com/smarie/python-pyfields/issues/61)
