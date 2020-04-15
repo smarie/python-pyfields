@@ -5,7 +5,7 @@
 from valid8 import Validator, ValidationError, ValidationFailure
 from valid8.base import getfullargspec as v8_getfullargspec, get_callable_name, is_mini_lambda
 
-from typing import Callable, Type, Any, TypeVar, Union, Iterable, Tuple, Mapping, Optional, Dict
+from typing import Callable, Type, Any, TypeVar, Union, Iterable, Tuple, Mapping, Optional, Dict, Literal
 
 
 T = TypeVar('T')
@@ -119,11 +119,11 @@ ConverterFuncDefinition = Union[Converter,
                                 Tuple[ValidationFuncOrLambda, ConverterFuncOrLambda],
                                 Tuple[ValidType, ConverterFuncOrLambda]]
 
-TypeDef = Union[Type, Tuple[Type, ...]]
+TypeDef = Union[Type, Tuple[Type, ...], Literal['*'], str]  # todo remove str whe pycharm understands Literal
 OneOrSeveralConverterDefinitions = Union[Converter,
                                          ConverterFuncOrLambda,
-                                         Iterable[Tuple[TypeDef, ConverterFunc]],
-                                         Mapping[TypeDef, ConverterFunc]]
+                                         Iterable[Tuple[TypeDef, ConverterFuncOrLambda]],
+                                         Mapping[TypeDef, ConverterFuncOrLambda]]
 Converters = OneOrSeveralConverterDefinitions
 
 

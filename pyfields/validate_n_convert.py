@@ -14,7 +14,7 @@ from valid8.validation_lib import instance_of
 
 try:  # python 3.5+
     # noinspection PyUnresolvedReferences
-    from typing import Callable, Type, Any, TypeVar, Union, Iterable, Tuple, Mapping, Optional, Dict
+    from typing import Callable, Type, Any, TypeVar, Union, Iterable, Tuple, Mapping, Optional, Dict, Literal
     from valid8.common_syntax import ValidationFuncs
     use_type_hints = sys.version_info > (3, 0)
 except ImportError:
@@ -356,11 +356,11 @@ if use_type_hints:
                                     Tuple[ValidationFuncOrLambda, ConverterFuncOrLambda],
                                     Tuple[ValidType, ConverterFuncOrLambda]]
 
-    TypeDef = Union[Type, Tuple[Type, ...]]
+    TypeDef = Union[Type, Tuple[Type, ...], Literal['*'], str]  # todo remove str whe pycharm understands Literal
     OneOrSeveralConverterDefinitions = Union[Converter,
                                              ConverterFuncOrLambda,
-                                             Iterable[Tuple[TypeDef, ConverterFunc]],
-                                             Mapping[TypeDef, ConverterFunc]]
+                                             Iterable[Tuple[TypeDef, ConverterFuncOrLambda]],
+                                             Mapping[TypeDef, ConverterFuncOrLambda]]
     Converters = OneOrSeveralConverterDefinitions
 
 
