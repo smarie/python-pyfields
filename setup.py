@@ -134,6 +134,9 @@ setup(
     # have to be included in MANIFEST.in as well.
     # Note: we use the empty string so that this also works with submodules
     package_data={"": ['py.typed', '*.pyi']},
+    # IMPORTANT: DO NOT set the `include_package_data` flag !! It triggers inclusion of all git-versioned files
+    # see https://github.com/pypa/setuptools_scm/issues/190#issuecomment-351181286
+    # include_package_data=True,
 
     # Although 'package_data' is the preferred approach, in some case you may
     # need to place data files outside of your packages. See:
