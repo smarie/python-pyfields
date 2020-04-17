@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.1.3 - smaller wheel
+
+ - `tests` folder is now excluded from generated package wheel. Fixed [#65](https://github.com/smarie/python-pyfields/issues/65)
+
 ### 1.1.2 - type hint fix (minor)
 
  - Now `converters={'*': ...}` does not appear as a type hint error. Fixed [#64](https://github.com/smarie/python-pyfields/issues/64)
