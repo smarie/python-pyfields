@@ -3,26 +3,22 @@ See:
 https://packaging.python.org/en/latest/distributing.html
 https://github.com/pypa/sampleproject
 """
-from six import raise_from
 from os import path
-
+import pkg_resources
 from setuptools import setup, find_packages
 
-here = path.abspath(path.dirname(__file__))
+pkg_resources.require("setuptools>=39.2")
+pkg_resources.require("setuptools_scm")
+
+from setuptools_scm import get_version  # noqa: E402
 
 # *************** Dependencies *********
 INSTALL_REQUIRES = ['valid8>=5.0', 'makefun',
                     'funcsigs;python_version<"3.3"', 'enum34;python_version<"3.4"']  # 'sentinel',
 DEPENDENCY_LINKS = []
-SETUP_REQUIRES = ['pytest-runner', 'setuptools_scm', 'six']
+SETUP_REQUIRES = ['pytest-runner', 'setuptools_scm']
 TESTS_REQUIRE = ['pytest', 'pytest-logging', 'mini-lambda', 'typing;python_version<"3.5"', 'vtypes', 'autoclass']
 EXTRAS_REQUIRE = {}
-
-# simple check
-try:
-    from setuptools_scm import get_version
-except Exception as e:
-    raise_from(Exception('Required packages for setup not found. Please install `setuptools_scm`'), e)
 
 # ************** ID card *****************
 DISTNAME = 'pyfields'
@@ -30,22 +26,15 @@ DESCRIPTION = 'Define fields in python classes. Easily.'
 MAINTAINER = 'Sylvain MARIE'
 MAINTAINER_EMAIL = 'sylvain.marie@se.com'
 URL = 'https://github.com/smarie/python-pyfields'
+DOWNLOAD_URL = URL + '/tarball/' + get_version()
 LICENSE = 'BSD 3-Clause'
 LICENSE_LONG = 'License :: OSI Approved :: BSD License'
-
-version_for_download_url = get_version()
-DOWNLOAD_URL = URL + '/tarball/' + version_for_download_url
-
 KEYWORDS = 'object class boilerplate oop field attr member descriptor attribute mix-in mixin validation type-check'
 
+here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'docs', 'long_description.md')) as f:
     LONG_DESCRIPTION = f.read()
 
-# ************* VERSION **************
-# --Get the Version number from VERSION file, see https://packaging.python.org/single_source_version/ option 4.
-# THIS IS DEPRECATED AS WE NOW USE GIT TO MANAGE VERSION
-# with open(path.join(here, 'VERSION')) as version_file:
-#    VERSION = version_file.read().strip()
 # OBSOLETES = []
 
 setup(
@@ -92,6 +81,8 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+
+        # 'Framework :: Pytest'
     ],
 
     # What does your project relate to?
