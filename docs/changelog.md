@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.1.4 - better python 2 packaging
+
+ - packaging improvements: set the "universal wheel" flag to 1, and cleaned up the `setup.py`. In particular removed dependency to `six`. Fixes [#66](https://github.com/smarie/python-pyfields/issues/66)
+
 ### 1.1.3 - smaller wheel
 
  - `tests` folder is now excluded from generated package wheel. Fixed [#65](https://github.com/smarie/python-pyfields/issues/65)
