@@ -2,6 +2,7 @@
 #
 #  Copyright (c) Schneider Electric Industries, 2019. All right reserved.
 import sys
+from inspect import isdatadescriptor, ismethoddescriptor
 
 try:
     from typing import Union, Callable, Type, Any, TypeVar
@@ -159,6 +160,10 @@ def autofields(check_types=False,     # type: Union[bool, DecoratedClass]
                 continue
             elif isinstance(default_value, Field):
                 # already a field, no need to create
+                continue
+            elif isinstance(default_value, property) or isdatadescriptor(default_value) \
+                    or ismethoddescriptor(default_value):
+                # a property or a data or non-data descriptor > exclude
                 continue
             elif (isinstance(default_value, type) or callable(default_value)) \
                     and getattr(default_value, '__name__', None) == member_name:

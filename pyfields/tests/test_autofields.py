@@ -5,7 +5,7 @@ import sys
 
 import pytest
 
-from pyfields import autofields, field, FieldTypeError, Field
+from pyfields import autofields, field, FieldTypeError, Field, get_fields
 from pyfields.core import NativeField
 
 
@@ -69,3 +69,31 @@ def test_autofields_basic(with_type_hints, type_check):
         assert f.fct() == 1
         assert f.barfunc(1) == 2
         assert f.barcls == str
+
+
+def test_autofields_property_descriptors():
+    """Checks that properties and descriptors are correctly ignored by autofields"""
+
+    @autofields
+    class Foo(object):
+        foo = 1
+        @property
+        def bar(self):
+            return 2
+
+        class MyDesc():
+            def __get__(self):
+                return 1
+
+        class MyDesc2():
+            def __get__(self):
+                return 0
+            def __set__(self, instance, value):
+                return
+
+        m = MyDesc()
+        p = MyDesc2()
+
+    fields = get_fields(Foo)
+    assert len(fields) == 1
+    assert fields[0].name == 'foo'
