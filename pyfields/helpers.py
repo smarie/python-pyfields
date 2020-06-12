@@ -36,6 +36,9 @@ def get_field(cls, name):
     except ClassFieldAccessError as e:
         # we know it is a field :)
         return e.field
+    except Exception:
+        # any other exception that can happen with a descriptor for example
+        raise NotAFieldError(cls, name)
     else:
         # it is a field if is it an instance of Field
         if isinstance(member, Field):
