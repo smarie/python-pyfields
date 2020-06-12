@@ -2,7 +2,7 @@
 
 ### 1.1.5 - bugfix
 
- - `@autofields` now correctly skips `@property` and descriptor members. Fixes [#67](https://github.com/smarie/python-pyfields/issues/67)
+ - `@autofields` now correctly skips `@property` and more generally, descriptor members. Fixes [#67](https://github.com/smarie/python-pyfields/issues/67)
 
 ### 1.1.4 - better python 2 packaging
 
