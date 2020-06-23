@@ -2,7 +2,7 @@
 #
 #  Copyright (c) Schneider Electric Industries, 2019. All right reserved.
 from copy import copy, deepcopy
-from inspect import getmro
+from inspect import getmro, isclass
 
 try:
     from typing import Union, Type, TypeVar
@@ -51,6 +51,7 @@ def yield_fields(cls,
                  include_inherited=True,  # type: bool
                  remove_duplicates=True,  # type: bool
                  ancestors_first=True,    # type: bool
+                 public_only=False,       # type: bool
                  _auto_fix_fields=False   # type: bool
                  ):
     """
@@ -60,6 +61,7 @@ def yield_fields(cls,
     :param include_inherited:
     :param remove_duplicates:
     :param ancestors_first:
+    :param public_only:
     :param _auto_fix_fields:
     :return:
     """
@@ -96,6 +98,9 @@ def yield_fields(cls,
                 if _auto_fix_fields:
                     # take this opportunity to set the name and type hints
                     field.set_as_cls_member(_cls, member_name, owner_cls_type_hints=_cls_pep484_member_type_hints)
+
+                if public_only and member_name.startswith('_'):
+                    continue
 
                 if remove_duplicates:
                     if member_name in _already_found_names:
@@ -140,10 +145,19 @@ def has_fields(cls,
     return any(yield_fields(cls, include_inherited=include_inherited))
 
 
-def get_fields(cls,
+def safe_isclass(obj: object) -> bool:
+    """Ignore any exception via isinstance on Python 3."""
+    try:
+        return isclass(obj)
+    except Exception:
+        return False
+
+
+def get_fields(cls_or_obj,
                include_inherited=True,  # type: bool
                remove_duplicates=True,  # type: bool
                ancestors_first=True,    # type: bool
+               public_only=False,       # type: bool
                container_type=tuple,    # type: Type[T]
                _auto_fix_fields=False   # type: bool
                ):
@@ -154,15 +168,21 @@ def get_fields(cls,
     By default duplicates are removed and ancestor fields are included and appear first. If a field is overridden,
     it will appear at the position of the overridden field in the order.
 
-    :param cls:
+    If an object is provided, `getfields` will be executed on its class.
+
+    :param cls_or_obj:
     :param include_inherited:
     :param remove_duplicates:
     :param ancestors_first:
+    :param public_only:
     :param container_type:
     :param _auto_fix_fields:
     :return: the fields (by default, as a tuple)
     """
-    return container_type(yield_fields(cls, include_inherited=include_inherited,
+    if not safe_isclass(cls_or_obj):
+        cls_or_obj = cls_or_obj.__class__
+
+    return container_type(yield_fields(cls_or_obj, include_inherited=include_inherited, public_only=public_only,
                                        remove_duplicates=remove_duplicates, ancestors_first=ancestors_first,
                                        _auto_fix_fields=_auto_fix_fields))
 
