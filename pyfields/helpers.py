@@ -1,6 +1,7 @@
 #  Authors: Sylvain Marie <sylvain.marie@se.com>
 #
 #  Copyright (c) Schneider Electric Industries, 2019. All right reserved.
+import sys
 from copy import copy, deepcopy
 from inspect import getmro, isclass
 
@@ -143,6 +144,47 @@ def has_fields(cls,
     :return:
     """
     return any(yield_fields(cls, include_inherited=include_inherited))
+
+
+if sys.version_info >= (3, 7):
+    ODict = dict
+else:
+    from collections import OrderedDict
+    ODict = OrderedDict
+
+
+def get_field_values(obj,
+                     include_inherited=True,  # type: bool
+                     remove_duplicates=True,  # type: bool
+                     ancestors_first=True,    # type: bool
+                     public_only=False,       # type: bool
+                     container_type=ODict,    # type: Type[T]
+                     _auto_fix_fields=False   # type: bool
+                     ):
+    """
+    Utility method to collect all field names and values defined on an object, including all inherited or not.
+
+    By default duplicates are removed and ancestor fields are included and appear first. If a field is overridden,
+    it will appear at the position of the overridden field in the order.
+
+    The result is an ordered dictionary (a `dict` in python 3.7, an `OrderedDict` otherwise) of {name: value} pairs.
+    One can change the container type with the `container_type` attribute though, that will receive an iterable of
+    (key, value) pairs.
+
+    :param obj:
+    :param include_inherited:
+    :param remove_duplicates:
+    :param ancestors_first:
+    :param public_only:
+    :param container_type:
+    :param _auto_fix_fields:
+    :return:
+    """
+    fields_gen = yield_fields(obj.__class__, include_inherited=include_inherited, public_only=public_only,
+                              remove_duplicates=remove_duplicates, ancestors_first=ancestors_first,
+                              _auto_fix_fields=_auto_fix_fields)
+
+    return container_type((f.name, getattr(obj, f.name)) for f in fields_gen)
 
 
 def safe_isclass(obj: object) -> bool:
