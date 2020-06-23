@@ -11,7 +11,7 @@
       
       
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.2.3">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.3.2">
     
     
       
@@ -19,7 +19,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.6e35a1a6.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.fe0cca5b.min.css">
       
       
     
@@ -42,6 +42,7 @@
   
     <body dir="ltr">
   
+    
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" for="__drawer"></label>
@@ -247,6 +248,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#120-getfields-improvements-and-new-get_field_values" class="md-nav__link">
+    1.2.0 - getfields improvements and new get_field_values
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#115-bugfix" class="md-nav__link">
     1.1.5 - bugfix
   </a>
@@ -433,6 +441,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#120-getfields-improvements-and-new-get_field_values" class="md-nav__link">
+    1.2.0 - getfields improvements and new get_field_values
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#115-bugfix" class="md-nav__link">
     1.1.5 - bugfix
   </a>
@@ -607,6 +622,15 @@
                 
                 
                 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
+<h3 id="120-getfields-improvements-and-new-get_field_values">1.2.0 - <code>getfields</code> improvements and new <code>get_field_values</code><a class="headerlink" href="#120-getfields-improvements-and-new-get_field_values" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><code>getfields</code> can now be executed on an instance, and provides a <code>public_only</code> option. Fixes <a href="https://github.com/smarie/python-pyfields/issues/69">#69</a></p>
+</li>
+<li>
+<p>New <code>get_field_values</code> method to get an ordered dict-like of field name: value.  Fixes <a href="https://github.com/smarie/python-pyfields/issues/70">#70</a></p>
+</li>
+</ul>
 <h3 id="115-bugfix">1.1.5 - bugfix<a class="headerlink" href="#115-bugfix" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>@autofields</code> now correctly skips <code>@property</code> and more generally, descriptor members. Fixes <a href="https://github.com/smarie/python-pyfields/issues/67">#67</a></li>
@@ -847,14 +871,14 @@
     </div>
     
       <script src="../assets/javascripts/vendor.d710d30a.min.js"></script>
-      <script src="../assets/javascripts/bundle.a45f732b.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "search.config.separator": "[\\s\\-]+", "search.result.none": "No matching documents", "search.result.placeholder": "Type to start searching", "search.result.one": "1 matching document", "clipboard.copied": "Copied to clipboard", "search.result.other": "# matching documents", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter"}</script>
+      <script src="../assets/javascripts/bundle.7f4f3c92.min.js"></script><script id="__lang" type="application/json">{"search.result.other": "# matching documents", "search.result.none": "No matching documents", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "clipboard.copied": "Copied to clipboard", "search.config.separator": "[\\s\\-]+", "search.result.one": "1 matching document", "search.result.placeholder": "Type to start searching", "search.config.pipeline": "trimmer, stopWordFilter"}</script>
       
       <script>
         app = initialize({
           base: "..",
           features: [],
           search: Object.assign({
-            worker: "../assets/javascripts/worker/search.c03f0417.min.js"
+            worker: "../assets/javascripts/worker/search.9b3611bd.min.js"
           }, typeof search !== "undefined" && search)
         })
       </script>
