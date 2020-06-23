@@ -419,16 +419,19 @@ If `include_inherited` is `True` (default), the method will return `True` if at 
 ### `get_fields`
 
 ```python
-def get_fields(cls,
+def get_fields(cls_or_obj,
                include_inherited=True,  # type: bool
                remove_duplicates=True,  # type: bool
                ancestors_first=True,    # type: bool
+               public_only=False,       # type: bool
                container_type=tuple,    # type: Type[T]
                )
 ```
 
 Utility method to collect all fields defined in a class, including all inherited or not.
 By default duplicates are removed and ancestor fields are included and appear first. If a field is overridden, it will appear at the position of the overridden field in the order.
+
+If an object is provided, `getfields` will be executed on its class.
 
 ### `yield_fields`
 
@@ -437,6 +440,7 @@ def yield_fields(cls,
                  include_inherited=True,  # type: bool
                  remove_duplicates=True,  # type: bool
                  ancestors_first=True,    # type: bool
+                 public_only=False,       # type: bool
                  )
 ```
 
@@ -450,3 +454,21 @@ def get_field(cls, name)
 
 Utility method to return the field member with name `name` in class `cls`.
 If the member is not a field, a `NotAFieldError` is raised.
+
+### `get_field_values`
+
+```python
+def get_field_values(obj,
+                     include_inherited=True,  # type: bool
+                     remove_duplicates=True,  # type: bool
+                     ancestors_first=True,    # type: bool
+                     public_only=False,       # type: bool
+                     container_type=ODict,    # type: Type[T]
+                     )
+```
+
+Utility method to collect all field names and values defined on an object, including all inherited or not.
+
+By default duplicates are removed and ancestor fields are included and appear first. If a field is overridden, it will appear at the position of the overridden field in the order.
+
+The result is an ordered dictionary (a `dict` in python 3.7, an `OrderedDict` otherwise) of {name: value} pairs. One can change the container type with the `container_type` attribute though, that will receive an iterable of (key, value) pairs.

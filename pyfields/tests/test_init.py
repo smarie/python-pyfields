@@ -148,7 +148,7 @@ def test_init_order():
     print(vars(c))
 
 
-@pytest.mark.parametrize("a_first", [None, False, True], ids="ancestor_first={}".format)
+@pytest.mark.parametrize("a_first", [False, True], ids="ancestor_first={}".format)
 def test_init_order2(a_first):
     """"""
     class A(object):
@@ -166,10 +166,9 @@ def test_init_order2(a_first):
         def __init__(self):
             pass
 
-    fields = get_fields(C, include_inherited=True, ancestors_first=a_first if a_first is not None else True,
-                        _auto_fix_fields=not PY36)
+    fields = get_fields(C, include_inherited=True, ancestors_first=a_first, _auto_fix_fields=not PY36)
     field_names = [f.name for f in fields]
-    if a_first is None or a_first:
+    if a_first:
         assert field_names == ['a', 'd', 'b', 'c']
     else:
         assert field_names == ['a', 'c', 'b', 'd']

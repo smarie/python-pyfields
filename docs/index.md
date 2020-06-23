@@ -29,7 +29,7 @@ It provides **many optional features** that will make your object-oriented devel
 
  - initializing fields in your *constructor* is very easy and highly customizable
 
-Finally, it offers an API that other libraries can leverage to get the list of fields. For example `autoclass` now leverages `pyfields` to automatically add hash/dict/eq/repr to your class.
+Finally, it offers an API that other libraries can leverage to [get the list of fields](./api_reference.md#api). For example `autoclass` now leverages `pyfields` to automatically add hash/dict/eq/repr to your class.
 
 If your first reaction is "what about `attrs` / `dataclasses` / `pydantic` / `characteristic` / `traits` / `traitlets` / ...", well all of these inspired `pyfields` a great deal, but all of these have stronger constraints on the class - which I did not want. Please have a look [here](why.md) for a complete list of inspirators.
 
