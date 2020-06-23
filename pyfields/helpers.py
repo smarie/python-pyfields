@@ -187,7 +187,9 @@ def get_field_values(obj,
     return container_type((f.name, getattr(obj, f.name)) for f in fields_gen)
 
 
-def safe_isclass(obj: object) -> bool:
+def safe_isclass(obj  # type: object
+                 ):
+    # type: (...) -> bool
     """Ignore any exception via isinstance on Python 3."""
     try:
         return isclass(obj)
