@@ -1,8 +1,7 @@
 import pytest
 
-from pyfields import field
+from pyfields import field, get_field_values, get_fields, copy_field
 from pyfields.core import PY36
-from pyfields.helpers import get_field_values, get_fields, copy_field
 
 
 @pytest.mark.parametrize("a_first", [False, True], ids="ancestor_first={}".format)

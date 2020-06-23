@@ -3,7 +3,8 @@ from .core import field, Field, FieldError, MandatoryFieldInitError, Unsupported
     ReadOnlyFieldError, NoneError
 from .validate_n_convert import Converter, ConversionError, DetailedConversionResults, trace_convert
 from .init_makers import inject_fields, make_init, init_fields
-from .helpers import copy_value, copy_field, copy_attr, has_fields, get_fields, yield_fields, get_field
+from .helpers import copy_value, copy_field, copy_attr, has_fields, get_fields, yield_fields, get_field, \
+    get_field_values
 from .autofields_ import autofields
 
 try:
@@ -25,5 +26,6 @@ __all__ = [
     'Converter', 'ConversionError', 'DetailedConversionResults', 'trace_convert',
     'inject_fields', 'make_init', 'init_fields',
     'copy_value', 'copy_field', 'copy_attr', 'has_fields', 'get_fields', 'yield_fields', 'get_field',
+    'get_field_values',
     'autofields'
 ]
