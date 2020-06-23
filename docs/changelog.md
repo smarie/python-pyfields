@@ -1,5 +1,11 @@
 # Changelog
 
+### 1.2.0 - `getfields` improvements and new `get_field_values`
+
+ - `getfields` can now be executed on an instance, and provides a `public_only` option. Fixes [#69](https://github.com/smarie/python-pyfields/issues/69)
+ 
+ - New `get_field_values` method to get an ordered dict-like of field name: value.  Fixes [#70](https://github.com/smarie/python-pyfields/issues/70)
+
 ### 1.1.5 - bugfix
 
  - `@autofields` now correctly skips `@property` and more generally, descriptor members. Fixes [#67](https://github.com/smarie/python-pyfields/issues/67)
