@@ -1118,10 +1118,10 @@ class DescriptorField(Field):
             # check the type
             if self.check_type:
                 if t is EMPTY:
-                    raise ValueError("`check_type` is enabled on field '%s' but no type hint is available. Please provide"
-                                     "type hints or set `field.check_type` to `False`. Note that python code is not able to"
-                                     " read type comments so if you wish to be compliant with python < 3.6 you'll have to"
-                                     "set the type hint explicitly in `field.type_hint` instead")
+                    raise ValueError("`check_type` is enabled on field '%s' but no type hint is available. Please "
+                                     "provide type hints or set `field.check_type` to `False`. Note that python code is"
+                                     " not able to read type comments so if you wish to be compliant with python < 3.6 "
+                                     "you'll have to set the type hint explicitly in `field.type_hint` instead")
 
                 if USE_ADVANCED_TYPE_CHECKER:
                     # take into account all the subtleties from `typing` module by relying on 3d party providers.
