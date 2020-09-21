@@ -817,13 +817,8 @@ class NativeField(Field):
             fix_field(obj_type, self)
 
         if obj is None:
-            # class-level call ?
-            # TODO put back when https://youtrack.jetbrains.com/issue/PY-38151 is solved
-            # return self
-            # even this does not work
-            # exec("o = self", globals(), locals())
-            # return locals()['o']
-            raise ClassFieldAccessError(self)
+            # class-level call: https://youtrack.jetbrains.com/issue/PY-38151 is solved, we can now return self
+            return self
 
         # Check if the field is already set in the object __dict__
         value = obj.__dict__.get(self.name, _unset)
@@ -1006,10 +1001,8 @@ class DescriptorField(Field):
             fix_field(obj_type, self)
 
         if obj is None:
-            # class-level call ?
-            # TODO put back when https://youtrack.jetbrains.com/issue/PY-38151 is solved
-            # return self
-            raise ClassFieldAccessError(self)
+            # class-level call: https://youtrack.jetbrains.com/issue/PY-38151 is solved, we can now return self
+            return self
 
         private_name = '_' + self.name
 
@@ -1073,11 +1066,10 @@ class DescriptorField(Field):
             # __set_name__ was not called yet. lazy-fix the name and type hints
             fix_field(obj.__class__, self)
 
-        if obj is None:
-            # class-level call ?
-            # TODO put back when https://youtrack.jetbrains.com/issue/PY-38151 is solved
-            # return self
-            raise ClassFieldAccessError(self)
+        # if obj is None:
+        #     # class-level call: this never happens
+        #     # https://youtrack.jetbrains.com/issue/PY-38151 is solved, but what do we wish to do here actually ?
+        #     raise ClassFieldAccessError(self)
 
         if self.converters is not None:
             # this is an inlined version of `trace_convert` with no capture of details
