@@ -15,7 +15,7 @@ except ImportError:
 
 from valid8 import ValidationFailure, is_pep484_nonable
 
-from pyfields.typing_utils import assert_is_of_type, FieldTypeError
+from pyfields.typing_utils import assert_is_of_type, FieldTypeError, get_type_hints
 from pyfields.validate_n_convert import FieldValidator, make_converters_list, trace_convert
 
 try:  # python 3.5+
@@ -37,13 +37,6 @@ USE_ADVANCED_TYPE_CHECKER = assert_is_of_type is not None
 
 
 PY36 = sys.version_info >= (3, 6)
-get_type_hints = None
-if PY36:
-    try:
-        from typing import get_type_hints
-    except ImportError:
-        pass
-
 PY2 = sys.version_info < (3, 0)
 # PY35 = sys.version_info >= (3, 5)
 
@@ -113,6 +106,7 @@ class Symbols(Enum):
     EMPTY = 2  # type: Any
     USE_FACTORY = 3
     _unset = 4
+    DELAYED = 5
 
     def __repr__(self):
         """ More compact representation for signatures readability"""
@@ -127,6 +121,7 @@ UNKNOWN = Symbols.UNKNOWN
 
 # EMPTY = sentinel.create('empty')
 EMPTY = Symbols.EMPTY
+DELAYED = Symbols.DELAYED
 
 # USE_FACTORY = sentinel.create('use_factory')
 USE_FACTORY = Symbols.USE_FACTORY
@@ -258,7 +253,7 @@ class Field(object):
             self.name = name
 
         # if not already manually overridden, get the type hints if there are some in the owner class annotations
-        if self.type_hint is EMPTY:
+        if self.type_hint is EMPTY or self.type_hint is DELAYED:
             # first reconciliate both ways to get the hint
             if owner_cls_type_hints is not None:
                 if type_hint is not None:
@@ -299,8 +294,17 @@ class Field(object):
                      ):
         if owner is not None:
             # fill all the information about how it is attached to the class
-            cls_type_hints = get_type_hints(owner)
-            self.set_as_cls_member(owner, name, owner_cls_type_hints=cls_type_hints)
+            # resolve type hint strings and get "optional" type hint automatically
+            # note: we need to pass an appropriate local namespace so that forward refs work.
+            # this seems like a bug in `get_type_hints` ?
+            try:
+                cls_type_hints = get_type_hints(owner)
+            except NameError:
+                # probably an issue of forward reference, or PEP563 is activated. Delay checking for later
+                self.set_as_cls_member(owner, name, type_hint=DELAYED)
+            else:
+                # nominal usage
+                self.set_as_cls_member(owner, name, owner_cls_type_hints=cls_type_hints)
 
     @property
     def qualname(self):
@@ -812,7 +816,7 @@ class NativeField(Field):
 
         # do this first, because a field might be referenced from its class the first time it will be used
         # for example if in `make_init` we use a field defined in another class, that was not yet accessed on instance.
-        if not PY36 and self.name is None:
+        if self.name is None or self.type_hint is DELAYED:
             # __set_name__ was not called yet. lazy-fix the name and type hints
             fix_field(obj_type, self)
 
@@ -996,7 +1000,7 @@ class DescriptorField(Field):
 
         # do this first, because a field might be referenced from its class the first time it will be used
         # for example if in `make_init` we use a field defined in another class, that was not yet accessed on instance.
-        if not PY36 and self.name is None:
+        if self.name is None or self.type_hint is DELAYED:
             # __set_name__ was not called yet. lazy-fix the name and type hints
             fix_field(obj_type, self)
 
@@ -1062,7 +1066,7 @@ class DescriptorField(Field):
 
         # do this first, because a field might be referenced from its class the first time it will be used
         # for example if in `make_init` we use a field defined in another class, that was not yet accessed on instance.
-        if not PY36 and self.name is None:
+        if self.name is None or self.type_hint is DELAYED:
             # __set_name__ was not called yet. lazy-fix the name and type hints
             fix_field(obj.__class__, self)
 

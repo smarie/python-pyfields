@@ -1,6 +1,7 @@
 #  Authors: Sylvain Marie <sylvain.marie@se.com>
 #
 #  Copyright (c) Schneider Electric Industries, 2019. All right reserved.
+import sys
 
 
 class FieldTypeError(TypeError):  # FieldError
@@ -166,3 +167,21 @@ try:  # very minimal way to check if typing it available, for runtime type check
     assert_is_of_type = _make_assert_is_of_type()
 except ImportError:
     assert_is_of_type = None
+
+
+PY36 = sys.version_info >= (3, 6)
+get_type_hints = None
+if PY36:
+    try:
+        from typing import get_type_hints as gth
+
+        def get_type_hints(obj, globalns=None, localns=None):
+            """
+            Fixed version of typing.get_type_hints to handle self forward references
+            """
+            if globalns is None and localns is None and isinstance(obj, type):
+                localns = {obj.__name__: obj}
+            return gth(obj, globalns=globalns, localns=localns)
+
+    except ImportError:
+        pass
