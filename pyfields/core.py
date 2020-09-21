@@ -259,15 +259,18 @@ class Field(object):
 
         # if not already manually overridden, get the type hints if there are some in the owner class annotations
         if self.type_hint is EMPTY:
+            # first reconciliate both ways to get the hint
             if owner_cls_type_hints is not None:
                 if type_hint is not None:
                     raise ValueError("Provide either owner_cls_type_hints or type_hint, not both")
                 type_hint = owner_cls_type_hints.get(name)
 
+            # then use it
             if type_hint is not None:
                 # only use type hint if not empty
                 self.type_hint = type_hint
-                # update the 'nonable' status
+                # update the 'nonable' status - only if not already explicitly set.
+                # note: if this is UNKNOWN, we already saw that self.default is not None. No need to check again.
                 if self.nonable is UNKNOWN:
                     if is_pep484_nonable(type_hint):
                         self.nonable = True
