@@ -10,11 +10,13 @@ from pyfields import FieldTypeError
 def test_self_referenced_class(str_hint, fix_in_class_field):
     """Fix https://github.com/smarie/python-pyfields/issues/73 """
     if str_hint:
-        # this is the old behaviour that happens even when PEP563 is not enabled at the top of the module
+        # this is the old behaviour that happens when PEP563 is not enabled at the top of the module
         from ._test_py36 import test_issue_73
         Foo = test_issue_73()
     else:
         # this is the new behaviour that happens when PEP563 is enabled at the top of the module
+        if sys.version_info < (3, 7):
+            pytest.skip("python 3.6 does not support PEP563")
         from ._test_py36_pep563 import test_issue_73
         Foo = test_issue_73()
 
@@ -40,9 +42,13 @@ def test_self_referenced_class(str_hint, fix_in_class_field):
 @pytest.mark.parametrize('fix_in_class_field', [False, True], ids="fix_in_class_field={}".format)
 def test_cross_referenced_class(str_hint, fix_in_class_field):
     if str_hint:
+        # this is the old behaviour that happens when PEP563 is not enabled at the top of the module
         from ._test_py36 import test_issue_73_cross_ref
         A, B = test_issue_73_cross_ref()
     else:
+        # this is the new behaviour that happens when PEP563 is enabled at the top of the module
+        if sys.version_info < (3, 7):
+            pytest.skip("python 3.6 does not support PEP563")
         from ._test_py36_pep563 import test_issue_73_cross_ref
         A, B = test_issue_73_cross_ref()
 
