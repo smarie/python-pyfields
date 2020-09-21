@@ -1,6 +1,7 @@
 
 
 
+
 <!doctype html>
 <html lang="en" class="no-js">
   <head>
@@ -11,7 +12,7 @@
       
       
       <link rel="shortcut icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.3.2">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-5.5.13">
     
     
       
@@ -19,7 +20,7 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.fe0cca5b.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.077507d7.min.css">
       
       
     
@@ -187,9 +188,7 @@
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
         Home
-        <span class="md-nav__icon md-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9h14V7H3v2m0 4h14v-2H3v2m0 4h14v-2H3v2m16 0h2v-2h-2v2m0-10v2h2V7h-2m0 6h2v-2h-2v2z"/></svg>
-        </span>
+        <span class="md-nav__icon md-icon"></span>
       </label>
     
     <a href="." title="Home" class="md-nav__link md-nav__link--active">
@@ -204,9 +203,7 @@
   
   
     <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-      </span>
+      <span class="md-nav__icon md-icon"></span>
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-scrollfix>
@@ -483,9 +480,7 @@
   
   
     <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-      </span>
+      <span class="md-nav__icon md-icon"></span>
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-scrollfix>
@@ -1185,11 +1180,11 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 
 
 <p>or you can inspect the method:</p>
-<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nf">help</span><span class="p">(</span><span class="n">Wall</span><span class="p">.</span><span class="n">__init__</span><span class="p">)</span>
-<span class="n">Help</span> <span class="k">on</span> <span class="n">function</span> <span class="n">__init__</span> <span class="k">in</span> <span class="n">module</span> <span class="o">&lt;</span><span class="p">...</span><span class="o">&gt;</span><span class="p">:</span>
+<div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="k">help</span><span class="p">(</span><span class="n">Wall</span><span class="p">.</span><span class="n">__init__</span><span class="p">)</span>
+<span class="k">Help</span> <span class="k">on</span> <span class="k">function</span> <span class="n">__init__</span> <span class="k">in</span> <span class="n">module</span> <span class="o">&lt;</span><span class="p">...</span><span class="o">&gt;:</span>
 
-<span class="hll"><span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
-</span>    <span class="n">The</span> <span class="ss">`__init__`</span> <span class="n">method</span> <span class="n">generated</span> <span class="k">for</span> <span class="n">you</span> <span class="k">when</span> <span class="n">you</span> <span class="k">use</span> <span class="ss">`make_init`</span>
+<span class="hll"><span class="n">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
+</span>    <span class="n">The</span> <span class="n">`__init__`</span> <span class="n">method</span> <span class="k">generated</span> <span class="k">for</span> <span class="n">you</span> <span class="k">when</span> <span class="n">you</span> <span class="k">use</span> <span class="n">`make_init`</span>
 </code></pre></div>
 
 
@@ -1256,16 +1251,16 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 <p>Note: as you can see in this example, you can of course create other attributes in this init function (done in the last line here with <code>self.non_field_attr = msg</code>). Indeed, declaring fields in a class do not "pollute" the class, so you can do anything you like as usual.</p>
 <p>You can check that the resulting constructor works as expected:</p>
 <div class="codehilite"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">help</span><span class="p">(</span><span class="n">Wall</span><span class="p">)</span>
-<span class="n">Help</span> <span class="k">on</span> <span class="k">class</span> <span class="n">Wall</span> <span class="k">in</span> <span class="n">module</span> <span class="o">&lt;</span><span class="p">...</span><span class="o">&gt;</span><span class="p">:</span>
-<span class="k">class</span> <span class="n">Wall</span><span class="p">(</span><span class="n">builtins</span><span class="p">.</span><span class="k">object</span><span class="p">)</span>
+<span class="n">Help</span> <span class="n">on</span> <span class="k">class</span> <span class="n">Wall</span> <span class="ow">in</span> <span class="n">module</span> <span class="o">&lt;...&gt;</span><span class="p">:</span>
+<span class="k">class</span> <span class="n">Wall</span><span class="p">(</span><span class="n">builtins</span><span class="o">.</span><span class="n">object</span><span class="p">)</span>
  <span class="o">|</span>  <span class="n">Wall</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>
-<span class="p">...</span>
+<span class="o">...</span>
 
 <span class="o">&gt;&gt;&gt;</span> <span class="n">w</span> <span class="o">=</span> <span class="n">Wall</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;hey&#39;</span><span class="p">)</span>
 <span class="n">post</span> <span class="n">init</span> <span class="o">!</span> <span class="n">height</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">white</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">hey</span>
 
 <span class="o">&gt;&gt;&gt;</span> <span class="n">vars</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
-<span class="err">{</span><span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;non_field_attr&#39;</span><span class="p">:</span> <span class="s1">&#39;hey&#39;</span><span class="err">}</span>
+<span class="p">{</span><span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="s1">&#39;non_field_attr&#39;</span><span class="p">:</span> <span class="s1">&#39;hey&#39;</span><span class="p">}</span>
 </code></pre></div>
 
 
@@ -1442,15 +1437,15 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
       
     </div>
     
-      <script src="assets/javascripts/vendor.d710d30a.min.js"></script>
-      <script src="assets/javascripts/bundle.7f4f3c92.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "search.result.one": "1 matching document", "search.result.none": "No matching documents", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.config.lang": "en", "search.result.placeholder": "Type to start searching", "search.result.other": "# matching documents", "clipboard.copied": "Copied to clipboard"}</script>
+      <script src="assets/javascripts/vendor.2d1db4bd.min.js"></script>
+      <script src="assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"search.result.none": "No matching documents", "search.config.separator": "[\\s\\-]+", "search.config.lang": "en", "search.result.other": "# matching documents", "clipboard.copied": "Copied to clipboard", "search.config.pipeline": "trimmer, stopWordFilter", "search.result.one": "1 matching document", "search.result.placeholder": "Type to start searching", "clipboard.copy": "Copy to clipboard"}</script>
       
       <script>
         app = initialize({
           base: ".",
           features: [],
           search: Object.assign({
-            worker: "assets/javascripts/worker/search.9b3611bd.min.js"
+            worker: "assets/javascripts/worker/search.5eca75d3.min.js"
           }, typeof search !== "undefined" && search)
         })
       </script>
