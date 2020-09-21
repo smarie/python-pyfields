@@ -1,5 +1,12 @@
 # Changelog
 
+### 1.3.0 - Support for Forward references, PEP563 and class-level access
+
+ - String forward references in type hints, and PEP563 behaviour, is now supported. When this case happense, the type hint resolution is delayed until the field is first accessed. Fixes [#73](https://github.com/smarie/python-pyfields/issues/73)
+
+ - Accessing a field definition from a class directly is now enabled, since PyCharm [fixed their autocompletion bug](https://youtrack.jetbrains.com/issue/PY-38151). Fixes [#12](https://github.com/smarie/python-pyfields/issues/12)
+
+
 ### 1.2.0 - `getfields` improvements and new `get_field_values`
 
  - `getfields` can now be executed on an instance, and provides a `public_only` option. Fixes [#69](https://github.com/smarie/python-pyfields/issues/69)
