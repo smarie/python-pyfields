@@ -428,7 +428,7 @@ def get_fields(cls_or_obj,
                )
 ```
 
-Utility method to collect all fields defined in a class, including all inherited or not.
+Utility method to collect all fields defined in a class, including all inherited or not, in definition order.
 By default duplicates are removed and ancestor fields are included and appear first. If a field is overridden, it will appear at the position of the overridden field in the order.
 
 If an object is provided, `getfields` will be executed on its class.
