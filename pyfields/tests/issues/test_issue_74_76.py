@@ -15,6 +15,7 @@ def test_issue_74():
     assert c.buildings == []
 
 
+@pytest.mark.skipif(sys.version_info < (3, 6), reason="Annotations not supported in python < 3.6")
 def test_issue_76():
     """ issue 76 is fixed """
     from ._test_py36 import test_issue_76
