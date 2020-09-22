@@ -895,22 +895,47 @@ disabled by setting <code>make_init=False</code>.</p>
 
 
 <h2 id="autoclass"><code>@autoclass</code><a class="headerlink" href="#autoclass" title="Permanent link">&para;</a></h2>
-<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">autoclass</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>      <span class="c1"># type: Union[str, Tuple[str]]</span>
-              <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>      <span class="c1"># type: Union[str, Tuple[str]]</span>
-              <span class="n">autoargs</span><span class="o">=</span><span class="n">_AUTO</span><span class="p">,</span>    <span class="c1"># type: bool</span>
-              <span class="n">autoprops</span><span class="o">=</span><span class="n">_AUTO</span><span class="p">,</span>   <span class="c1"># type: bool</span>
-              <span class="n">autodict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>     <span class="c1"># type: bool</span>
-              <span class="n">autorepr</span><span class="o">=</span><span class="n">_AUTO</span><span class="p">,</span>    <span class="c1"># type: bool</span>
-              <span class="n">autoeq</span><span class="o">=</span><span class="n">_AUTO</span><span class="p">,</span>      <span class="c1"># type: bool</span>
-              <span class="n">autohash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>     <span class="c1"># type: bool</span>
-              <span class="n">autoslots</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>   <span class="c1"># type: bool</span>
-              <span class="n">autoinit</span><span class="o">=</span><span class="n">_AUTO</span><span class="p">,</span>    <span class="c1"># type: bool</span>
-              <span class="n">autofields</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>   <span class="c1"># type: bool</span>
-              <span class="p">):</span>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">autoclass</span><span class="p">(</span>
+        <span class="c1"># from autofields</span>
+        <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>                <span class="c1"># type: Union[bool, DecoratedClass]</span>
+        <span class="n">autofields_include_upper</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>   <span class="c1"># type: bool</span>
+        <span class="n">autofields_include_dunder</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># type: bool</span>
+        <span class="c1"># from both (merging the names)</span>
+        <span class="n">autoinit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                    <span class="c1"># type: bool</span>
+        <span class="c1"># from autoclass</span>
+        <span class="n">ac_include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                  <span class="c1"># type: Union[str, Tuple[str]]</span>
+        <span class="n">ac_exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                  <span class="c1"># type: Union[str, Tuple[str]]</span>
+        <span class="n">autodict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                    <span class="c1"># type: bool</span>
+        <span class="n">autorepr</span><span class="o">=</span><span class="n">_AUTO</span><span class="p">,</span>                   <span class="c1"># type: bool</span>
+        <span class="n">autoeq</span><span class="o">=</span><span class="n">_AUTO</span><span class="p">,</span>                     <span class="c1"># type: bool</span>
+        <span class="n">autohash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                    <span class="c1"># type: bool</span>
+    <span class="p">):</span>
 </code></pre></div>
 
 
-<p>Decorator to automatically create fields and constructor on a class, as well as to add string representation, equality methods, dict view, etc. This is similar to the one from <code>autoclass</code> library with the single difference that by default <code>autofields=True</code>. See <a href="https://smarie.github.io/python-autoclass/">autoclass documentation</a> for details.</p>
+<p>A decorator to automate many things at once for your class. First it executes <code>@autofields</code> to generate fields from attribute defined at class level, and generate the init.</p>
+<ul>
+<li>you can include attributes with dunder names or uppercase names with <code>autofields_include_dunder</code> and
+   <code>autofields_include_upper</code> respectively</li>
+<li>you can enable type checking on all fields at once by setting <code>check_types=True</code></li>
+<li>you can disable constructor (init) creation by setting <code>autoinit=False</code></li>
+</ul>
+<p>Then it executes <code>@autoclass</code> to generate convenience methods for the class. By default the class gets a dictionary behaviour (including string representation and equality comparison). You can disable this behaviour by setting <code>autodict=False</code>. This will automatically enable an alternate string representation and equality comparison. If you wish to disable them you can further set <code>autorepr=False</code> and <code>autoeq=False</code> explicitly. All those methods have default include/exlude behaviours that you can override with <code>ac_include</code> or <code>ac_exclude</code> name lists.</p>
+<p>Finally by default the class gets a <code>hash</code> implementation so that its instances can be inserted in sets or dict keys. You can disable this with <code>autohash=False</code>.</p>
+<p>See <a href="https://smarie.github.io/python-autoclass/">autoclass documentation</a> for details on the lower-level methods.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>check_types</code>: boolean flag (default: False) indicating the value of <code>check_type</code> for created fields. Note that the type hint of each created field is copied from the type hint of the member it originates from.</li>
+<li><code>autofields_include_upper</code>: boolean flag (default: False) indicating whether upper-case class members should be also transformed to fields (usually such names are reserved for class constants, not for fields).</li>
+<li><code>autofields_include_dunder</code>: boolean flag (default: False) indicating whether dunder-named class members should be also transformed to fields. Note that even if you set this to True, members with reserved python dunder names will not be transformed. See <code>is_reserved_dunder</code> for the list of reserved names.</li>
+<li><code>autoinit</code>: boolean flag (default: True) indicating whether a constructor should be created for the class if no <code>__init__</code> method is already present. Such constructor will be created using <code>__init__ = make_init()</code>. This is the same behaviour than <code>make_init</code> in <code>@autofields</code>.</li>
+<li><code>ac_include</code>: a tuple of explicit attribute names to include in the autodict/repr/eq/hash (None means all)</li>
+<li><code>ac_exclude</code>: a tuple of explicit attribute names to exclude in the autodict/repr/eq/hash. In such case, include should be None.</li>
+<li><code>autodict</code>: a boolean to enable autodict on the class (default: True). By default it will be executed with <code>only_known_fields=True</code>.</li>
+<li><code>autorepr</code>: a boolean to enable autorepr on the class. By default it is <code>AUTO</code> and means "automatic configuration". In that case, it will be defined as <code>not autodict</code>.</li>
+<li><code>autoeq</code>: a boolean to enable autoeq on the class. By default it is <code>AUTO</code> and means "automatic configuration". In that case, it will be defined as <code>not autodict</code>.</li>
+<li><code>autohash</code>: a boolean to enable autohash on the class (default: True). By default it will be executed with <code>only_known_fields=True</code>.</li>
+</ul>
 <h2 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
 <h3 id="has_fields"><code>has_fields</code><a class="headerlink" href="#has_fields" title="Permanent link">&para;</a></h3>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">has_fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
@@ -1034,7 +1059,7 @@ If the member is not a field, a <code>NotAFieldError</code> is raised.</p>
     </div>
     
       <script src="../assets/javascripts/vendor.2d1db4bd.min.js"></script>
-      <script src="../assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"search.result.none": "No matching documents", "clipboard.copied": "Copied to clipboard", "search.result.other": "# matching documents", "search.config.pipeline": "trimmer, stopWordFilter", "search.result.placeholder": "Type to start searching", "search.config.separator": "[\\s\\-]+", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.result.one": "1 matching document"}</script>
+      <script src="../assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"search.config.separator": "[\\s\\-]+", "search.result.other": "# matching documents", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.result.one": "1 matching document", "clipboard.copied": "Copied to clipboard", "search.config.pipeline": "trimmer, stopWordFilter", "search.result.none": "No matching documents", "search.result.placeholder": "Type to start searching"}</script>
       
       <script>
         app = initialize({
