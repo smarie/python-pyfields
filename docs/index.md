@@ -6,8 +6,7 @@
 
 [![Documentation](https://img.shields.io/badge/doc-latest-blue.svg)](https://smarie.github.io/python-pyfields/) [![PyPI](https://img.shields.io/pypi/v/pyfields.svg)](https://pypi.python.org/pypi/pyfields/) [![Downloads](https://pepy.tech/badge/pyfields)](https://pepy.tech/project/pyfields) [![Downloads per week](https://pepy.tech/badge/pyfields/week)](https://pepy.tech/project/pyfields) [![GitHub stars](https://img.shields.io/github/stars/smarie/python-pyfields.svg)](https://github.com/smarie/python-pyfields/stargazers)
 
-!!! new `@autofields` feature, [check it out](#a-autofields) !
-!!! success "`pyfields` is now automatically supported by `autoclass` ! See [here](#hash-dict-eq-repr) for details."
+!!! success "`pyfields` now has its own `@autoclass` with sensible defaults, to complement the existing `@autofields` [feature](#a-autofields)! No need to import `autoclass` anymore. See [here](#hash-dict-eq-repr) for details."
 
 `pyfields` provides a simple and elegant way to define fields in python classes. With `pyfields` you explicitly define all aspects of a field (default value/factory, type, validators, converters, documentation...) in a single place, and can refer to it from other places. 
 
@@ -29,7 +28,9 @@ It provides **many optional features** that will make your object-oriented devel
 
  - initializing fields in your *constructor* is very easy and highly customizable
 
-Finally, it offers an API that other libraries can leverage to [get the list of fields](./api_reference.md#api). For example `autoclass` now leverages `pyfields` to automatically add hash/dict/eq/repr to your class.
+ - you can automate fields creation with `@autofields` or even automatically add hash/dict/eq/repr to your class based on the fields using `@autoclass`.
+
+Finally, it offers an API that other libraries can leverage to [get the list of fields](./api_reference.md#api).
 
 If your first reaction is "what about `attrs` / `dataclasses` / `pydantic` / `characteristic` / `traits` / `traitlets` / ...", well all of these inspired `pyfields` a great deal, but all of these have stronger constraints on the class - which I did not want. Please have a look [here](why.md) for a complete list of inspirators.
 
@@ -693,34 +694,34 @@ class Item:
 
 #### hash, dict, eq, repr 
 
-`autoclass` is now compliant with `pyfields`. So you can use `@autoclass`, or `@autorepr`, `@autohash`, `@autodict`... on the decorated class. That way, your fields definition is directly reused for most of the class behaviour. 
+`pyfields` now works hand in hand with `autoclass`. That way, your field definitions can directly be reused for most of the class behaviour. From version 1.4 on, a dedicated `@autoclass` decorator is directly exported from `pyfields`. That way you do not have to specify `autofields=True` anymore.
 
 ```python
-from autoclass import autoclass
-from pyfields import field
+from pyfields import field, autoclass
 
 @autoclass
 class Foo:
-    msg: str = field()
-    age: int = field(default=12)
+    msg: str
+    age: int = 12
+    height: int = field(default=50)
 
 foo = Foo(msg='hello')
 
 print(foo)          # automatic string representation
 print(dict(foo))    # automatic dict view
 
-assert foo == Foo(msg='hello', age=12)     # automatic equality comparison 
-assert foo == {'msg': 'hello', 'age': 12}  # automatic eq comparison with dicts
+assert foo == Foo(msg='hello', age=12, height=50)        # automatic equality comparison 
+assert foo == {'msg': 'hello', 'age': 12, 'height': 50}  # automatic eq comparison with dicts
 ```
 
 yields
 
 ```
-Foo(msg='hello', age=12)
-{'msg': 'hello', 'age': 12}
+Foo(msg='hello', age=12, height=50)
+{'msg': 'hello', 'age': 12, 'height': 50}
 ```
 
-See [here](https://smarie.github.io/python-autoclass/#pyfields-combo) for details.
+Note that apart from setting `autofields=True`, the `@autoclass` symbol demonstrated above has the same functionalities than the one in the `autoclass` lib. See [here](https://smarie.github.io/python-autoclass/#pyfields-combo) for details.
 
 #### Slots
 

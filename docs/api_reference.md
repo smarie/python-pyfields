@@ -402,6 +402,25 @@ Traceback (most recent call last):
 TypeError: __init__() got an unexpected keyword argument 'SENTENCE'
 ```
 
+## `@autoclass`
+
+```python
+def autoclass(include=None,      # type: Union[str, Tuple[str]]
+              exclude=None,      # type: Union[str, Tuple[str]]
+              autoargs=_AUTO,    # type: bool
+              autoprops=_AUTO,   # type: bool
+              autodict=True,     # type: bool
+              autorepr=_AUTO,    # type: bool
+              autoeq=_AUTO,      # type: bool
+              autohash=True,     # type: bool
+              autoslots=False,   # type: bool
+              autoinit=_AUTO,    # type: bool
+              autofields=True,   # type: bool
+              ):
+```
+
+Decorator to automatically create fields and constructor on a class, as well as to add string representation, equality methods, dict view, etc. This is similar to the one from `autoclass` library with the single difference that by default `autofields=True`. See [autoclass documentation](https://smarie.github.io/python-autoclass/) for details.
+
 
 ## API
 
