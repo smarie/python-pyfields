@@ -93,10 +93,10 @@ def test_slots():
 
     if sys.version_info >= (3, 6):
         # change is done immediately
-        assert repr(WithSlots.a) == "<DescriptorField: %s>" % a_fixed_name
+        assert repr(WithSlots.__dict__['a']) == "<DescriptorField: %s>" % a_fixed_name
     else:
         # change will be done after first access
-        assert repr(WithSlots.a) == "<NativeField: %s>" % a_unknown_name
+        assert repr(WithSlots.__dict__['a']) == "<NativeField: %s>" % a_unknown_name
 
     w = WithSlots()
 
@@ -122,7 +122,8 @@ def test_slots2():
         a_name = "test_slots2.<locals>.WithSlots.a"
     else:
         a_name = "<unknown_cls>.None"
-    assert repr(WithSlots.a) == "<NativeField: %s>" % a_name
+
+    assert repr(WithSlots.__dict__['a']) == "<NativeField: %s>" % a_name
 
 
 def test_default_factory():
