@@ -5,7 +5,7 @@ import sys
 from inspect import isdatadescriptor, ismethoddescriptor
 
 try:
-    from typing import Union, Callable, Type, Any, TypeVar
+    from typing import Union, Callable, Type, Any, TypeVar, Tuple
     DecoratedClass = TypeVar("DecoratedClass", bound=Type[Any])
 except ImportError:
     pass
@@ -69,7 +69,7 @@ def autofields(check_types=False,     # type: Union[bool, DecoratedClass]
     :param check_types: boolean flag (default: False) indicating the value of `check_type` for created fields. Note that
         the type hint of each created field is copied from the type hint of the member it originates from.
     :param include_upper: boolean flag (default: False) indicating whether upper-case class members should be also
-        transformed to fields.
+        transformed to fields (usually such names are reserved for class constants, not for fields).
     :param include_dunder: boolean flag (default: False) indicating whether dunder-named class members should be also
         transformed to fields. Note that even if you set this to True, members with reserved python dunder names will
         not be transformed. See `is_reserved_dunder` for the list of reserved names.
@@ -230,34 +230,54 @@ def is_reserved_dunder(name):
 _AUTO = object()
 
 
-def autoclass(include=None,      # type: Union[str, Tuple[str]]
-              exclude=None,      # type: Union[str, Tuple[str]]
-              autoargs=_AUTO,    # type: bool
-              autoprops=_AUTO,   # type: bool
-              autodict=True,     # type: bool
-              autorepr=_AUTO,    # type: bool
-              autoeq=_AUTO,      # type: bool
-              autohash=True,     # type: bool
-              autoslots=False,   # type: bool
-              autoinit=_AUTO,    # type: bool
-              autofields=True,   # type: bool
-              ):
+def autoclass(
+        # from autofields
+        check_types=False,                # type: Union[bool, DecoratedClass]
+        autofields_include_upper=False,   # type: bool
+        autofields_include_dunder=False,  # type: bool
+        # from both (merging the names)
+        autoinit=True,                    # type: bool
+        # from autoclass
+        ac_include=None,                  # type: Union[str, Tuple[str]]
+        ac_exclude=None,                  # type: Union[str, Tuple[str]]
+        autodict=True,                    # type: bool
+        autorepr=_AUTO,                   # type: bool
+        autoeq=_AUTO,                     # type: bool
+        autohash=True,                    # type: bool
+    ):
     """
-    A decorator to perform @autoargs, @autoprops and @autodict all at once with the same include/exclude list.
+    A decorator to automate many things at once for your class.
+    First it executes `@autofields` to generate fields from attribute defined at class level, and generate the init.
 
-    This is identical to the `autoclass` version except that it comes with `autofields=True`.
+     - you can include attributes with dunder names or uppercase names with `autofields_include_dunder` and
+       `autofields_include_upper` respectively
+     - you can enable type checking on all fields at once by setting `check_types=True`
+     - you can disable constructor (init) creation by setting `autoinit=False`
 
-    :param include: a tuple of explicit attribute names to include (None means all)
-    :param exclude: a tuple of explicit attribute names to exclude. In such case, include should be None.
-    :param autoargs: a boolean to enable autoargs on the constructor. By default it is `AUTO` and means "automatic
-        configuration". In that case, the behaviour will depend on the class: it will be equivalent to `True` if the
-        class defines an `__init__` method and has no `pyfields` fields ; and `False` otherwise.
-    :param autoprops: a boolean to enable autoprops on the class. By default it is `AUTO` and means "automatic
-        configuration". In that case, the behaviour will depend on the class: it will be equivalent to `True` if the
-        class defines an `__init__` method and has no `pyfields` fields ; and `False` otherwise.
-    :param autoinit: a boolean to enable autoinit on the class. By default it is `AUTO` and means "automatic
-        configuration". In that case, the behaviour will depend on the class: it will be equivalent to `True` if the
-        class has `pyfields` fields and does not define an `__init__` method ; and `False` otherwise.
+    Then it executes `@autoclass` to generate convenience methods for the class. By default the class gets a dictionary
+    behaviour (including string representation and equality comparison). You can disable this behaviour by setting
+    `autodict=False`. This will automatically enable an alternate string representation and equality comparison.
+    If you wish to disable them you can further set `autorepr=False` and `autoeq=False` explicitly. All those methods
+    have default include/exlude behaviours that you can override with `ac_include` or `ac_exclude` name lists.
+
+    Finally by default the class gets a `hash` implementation so that its instances can be inserted in sets or dict
+    keys. You can disable this with `autohash=False`.
+
+    See [autoclass documentation](https://smarie.github.io/python-autoclass/) for details on the lower-level methods.
+
+    :param check_types: boolean flag (default: False) indicating the value of `check_type` for created fields. Note that
+        the type hint of each created field is copied from the type hint of the member it originates from.
+    :param autofields_include_upper: boolean flag (default: False) indicating whether upper-case class members
+        should be also transformed to fields (usually such names are reserved for class constants, not for fields).
+    :param autofields_include_dunder: boolean flag (default: False) indicating whether dunder-named class members should
+        be also transformed to fields. Note that even if you set this to True, members with reserved python dunder names
+        will not be transformed. See `is_reserved_dunder` for the list of reserved names.
+    :param autoinit: boolean flag (default: True) indicating whether a constructor should be created for the class if
+        no `__init__` method is already present. Such constructor will be created using `__init__ = make_init()`.
+        This is the same behaviour than `make_init` in `@autofields`.
+    :param autoclass_include: a tuple of explicit attribute names to include in autodict/repr/eq/hash (None means all)
+    :param autoclass_exclude: a tuple of explicit attribute names to exclude in autodict/repr/eq/hash. In such case,
+        include should be None.
     :param autodict: a boolean to enable autodict on the class (default: True). By default it will be executed with
         `only_known_fields=True`.
     :param autorepr: a boolean to enable autorepr on the class. By default it is `AUTO` and means "automatic
@@ -266,9 +286,6 @@ def autoclass(include=None,      # type: Union[str, Tuple[str]]
         configuration". In that case, it will be defined as `not autodict`.
     :param autohash: a boolean to enable autohash on the class (default: True). By default it will be executed with
         `only_known_fields=True`.
-    :param autoslots: a boolean to enable autoslots on the class (default: False).
-    :param autofields: a boolean (default: False) to apply autofields automatically on the class before applying
-        `autoclass` (see `pyfields` documentation for details)
     :return:
     """
     # lazy import autoclass to avoid circular imports (since autoclass has a static import of pyfields)
@@ -276,27 +293,30 @@ def autoclass(include=None,      # type: Union[str, Tuple[str]]
     from autoclass.autoclass_ import AUTO
 
     # replace local _AUTO with autoclass AUTO
-    if autoargs is _AUTO:
-        autoargs = AUTO
-    if autoprops is _AUTO:
-        autoprops = AUTO
     if autorepr is _AUTO:
         autorepr = AUTO
     if autoeq is _AUTO:
         autoeq = AUTO
-    if autoinit is _AUTO:
-        autoinit = AUTO
 
     # create the decorator function
     def _apply_decorator(cls):
-        return autoclass_decorate(cls, include=include, exclude=exclude, autoargs=autoargs, autoprops=autoprops,
-                                  autodict=autodict, autohash=autohash, autoslots=autoslots, autoinit=autoinit,
-                                  autorepr=autorepr, autoeq=autoeq, autofields=autofields)
+        # apply autofields
+        cls = autofields(check_types=check_types, include_upper=autofields_include_upper,
+                         include_dunder=autofields_include_dunder, make_init=autoinit)(cls)
+        # apply autoclass
+        return autoclass_decorate(cls,
+                                  # no need to enable autofields and autoinit anymore
+                                  autofields=False, autoinit=False,
+                                  # we know that those are irrelevant
+                                  autoargs=False, autoprops=False, autoslots=False,
+                                  # remaining arguments
+                                  include=ac_include, exclude=ac_exclude,
+                                  autodict=autodict, autohash=autohash, autorepr=autorepr, autoeq=autoeq)
 
-    if include is not None and isinstance(include, type):
+    if check_types is not None and isinstance(check_types, type):
         # called without parenthesis: directly apply decorator on first argument
-        cls = include
-        include = None
+        cls = check_types
+        check_types = False  # set it back to default
         return _apply_decorator(cls)
     else:
         # called with parenthesis: return a decorator function

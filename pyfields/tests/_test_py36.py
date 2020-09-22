@@ -198,3 +198,14 @@ def _test_autoclass2():
         height: int = field(default=50)
 
     return Foo
+
+
+def _test_autoclass3():
+
+    @autoclass(check_types=True, autodict=False)
+    class Foo:
+        msg: str
+        age: int = 12
+        height: int = field(default=50)
+
+    return Foo

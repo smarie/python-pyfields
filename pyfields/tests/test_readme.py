@@ -478,3 +478,23 @@ def test_autoclass_2():
 
     assert foo == Foo(msg='hello', age=12, height=50)  # automatic equality comparison
     assert foo == {'msg': 'hello', 'age': 12, 'height': 50}  # automatic eq comparison with dicts
+
+
+@pytest.mark.skipif(sys.version_info < (3, 6), reason="not valid for old python")
+def test_autoclass_3():
+    from ._test_py36 import _test_autoclass3
+    Foo = _test_autoclass3()
+
+    # assert [f.name for f in get_fields(Foo)] == ['msg', 'age', 'height']
+
+    foo = Foo(msg='hello')
+
+    with pytest.raises(TypeError):
+        dict(foo)  # TypeError: 'Foo' object is not iterable
+
+    assert repr(foo) == "Foo(msg='hello', age=12, height=50)"  # automatic string representation
+    assert foo == Foo(msg='hello', age=12, height=50)  # automatic equality comparison
+
+    # type checking ON
+    with pytest.raises(FieldTypeError):
+        foo.msg = 1
