@@ -335,8 +335,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#b-vtypes" class="md-nav__link">
-    b - VTypes
+  <a href="#b-autoclass" class="md-nav__link">
+    b - @autoclass
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-vtypes" class="md-nav__link">
+    c - VTypes
   </a>
   
 </li>
@@ -357,13 +364,6 @@
           <li class="md-nav__item">
   <a href="#api" class="md-nav__link">
     API
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hash-dict-eq-repr" class="md-nav__link">
-    hash, dict, eq, repr
   </a>
   
 </li>
@@ -612,8 +612,15 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#b-vtypes" class="md-nav__link">
-    b - VTypes
+  <a href="#b-autoclass" class="md-nav__link">
+    b - @autoclass
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c-vtypes" class="md-nav__link">
+    c - VTypes
   </a>
   
 </li>
@@ -634,13 +641,6 @@
           <li class="md-nav__item">
   <a href="#api" class="md-nav__link">
     API
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#hash-dict-eq-repr" class="md-nav__link">
-    hash, dict, eq, repr
   </a>
   
 </li>
@@ -721,7 +721,7 @@
 <p><a href="https://pypi.python.org/pypi/pyfields/"><img alt="Python versions" src="https://img.shields.io/pypi/pyversions/pyfields.svg" /></a> <a href="https://travis-ci.org/smarie/python-pyfields"><img alt="Build Status" src="https://travis-ci.org/smarie/python-pyfields.svg?branch=master" /></a> <a href="https://smarie.github.io/python-pyfields/junit/report.html"><img alt="Tests Status" src="https://smarie.github.io/python-pyfields/junit/junit-badge.svg?dummy=8484744" /></a> <a href="https://codecov.io/gh/smarie/python-pyfields"><img alt="codecov" src="https://codecov.io/gh/smarie/python-pyfields/branch/master/graph/badge.svg" /></a></p>
 <p><a href="https://smarie.github.io/python-pyfields/"><img alt="Documentation" src="https://img.shields.io/badge/doc-latest-blue.svg" /></a> <a href="https://pypi.python.org/pypi/pyfields/"><img alt="PyPI" src="https://img.shields.io/pypi/v/pyfields.svg" /></a> <a href="https://pepy.tech/project/pyfields"><img alt="Downloads" src="https://pepy.tech/badge/pyfields" /></a> <a href="https://pepy.tech/project/pyfields"><img alt="Downloads per week" src="https://pepy.tech/badge/pyfields/week" /></a> <a href="https://github.com/smarie/python-pyfields/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/smarie/python-pyfields.svg" /></a></p>
 <div class="admonition success">
-<p class="admonition-title"><code>pyfields</code> now has its own <a href="#hash-dict-eq-repr"><code>@autoclass</code></a> with sensible defaults, to complement the existing <a href="#a-autofields"><code>@autofields</code></a> feature! No need to import it from <code>autoclass</code> anymore.</p>
+<p class="admonition-title"><code>pyfields</code> now has its own <a href="#b-autoclass"><code>@autoclass</code></a> with sensible defaults, to complement the existing <a href="#a-autofields"><code>@autofields</code></a> feature! No need to import it from <code>autoclass</code> anymore.</p>
 </div>
 <p><code>pyfields</code> provides a simple and elegant way to define fields in python classes. With <code>pyfields</code> you explicitly define all aspects of a field (default value/factory, type, validators, converters, documentation...) in a single place, and can refer to it from other places. </p>
 <p>It is designed with <strong>development freedom</strong> as primary target: </p>
@@ -1303,7 +1303,35 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 
 
 <p>By default type checking is not enabled on the generated fields, but you can enable it with <code>@autofields(check_types=True)</code>. You can also disable constructor creation with <code>@autofields(make_init=False)</code>. See <a href="https://smarie.github.io/python-pyfields/api_reference/#api">API reference</a> for details.</p>
-<h4 id="b-vtypes">b - <code>VType</code>s<a class="headerlink" href="#b-vtypes" title="Permanent link">&para;</a></h4>
+<h4 id="b-autoclass">b - <code>@autoclass</code><a class="headerlink" href="#b-autoclass" title="Permanent link">&para;</a></h4>
+<p>Do you <strong>also</strong> wish to have <code>hash</code>, <code>dict</code>, <code>eq</code>, and <code>repr</code> views automatically created for your class ? <code>pyfields</code> now works hand in hand with <code>autoclass</code>. That way, your field definitions can directly be reused for most of the class behaviour. From version <code>1.5</code> on, a dedicated <code>@autoclass</code> decorator is directly exported from <code>pyfields</code>. </p>
+<p>This decorator combines <code>@autofields</code> (above) and <code>@autoclass</code> into one, with options that are relevant to <code>pyfields</code>. You can create fields, create the constructor, enable type checking, create a dictionary views, etc. all in one call.</p>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">autoclass</span>
+
+<span class="nd">@autoclass</span>
+<span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
+    <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">age</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="n">foo</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;hello&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span>          <span class="c1"># automatic string representation</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">foo</span><span class="p">))</span>    <span class="c1"># automatic dict view</span>
+
+<span class="k">assert</span> <span class="n">foo</span> <span class="o">==</span> <span class="n">Foo</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>        <span class="c1"># automatic equality comparison </span>
+<span class="k">assert</span> <span class="n">foo</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">}</span>  <span class="c1"># automatic eq comparison with dicts</span>
+</code></pre></div>
+
+
+<p>yields</p>
+<div class="codehilite"><pre><span></span><code><span class="err">Foo(msg=&#39;hello&#39;, age=12, height=50)</span>
+<span class="err">{&#39;msg&#39;: &#39;hello&#39;, &#39;age&#39;: 12, &#39;height&#39;: 50}</span>
+</code></pre></div>
+
+
+<p>See <a href="api_reference/#autoclass">API reference</a> for details.</p>
+<h4 id="c-vtypes">c - <code>VType</code>s<a class="headerlink" href="#c-vtypes" title="Permanent link">&para;</a></h4>
 <p>Instead of registering validators in the field, you can now use <code>vtypes</code>. That way, everything is in the type: type checking AND value validation. </p>
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span>
 <span class="kn">from</span> <span class="nn">vtypes</span> <span class="kn">import</span> <span class="n">VType</span>
@@ -1336,33 +1364,6 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
 <h3 id="4-misc">4. Misc.<a class="headerlink" href="#4-misc" title="Permanent link">&para;</a></h3>
 <h4 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h4>
 <p><code>pyfields</code> offers an API so that other libraries can inspect the fields: <code>get_fields</code>, <code>yield_fields</code>, <code>has_fields</code>, <code>get_field</code>. See <a href="https://smarie.github.io/python-pyfields/api_reference/#api">API reference</a> for details.</p>
-<h4 id="hash-dict-eq-repr">hash, dict, eq, repr<a class="headerlink" href="#hash-dict-eq-repr" title="Permanent link">&para;</a></h4>
-<p><code>pyfields</code> now works hand in hand with <code>autoclass</code>. That way, your field definitions can directly be reused for most of the class behaviour. From version 1.4 on, a dedicated <code>@autoclass</code> decorator is directly exported from <code>pyfields</code>. That way you do not have to specify <code>autofields=True</code> anymore, and furthermore you can specify <code>check_types=True</code> like in <code>@autofields</code>.</p>
-<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">autoclass</span>
-
-<span class="nd">@autoclass</span>
-<span class="k">class</span> <span class="nc">Foo</span><span class="p">:</span>
-    <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">age</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span>
-    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
-
-<span class="n">foo</span> <span class="o">=</span> <span class="n">Foo</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;hello&#39;</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span>          <span class="c1"># automatic string representation</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">foo</span><span class="p">))</span>    <span class="c1"># automatic dict view</span>
-
-<span class="k">assert</span> <span class="n">foo</span> <span class="o">==</span> <span class="n">Foo</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="n">age</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>        <span class="c1"># automatic equality comparison </span>
-<span class="k">assert</span> <span class="n">foo</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;msg&#39;</span><span class="p">:</span> <span class="s1">&#39;hello&#39;</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">}</span>  <span class="c1"># automatic eq comparison with dicts</span>
-</code></pre></div>
-
-
-<p>yields</p>
-<div class="codehilite"><pre><span></span><code><span class="err">Foo(msg=&#39;hello&#39;, age=12, height=50)</span>
-<span class="err">{&#39;msg&#39;: &#39;hello&#39;, &#39;age&#39;: 12, &#39;height&#39;: 50}</span>
-</code></pre></div>
-
-
-<p>See <a href="api_reference/#autoclass">API reference</a> for details.</p>
 <h4 id="slots">Slots<a class="headerlink" href="#slots" title="Permanent link">&para;</a></h4>
 <p>You can use <code>pyfields</code> if your class has <code>__slots__</code>. You will simply have to use an underscore in the slot name corresponding to a field: <code>_&lt;field_name&gt;</code>. For example:</p>
 <div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">WithSlots</span><span class="p">:</span>
@@ -1441,7 +1442,7 @@ TypeError: Invalid value <span class="nb">type</span> provided <span class="k">f
     </div>
     
       <script src="assets/javascripts/vendor.2d1db4bd.min.js"></script>
-      <script src="assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"search.result.other": "# matching documents", "search.result.none": "No matching documents", "clipboard.copied": "Copied to clipboard", "search.config.pipeline": "trimmer, stopWordFilter", "search.result.one": "1 matching document", "search.config.lang": "en", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "clipboard.copy": "Copy to clipboard"}</script>
+      <script src="assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"search.config.separator": "[\\s\\-]+", "search.config.pipeline": "trimmer, stopWordFilter", "search.result.placeholder": "Type to start searching", "clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.none": "No matching documents"}</script>
       
       <script>
         app = initialize({
