@@ -84,8 +84,8 @@ def autofields(check_types=False,     # type: Union[bool, DecoratedClass]
             # Are type hints present ?
             cls_annotations = cls.__annotations__
         except AttributeError:
-            # No type hints: shortcut
-            members_defs = ((k, None, v) for k, v in cls.__dict__.items())
+            # No type hints: shortcut. note: do not return a generator since we'll modify __dict__ in the loop after
+            members_defs = tuple((k, None, v) for k, v in cls.__dict__.items())
         else:
             # Fill the list of potential fields definitions
             members_defs = []
@@ -160,6 +160,12 @@ def autofields(check_types=False,     # type: Union[bool, DecoratedClass]
                 continue
             elif isinstance(default_value, Field):
                 # already a field, no need to create
+                # but in order to preserve relative order with generated fields, detach and attach again
+                try:
+                    delattr(cls, member_name)
+                except AttributeError:
+                    pass
+                setattr(cls, member_name, default_value)
                 continue
             elif isinstance(default_value, property) or isdatadescriptor(default_value) \
                     or ismethoddescriptor(default_value):

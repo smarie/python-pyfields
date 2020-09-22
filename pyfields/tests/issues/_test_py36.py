@@ -1,7 +1,6 @@
 #  Authors: Sylvain Marie <sylvain.marie@se.com>
 #
 #  Copyright (c) Schneider Electric Industries, 2019. All right reserved.
-from typing import Optional, List
 
 from pyfields import field, init_fields, autofields
 
@@ -46,21 +45,3 @@ def test_issue_73_cross_ref():
     # note: we have to define the classes outside the function for the cross-ref to work
     # indeed typing.get_type_hints() will only access the globals of the defining module
     return A, B
-
-
-def test_issue_74():
-    @autofields
-    class City:
-        name: Optional[str]
-        buildings: List[str] = []
-
-    return City
-
-
-def test_issue_76():
-    @autofields
-    class Foo:
-        c: int
-        b: str = "hello"
-
-    return Foo

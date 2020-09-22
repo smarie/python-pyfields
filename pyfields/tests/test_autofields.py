@@ -97,3 +97,32 @@ def test_autofields_property_descriptors():
     fields = get_fields(Foo)
     assert len(fields) == 1
     assert fields[0].name == 'foo'
+
+
+@pytest.mark.skipif(sys.version_info < (3, 6), reason="Annotations not supported in python < 3.6")
+def test_issue_74():
+    """test associated with the non-issue 74"""
+    from ._test_py36 import test_issue_74
+    City = test_issue_74()
+    c = City(name=None)
+    assert c.name is None
+    assert c.buildings == []
+
+
+@pytest.mark.skipif(sys.version_info < (3, 6), reason="Annotations not supported in python < 3.6")
+def test_issue_76():
+    """ order issue 76 and 77 are fixed """
+    from ._test_py36 import test_issue_76
+    Foo = test_issue_76()
+    assert [f.name for f in get_fields(Foo)] == ['c', 'b', 'a']
+
+
+def test_issue_76_bis():
+    """ another order issue with @autofields """
+
+    @autofields
+    class Foo(object):
+        msg = field(type_hint=str)
+        age = field(default=12, type_hint=int)
+
+    assert [f.name for f in get_fields(Foo)] == ['msg', 'age']

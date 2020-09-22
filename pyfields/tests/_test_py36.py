@@ -4,7 +4,7 @@
 
 import pytest
 
-from typing import List
+from typing import List, Optional
 from pyfields import field, inject_fields, MandatoryFieldInitError, make_init, autofields
 
 
@@ -169,3 +169,22 @@ def _test_autofields_vtypes_readme():
         y: PositiveInt
 
     return Rectangle
+
+
+def test_issue_74():
+    @autofields
+    class City:
+        name: Optional[str]
+        buildings: List[str] = []
+
+    return City
+
+
+def test_issue_76():
+    @autofields
+    class Foo:
+        c: int
+        b: str = "hello"
+        a: int = field(default=50)
+
+    return Foo
