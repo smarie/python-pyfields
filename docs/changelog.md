@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.5.0 - updated `@autoclass` signature
+
+ - Improved `@autoclass` so that it is much easier to access the relevant arguments from underlying `@autofields` and `@autoclass`. Fixed [#78](https://github.com/smarie/python-pyfields/issues/78)
+
 ### 1.4.0 - new `@autoclass` decorator
 
  - New `@autoclass` decorator directly available from `pyfields`. It is merely equivalent to the original `@autoclass` with option `autofields=True`, which makes it easier to use on classes with automatic fields. Fixes [#75](https://github.com/smarie/python-pyfields/issues/75)
