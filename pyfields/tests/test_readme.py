@@ -83,7 +83,7 @@ def test_readonly_field():
     assert "name: %s" % u.name == "name: john"
     with pytest.raises(ReadOnlyFieldError) as exc_info:
         u.name = "john2"
-    qualname = User.name.qualname
+    qualname = User.__dict__['name'].qualname
     assert str(exc_info.value) == "Read-only field '%s' has already been " \
                                   "initialized on instance %s and cannot be modified anymore." % (qualname, u)
 
@@ -247,7 +247,6 @@ def test_native_descriptors():
         a = field()
         b = field(native=False)
 
-    # TODO change when issue with class level access is fixed
     a_name = "test_native_descriptors.<locals>.Foo.a" if sys.version_info >= (3, 6) else "<unknown_cls>.None"
     b_name = "test_native_descriptors.<locals>.Foo.b" if sys.version_info >= (3, 6) else "<unknown_cls>.None"
     assert repr(Foo.a) == "<NativeField: %s>" % a_name

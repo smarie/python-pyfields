@@ -630,7 +630,7 @@ def test_inheritance():
     assert b.a == 'hello'  # first access should have fixed the field name
 
     # make sure that for all python versions (especially 2 and 3.5) the name is now ok.
-    assert A.a.name == 'a'
+    assert A.__dict__['a'].name == 'a'
 
 
 class Foo(object):
@@ -684,7 +684,7 @@ def test_default_validated(default_flavor, check_type):
         bar = field(type_hint=str, check_type=check_type, validators=validator, converters=str, **def_kwargs)
 
     # default value check
-    bar_field = Foo.bar
+    bar_field = Foo.__dict__['bar']
     if default_flavor == "simple":
         assert bar_field.default == 0
         assert bar_field._default_is_safe is False

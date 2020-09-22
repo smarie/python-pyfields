@@ -21,10 +21,10 @@ def test_autofields_basic(with_type_hints, type_check):
         Foo = _test_autofields(type_check)
 
         # test it
-        assert isinstance(Foo.barcls, NativeField)
-        assert isinstance(Foo.barfunc, Field)
-        assert not isinstance(Foo.fct, Field)
-        assert not isinstance(Foo.cls, Field)
+        assert isinstance(Foo.__dict__['barcls'], NativeField)
+        assert isinstance(Foo.__dict__['barfunc'], Field)
+        assert not isinstance(Foo.__dict__['fct'], Field)
+        assert not isinstance(Foo.__dict__['cls'], Field)
 
         f = Foo(foo=1, barbar='yo', barfunc=lambda x: 2, barcls=str)
         if type_check:
@@ -59,10 +59,10 @@ def test_autofields_basic(with_type_hints, type_check):
                 return 1
 
         # test it
-        assert isinstance(Foo.barcls, Field)
-        assert isinstance(Foo.barfunc, Field)
-        assert not isinstance(Foo.fct, Field)
-        assert not isinstance(Foo.cls, Field)
+        assert isinstance(Foo.__dict__['barcls'], Field)
+        assert isinstance(Foo.__dict__['barfunc'], Field)
+        assert not isinstance(Foo.__dict__['fct'], Field)
+        assert not isinstance(Foo.__dict__['cls'], Field)
 
         f = Foo(foo=1, barfunc=lambda x: 2, barcls=str)
         assert f.bar == 0
