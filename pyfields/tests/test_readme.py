@@ -83,7 +83,7 @@ def test_readonly_field():
     assert "name: %s" % u.name == "name: john"
     with pytest.raises(ReadOnlyFieldError) as exc_info:
         u.name = "john2"
-    qualname = User.__dict__['name'].qualname
+    qualname = User.name.qualname
     assert str(exc_info.value) == "Read-only field '%s' has already been " \
                                   "initialized on instance %s and cannot be modified anymore." % (qualname, u)
 
@@ -250,8 +250,8 @@ def test_native_descriptors():
     # TODO change when issue with class level access is fixed
     a_name = "test_native_descriptors.<locals>.Foo.a" if sys.version_info >= (3, 6) else "<unknown_cls>.None"
     b_name = "test_native_descriptors.<locals>.Foo.b" if sys.version_info >= (3, 6) else "<unknown_cls>.None"
-    assert repr(Foo.__dict__['a']) == "<NativeField: %s>" % a_name
-    assert repr(Foo.__dict__['b']) == "<DescriptorField: %s>" % b_name
+    assert repr(Foo.a) == "<NativeField: %s>" % a_name
+    assert repr(Foo.b) == "<DescriptorField: %s>" % b_name
 
     f = Foo()
 
@@ -327,7 +327,7 @@ def test_make_init_with_inheritance():
 
     class ColoredWall(Wall):
         color = field(default='white', doc="Color of the wall.")  # type: str
-        __init__ = make_init(Wall.__dict__['height'], color)
+        __init__ = make_init(Wall.height, color)
 
     w = ColoredWall(2)
     assert vars(w) == {'color': 'white', 'height': 2}

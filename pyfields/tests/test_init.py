@@ -100,8 +100,8 @@ def test_init_all_methods(py36_style_type_hints, explicit_fields_list, init_type
         assert vars(w) == {'_color': 'blue', '_height': 1}
 
     # type hints
-    height_field = Wall.__dict__['height']
-    color_field = Wall.__dict__['color']
+    height_field = Wall.height
+    color_field = Wall.color
 
     if py36_style_type_hints:
         assert height_field.type_hint is int

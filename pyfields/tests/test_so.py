@@ -71,7 +71,7 @@ def test_so2():
     p.x = 1
     with pytest.raises(ValidationError) as exc_info:
         p.y = 101
-    qualname = Position.__dict__['y'].qualname
+    qualname = Position.y.qualname
     assert str(exc_info.value) == "Error validating [%s=101]. " \
                                   "InvalidValue: y should be between 0 and 100. " \
                                   "Function [<lambda>] returned [False] for value 101." % qualname
@@ -89,7 +89,7 @@ def test_so3():
     s = Spam()
     with pytest.raises(ValidationError) as exc_info:
         s.description = ""
-    qualname = Spam.__dict__['description'].qualname
+    qualname = Spam.description.qualname
     assert str(exc_info.value) == "Error validating [%s='']. " \
                                   "InvalidValue: description can not be empty. " \
                                   "Function [<lambda>] returned [False] for value ''." % qualname
@@ -116,7 +116,7 @@ def test_so4():
     c = Car(color='blue', name='roadie', wheels=3)
     assert vars(c) == {'_wheels': 3, '_name': 'roadie', '_color': 'blue'}
 
-    qualname = Car.__dict__['wheels'].qualname
+    qualname = Car.wheels.qualname
 
     with pytest.raises(TypeError) as exc_info:
         c.wheels = 'hello'
@@ -182,7 +182,7 @@ def test_so6():
     p = Position(x=1, y=12)
     with pytest.raises(TypeError) as exc_info:
         p.x = '1'
-    qualname = Position.__dict__['x'].qualname
+    qualname = Position.x.qualname
     assert str(exc_info.value) == "Invalid value type provided for '%s'. " \
                                   "Value should be of type %r. Instead, received a 'str': '1'" % (qualname, int)
 
@@ -203,6 +203,6 @@ def test_so7():
     assert vars(u) == {'_username': "earthling"}
     with pytest.raises(ReadOnlyFieldError) as exc_info:
         u.username = "earthling2"
-    qualname = User.__dict__['username'].qualname
+    qualname = User.username.qualname
     assert str(exc_info.value) == "Read-only field '%s' has already been initialized on instance %s and cannot be " \
                                   "modified anymore." % (qualname, u)

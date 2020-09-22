@@ -72,7 +72,7 @@ def test_field(write_before_reading, type_, read_only):
 
         with pytest.raises(ReadOnlyFieldError) as exc_info:
             t.afraid = False
-        qualname = Tweety.__dict__['afraid'].qualname
+        qualname = Tweety.afraid.qualname
         assert str(exc_info.value) == "Read-only field '%s' has already been " \
                                       "initialized on instance %s and cannot be modified anymore." % (qualname, t)
 
@@ -93,10 +93,10 @@ def test_slots():
 
     if sys.version_info >= (3, 6):
         # change is done immediately
-        assert repr(WithSlots.__dict__['a']) == "<DescriptorField: %s>" % a_fixed_name
+        assert repr(WithSlots.a) == "<DescriptorField: %s>" % a_fixed_name
     else:
         # change will be done after first access
-        assert repr(WithSlots.__dict__['a']) == "<NativeField: %s>" % a_unknown_name
+        assert repr(WithSlots.a) == "<NativeField: %s>" % a_unknown_name
 
     w = WithSlots()
 
@@ -110,7 +110,7 @@ def test_slots():
     w.a = 1
     assert w.a == 1
 
-    assert repr(WithSlots.__dict__['a']) == "<DescriptorField: %s>" % a_fixed_name
+    assert repr(WithSlots.a) == "<DescriptorField: %s>" % a_fixed_name
 
 
 def test_slots2():
@@ -122,7 +122,7 @@ def test_slots2():
         a_name = "test_slots2.<locals>.WithSlots.a"
     else:
         a_name = "<unknown_cls>.None"
-    assert repr(WithSlots.__dict__['a']) == "<NativeField: %s>" % a_name
+    assert repr(WithSlots.a) == "<NativeField: %s>" % a_name
 
 
 def test_default_factory():
@@ -379,7 +379,7 @@ def test_field_validators_decorator(explicit):
         def f_should_be_larger_than_g(self, f_val):
             return f_val > self.g
 
-    f_field = Foo.__dict__['f']
+    f_field = Foo.f
     assert len(f_field.root_validator.base_validation_funcs) == 2
     foo = Foo()
     foo.g = 0
@@ -387,11 +387,11 @@ def test_field_validators_decorator(explicit):
         foo.f = 2
     # assert str(exc_info.value) == "Error validating [%s=2]. " \
     #                               "InvalidValue: Function [f_should_be_a_multiple_of_3] returned [False] for value 2." \
-    #        % Foo.__dict__['f'].qualname
+    #        % Foo.f.qualname
     assert str(exc_info.value) == "Error validating [%s=2]. At least one validation function failed for value 2. " \
                                   "Successes: ['f_should_be_larger_than_g'] / " \
                                   "Failures: {'f_should_be_a_multiple_of_3': 'Returned False.'}." \
-           % Foo.__dict__['f'].qualname
+           % Foo.f.qualname
     foo.f = 3
     foo.g = 3
     with pytest.raises(ValidationError) as exc_info:
@@ -400,7 +400,7 @@ def test_field_validators_decorator(explicit):
                                   "Successes: ['f_should_be_a_multiple_of_3'] / " \
                                   "Failures: {'f_should_be_larger_than_g': " \
                                   "'InvalidValue: not a large enough value. Returned False.'}." \
-           % Foo.__dict__['f'].qualname
+           % Foo.f.qualname
 
 
 def test_validator_not_compliant_with_native_field():
@@ -443,7 +443,7 @@ def test_field_converters_decorator(explicit):
                 raise Exception("no need to convert! already an int")
             return int(f_val) + 1
 
-    f_field = Foo.__dict__['f']
+    f_field = Foo.f
     assert len(f_field.converters) == 2
     foo = Foo()
     foo.f = 0    # uses no converter at all
@@ -576,7 +576,7 @@ def test_converters(format, nbargs, validator_return_none):
         f = field(converters=convs, validators=[x % 3 == 0])
 
     o = Foo()
-    f_field = Foo.__dict__['f']
+    f_field = Foo.f
     f_converters = f_field.converters
     assert len(f_converters) == 1 and isinstance(f_converters[0], Converter)
     o.f = 3
@@ -629,7 +629,7 @@ def test_inheritance():
     assert b.a == 'hello'  # first access should have fixed the field name
 
     # make sure that for all python versions (especially 2 and 3.5) the name is now ok.
-    assert A.__dict__['a'].name == 'a'
+    assert A.a.name == 'a'
 
 
 class Foo(object):
@@ -683,7 +683,7 @@ def test_default_validated(default_flavor, check_type):
         bar = field(type_hint=str, check_type=check_type, validators=validator, converters=str, **def_kwargs)
 
     # default value check
-    bar_field = Foo.__dict__['bar']
+    bar_field = Foo.bar
     if default_flavor == "simple":
         assert bar_field.default == 0
         assert bar_field._default_is_safe is False
