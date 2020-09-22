@@ -249,8 +249,8 @@ def test_native_descriptors():
 
     a_name = "test_native_descriptors.<locals>.Foo.a" if sys.version_info >= (3, 6) else "<unknown_cls>.None"
     b_name = "test_native_descriptors.<locals>.Foo.b" if sys.version_info >= (3, 6) else "<unknown_cls>.None"
-    assert repr(Foo.a) == "<NativeField: %s>" % a_name
-    assert repr(Foo.b) == "<DescriptorField: %s>" % b_name
+    assert repr(Foo.__dict__['a']) == "<NativeField: %s>" % a_name
+    assert repr(Foo.__dict__['b']) == "<DescriptorField: %s>" % b_name
 
     f = Foo()
 
