@@ -6,7 +6,7 @@
 
 [![Documentation](https://img.shields.io/badge/doc-latest-blue.svg)](https://smarie.github.io/python-pyfields/) [![PyPI](https://img.shields.io/pypi/v/pyfields.svg)](https://pypi.python.org/pypi/pyfields/) [![Downloads](https://pepy.tech/badge/pyfields)](https://pepy.tech/project/pyfields) [![Downloads per week](https://pepy.tech/badge/pyfields/week)](https://pepy.tech/project/pyfields) [![GitHub stars](https://img.shields.io/github/stars/smarie/python-pyfields.svg)](https://github.com/smarie/python-pyfields/stargazers)
 
-!!! success "`pyfields` now has its own `@autoclass` with sensible defaults, to complement the existing `@autofields` [feature](#a-autofields)! No need to import `autoclass` anymore. See [here](#hash-dict-eq-repr) for details."
+!!! success "`pyfields` now has its own [`@autoclass`](#hash-dict-eq-repr) with sensible defaults, to complement the existing [`@autofields`](#a-autofields) feature! No need to import it from `autoclass` anymore."
 
 `pyfields` provides a simple and elegant way to define fields in python classes. With `pyfields` you explicitly define all aspects of a field (default value/factory, type, validators, converters, documentation...) in a single place, and can refer to it from other places. 
 
