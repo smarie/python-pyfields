@@ -179,7 +179,12 @@ def autofields(check_types=False,     # type: Union[bool, DecoratedClass]
                     # optional field : copy the default value by default
                     new_field = field(check_type=need_to_check_type, default_factory=copy_value(default_value))
 
-                # Attach the newly created field to the class
+                # Attach the newly created field to the class. Delete attr first so that order is preserved
+                # even if one of them had only an annotation.
+                try:
+                    delattr(cls, member_name)
+                except AttributeError:
+                    pass
                 setattr(cls, member_name, new_field)
                 new_field.set_as_cls_member(cls, member_name, type_hint=type_hint)
 
