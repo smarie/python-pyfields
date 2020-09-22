@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.4.0 - new `@autoclass` decorator
+
+ - New `@autoclass` decorator directly available from `pyfields`. It is merely equivalent to the original `@autoclass` with option `autofields=True`, which makes it easier to use on classes with automatic fields. Fixes [#75](https://github.com/smarie/python-pyfields/issues/75)
+
 ### 1.3.2 - bugfix
 
  - Fields order are preserved by `@autofields` even in the case of an explicit `field()` with all others implicit. Fixed [#77](https://github.com/smarie/python-pyfields/issues/77)
