@@ -5,7 +5,7 @@
 import pytest
 
 from typing import List, Optional
-from pyfields import field, inject_fields, MandatoryFieldInitError, make_init, autofields
+from pyfields import field, inject_fields, MandatoryFieldInitError, make_init, autofields, autoclass
 
 
 def _test_class_annotations():
@@ -186,5 +186,15 @@ def test_issue_76():
         c: int
         b: str = "hello"
         a: int = field(default=50)
+
+    return Foo
+
+
+def _test_autoclass2():
+    @autoclass()
+    class Foo:
+        msg: str
+        age: int = 12
+        height: int = field(default=50)
 
     return Foo

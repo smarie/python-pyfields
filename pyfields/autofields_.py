@@ -225,3 +225,79 @@ def is_dunder(name):
 def is_reserved_dunder(name):
     return name in ('__doc__', '__name__', '__qualname__', '__module__', '__code__', '__globals__',
                     '__dict__', '__closure__', '__annotations__')  # '__defaults__', '__kwdefaults__')
+
+
+_AUTO = object()
+
+
+def autoclass(include=None,      # type: Union[str, Tuple[str]]
+              exclude=None,      # type: Union[str, Tuple[str]]
+              autoargs=_AUTO,    # type: bool
+              autoprops=_AUTO,   # type: bool
+              autodict=True,     # type: bool
+              autorepr=_AUTO,    # type: bool
+              autoeq=_AUTO,      # type: bool
+              autohash=True,     # type: bool
+              autoslots=False,   # type: bool
+              autoinit=_AUTO,    # type: bool
+              autofields=True,   # type: bool
+              ):
+    """
+    A decorator to perform @autoargs, @autoprops and @autodict all at once with the same include/exclude list.
+
+    This is identical to the `autoclass` version except that it comes with `autofields=True`.
+
+    :param include: a tuple of explicit attribute names to include (None means all)
+    :param exclude: a tuple of explicit attribute names to exclude. In such case, include should be None.
+    :param autoargs: a boolean to enable autoargs on the constructor. By default it is `AUTO` and means "automatic
+        configuration". In that case, the behaviour will depend on the class: it will be equivalent to `True` if the
+        class defines an `__init__` method and has no `pyfields` fields ; and `False` otherwise.
+    :param autoprops: a boolean to enable autoprops on the class. By default it is `AUTO` and means "automatic
+        configuration". In that case, the behaviour will depend on the class: it will be equivalent to `True` if the
+        class defines an `__init__` method and has no `pyfields` fields ; and `False` otherwise.
+    :param autoinit: a boolean to enable autoinit on the class. By default it is `AUTO` and means "automatic
+        configuration". In that case, the behaviour will depend on the class: it will be equivalent to `True` if the
+        class has `pyfields` fields and does not define an `__init__` method ; and `False` otherwise.
+    :param autodict: a boolean to enable autodict on the class (default: True). By default it will be executed with
+        `only_known_fields=True`.
+    :param autorepr: a boolean to enable autorepr on the class. By default it is `AUTO` and means "automatic
+        configuration". In that case, it will be defined as `not autodict`.
+    :param autoeq: a boolean to enable autoeq on the class. By default it is `AUTO` and means "automatic
+        configuration". In that case, it will be defined as `not autodict`.
+    :param autohash: a boolean to enable autohash on the class (default: True). By default it will be executed with
+        `only_known_fields=True`.
+    :param autoslots: a boolean to enable autoslots on the class (default: False).
+    :param autofields: a boolean (default: False) to apply autofields automatically on the class before applying
+        `autoclass` (see `pyfields` documentation for details)
+    :return:
+    """
+    # lazy import autoclass to avoid circular imports (since autoclass has a static import of pyfields)
+    from autoclass import autoclass_decorate
+    from autoclass.autoclass_ import AUTO
+
+    # replace local _AUTO with autoclass AUTO
+    if autoargs is _AUTO:
+        autoargs = AUTO
+    if autoprops is _AUTO:
+        autoprops = AUTO
+    if autorepr is _AUTO:
+        autorepr = AUTO
+    if autoeq is _AUTO:
+        autoeq = AUTO
+    if autoinit is _AUTO:
+        autoinit = AUTO
+
+    # create the decorator function
+    def _apply_decorator(cls):
+        return autoclass_decorate(cls, include=include, exclude=exclude, autoargs=autoargs, autoprops=autoprops,
+                                  autodict=autodict, autohash=autohash, autoslots=autoslots, autoinit=autoinit,
+                                  autorepr=autorepr, autoeq=autoeq, autofields=autofields)
+
+    if include is not None and isinstance(include, type):
+        # called without parenthesis: directly apply decorator on first argument
+        cls = include
+        include = None
+        return _apply_decorator(cls)
+    else:
+        # called with parenthesis: return a decorator function
+        return _apply_decorator

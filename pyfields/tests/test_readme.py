@@ -6,7 +6,7 @@ import pytest
 from valid8 import ValidationError, ValidationFailure
 
 from pyfields import field, MandatoryFieldInitError, make_init, init_fields, ReadOnlyFieldError, NoneError, \
-    FieldTypeError
+    FieldTypeError, autoclass, get_fields
 
 
 def runs_on_travis():
@@ -447,14 +447,14 @@ def test_autofields_vtypes_readme():
 
 def test_autoclass():
     """ Tests the example with autoclass in the doc """
-    from autoclass import autoclass
-
     @autoclass
     class Foo(object):
         msg = field(type_hint=str)
         age = field(default=12, type_hint=int)
 
     foo = Foo(msg='hello')
+
+    assert [f.name for f in get_fields(Foo)] == ['msg', 'age']
 
     print(foo)  # automatic string representation
     print(dict(foo))  # dict view
@@ -463,3 +463,19 @@ def test_autoclass():
     assert str(dict(foo)) in ("{'msg': 'hello', 'age': 12}", "{'age': 12, 'msg': 'hello'}")
     assert foo == Foo(msg='hello', age=12)  # comparison (equality)
     assert foo == {'msg': 'hello', 'age': 12}  # comparison with dicts
+
+
+@pytest.mark.skipif(sys.version_info < (3, 6), reason="not valid for old python")
+def test_autoclass_2():
+    from ._test_py36 import _test_autoclass2
+    Foo = _test_autoclass2()
+
+    # assert [f.name for f in get_fields(Foo)] == ['msg', 'age', 'height']
+
+    foo = Foo(msg='hello')
+
+    assert repr(foo) == "Foo(msg='hello', age=12, height=50)"  # automatic string representation
+    assert str(dict(foo))  # automatic dict view
+
+    assert foo == Foo(msg='hello', age=12, height=50)  # automatic equality comparison
+    assert foo == {'msg': 'hello', 'age': 12, 'height': 50}  # automatic eq comparison with dicts
