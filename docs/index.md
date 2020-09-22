@@ -6,7 +6,7 @@
 
 [![Documentation](https://img.shields.io/badge/doc-latest-blue.svg)](https://smarie.github.io/python-pyfields/) [![PyPI](https://img.shields.io/pypi/v/pyfields.svg)](https://pypi.python.org/pypi/pyfields/) [![Downloads](https://pepy.tech/badge/pyfields)](https://pepy.tech/project/pyfields) [![Downloads per week](https://pepy.tech/badge/pyfields/week)](https://pepy.tech/project/pyfields) [![GitHub stars](https://img.shields.io/github/stars/smarie/python-pyfields.svg)](https://github.com/smarie/python-pyfields/stargazers)
 
-!!! success "`pyfields` now has its own [`@autoclass`](#hash-dict-eq-repr) with sensible defaults, to complement the existing [`@autofields`](#a-autofields) feature! No need to import it from `autoclass` anymore."
+!!! success "`pyfields` now has its own [`@autoclass`](#b-autoclass) with sensible defaults, to complement the existing [`@autofields`](#a-autofields) feature! No need to import it from `autoclass` anymore."
 
 `pyfields` provides a simple and elegant way to define fields in python classes. With `pyfields` you explicitly define all aspects of a field (default value/factory, type, validators, converters, documentation...) in a single place, and can refer to it from other places. 
 
@@ -654,7 +654,40 @@ class Pocket:
 
 By default type checking is not enabled on the generated fields, but you can enable it with `@autofields(check_types=True)`. You can also disable constructor creation with `@autofields(make_init=False)`. See [API reference](https://smarie.github.io/python-pyfields/api_reference/#api) for details.
 
-#### b - `VType`s
+#### b - `@autoclass`
+
+Do you **also** wish to have `hash`, `dict`, `eq`, and `repr` views automatically created for your class ? `pyfields` now works hand in hand with `autoclass`. That way, your field definitions can directly be reused for most of the class behaviour. From version `1.5` on, a dedicated `@autoclass` decorator is directly exported from `pyfields`. 
+
+This decorator combines `@autofields` (above) and `@autoclass` into one, with options that are relevant to `pyfields`. You can create fields, create the constructor, enable type checking, create a dictionary views, etc. all in one call.
+
+```python
+from pyfields import field, autoclass
+
+@autoclass
+class Foo:
+    msg: str
+    age: int = 12
+    height: int = field(default=50)
+
+foo = Foo(msg='hello')
+
+print(foo)          # automatic string representation
+print(dict(foo))    # automatic dict view
+
+assert foo == Foo(msg='hello', age=12, height=50)        # automatic equality comparison 
+assert foo == {'msg': 'hello', 'age': 12, 'height': 50}  # automatic eq comparison with dicts
+```
+
+yields
+
+```
+Foo(msg='hello', age=12, height=50)
+{'msg': 'hello', 'age': 12, 'height': 50}
+```
+
+See [API reference](./api_reference.md#autoclass) for details.
+
+#### c - `VType`s
 
 Instead of registering validators in the field, you can now use `vtypes`. That way, everything is in the type: type checking AND value validation. 
 
@@ -691,37 +724,6 @@ class Item:
 #### API
 
 `pyfields` offers an API so that other libraries can inspect the fields: `get_fields`, `yield_fields`, `has_fields`, `get_field`. See [API reference](https://smarie.github.io/python-pyfields/api_reference/#api) for details.
-
-#### hash, dict, eq, repr 
-
-`pyfields` now works hand in hand with `autoclass`. That way, your field definitions can directly be reused for most of the class behaviour. From version 1.4 on, a dedicated `@autoclass` decorator is directly exported from `pyfields`. That way you do not have to specify `autofields=True` anymore, and furthermore you can specify `check_types=True` like in `@autofields`.
-
-```python
-from pyfields import field, autoclass
-
-@autoclass
-class Foo:
-    msg: str
-    age: int = 12
-    height: int = field(default=50)
-
-foo = Foo(msg='hello')
-
-print(foo)          # automatic string representation
-print(dict(foo))    # automatic dict view
-
-assert foo == Foo(msg='hello', age=12, height=50)        # automatic equality comparison 
-assert foo == {'msg': 'hello', 'age': 12, 'height': 50}  # automatic eq comparison with dicts
-```
-
-yields
-
-```
-Foo(msg='hello', age=12, height=50)
-{'msg': 'hello', 'age': 12, 'height': 50}
-```
-
-See [API reference](./api_reference.md#autoclass) for details.
 
 #### Slots
 
