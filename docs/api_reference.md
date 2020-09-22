@@ -405,22 +405,48 @@ TypeError: __init__() got an unexpected keyword argument 'SENTENCE'
 ## `@autoclass`
 
 ```python
-def autoclass(include=None,      # type: Union[str, Tuple[str]]
-              exclude=None,      # type: Union[str, Tuple[str]]
-              autoargs=_AUTO,    # type: bool
-              autoprops=_AUTO,   # type: bool
-              autodict=True,     # type: bool
-              autorepr=_AUTO,    # type: bool
-              autoeq=_AUTO,      # type: bool
-              autohash=True,     # type: bool
-              autoslots=False,   # type: bool
-              autoinit=_AUTO,    # type: bool
-              autofields=True,   # type: bool
-              ):
+def autoclass(
+        # from autofields
+        check_types=False,                # type: Union[bool, DecoratedClass]
+        autofields_include_upper=False,   # type: bool
+        autofields_include_dunder=False,  # type: bool
+        # from both (merging the names)
+        autoinit=True,                    # type: bool
+        # from autoclass
+        ac_include=None,                  # type: Union[str, Tuple[str]]
+        ac_exclude=None,                  # type: Union[str, Tuple[str]]
+        autodict=True,                    # type: bool
+        autorepr=_AUTO,                   # type: bool
+        autoeq=_AUTO,                     # type: bool
+        autohash=True,                    # type: bool
+    ):
 ```
 
-Decorator to automatically create fields and constructor on a class, as well as to add string representation, equality methods, dict view, etc. This is similar to the one from `autoclass` library with the single difference that by default `autofields=True`. See [autoclass documentation](https://smarie.github.io/python-autoclass/) for details.
+A decorator to automate many things at once for your class. First it executes `@autofields` to generate fields from attribute defined at class level, and generate the init.
 
+ - you can include attributes with dunder names or uppercase names with `autofields_include_dunder` and
+   `autofields_include_upper` respectively
+ - you can enable type checking on all fields at once by setting `check_types=True`
+ - you can disable constructor (init) creation by setting `autoinit=False`
+
+Then it executes `@autoclass` to generate convenience methods for the class. By default the class gets a dictionary behaviour (including string representation and equality comparison). You can disable this behaviour by setting `autodict=False`. This will automatically enable an alternate string representation and equality comparison. If you wish to disable them you can further set `autorepr=False` and `autoeq=False` explicitly. All those methods have default include/exlude behaviours that you can override with `ac_include` or `ac_exclude` name lists.
+
+Finally by default the class gets a `hash` implementation so that its instances can be inserted in sets or dict keys. You can disable this with `autohash=False`.
+
+See [autoclass documentation](https://smarie.github.io/python-autoclass/) for details on the lower-level methods.
+
+**Parameters**
+
+ - `check_types`: boolean flag (default: False) indicating the value of `check_type` for created fields. Note that the type hint of each created field is copied from the type hint of the member it originates from.
+ - `autofields_include_upper`: boolean flag (default: False) indicating whether upper-case class members should be also transformed to fields (usually such names are reserved for class constants, not for fields).
+ - `autofields_include_dunder`: boolean flag (default: False) indicating whether dunder-named class members should be also transformed to fields. Note that even if you set this to True, members with reserved python dunder names will not be transformed. See `is_reserved_dunder` for the list of reserved names.
+ - `autoinit`: boolean flag (default: True) indicating whether a constructor should be created for the class if no `__init__` method is already present. Such constructor will be created using `__init__ = make_init()`. This is the same behaviour than `make_init` in `@autofields`.
+ - `ac_include`: a tuple of explicit attribute names to include in the autodict/repr/eq/hash (None means all)
+ - `ac_exclude`: a tuple of explicit attribute names to exclude in the autodict/repr/eq/hash. In such case, include should be None.
+ - `autodict`: a boolean to enable autodict on the class (default: True). By default it will be executed with `only_known_fields=True`.
+ - `autorepr`: a boolean to enable autorepr on the class. By default it is `AUTO` and means "automatic configuration". In that case, it will be defined as `not autodict`.
+ - `autoeq`: a boolean to enable autoeq on the class. By default it is `AUTO` and means "automatic configuration". In that case, it will be defined as `not autodict`.
+ - `autohash`: a boolean to enable autohash on the class (default: True). By default it will be executed with `only_known_fields=True`.
 
 ## API
 

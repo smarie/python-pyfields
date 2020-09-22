@@ -694,7 +694,7 @@ class Item:
 
 #### hash, dict, eq, repr 
 
-`pyfields` now works hand in hand with `autoclass`. That way, your field definitions can directly be reused for most of the class behaviour. From version 1.4 on, a dedicated `@autoclass` decorator is directly exported from `pyfields`. That way you do not have to specify `autofields=True` anymore.
+`pyfields` now works hand in hand with `autoclass`. That way, your field definitions can directly be reused for most of the class behaviour. From version 1.4 on, a dedicated `@autoclass` decorator is directly exported from `pyfields`. That way you do not have to specify `autofields=True` anymore, and furthermore you can specify `check_types=True` like in `@autofields`.
 
 ```python
 from pyfields import field, autoclass
@@ -721,7 +721,7 @@ Foo(msg='hello', age=12, height=50)
 {'msg': 'hello', 'age': 12, 'height': 50}
 ```
 
-Note that apart from setting `autofields=True`, the `@autoclass` symbol demonstrated above has the same functionalities than the one in the `autoclass` lib. See [here](https://smarie.github.io/python-autoclass/#pyfields-combo) for details.
+See [API reference](./api_reference.md#autoclass) for details.
 
 #### Slots
 

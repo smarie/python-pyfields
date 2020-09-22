@@ -275,8 +275,8 @@ def autoclass(
     :param autoinit: boolean flag (default: True) indicating whether a constructor should be created for the class if
         no `__init__` method is already present. Such constructor will be created using `__init__ = make_init()`.
         This is the same behaviour than `make_init` in `@autofields`.
-    :param autoclass_include: a tuple of explicit attribute names to include in autodict/repr/eq/hash (None means all)
-    :param autoclass_exclude: a tuple of explicit attribute names to exclude in autodict/repr/eq/hash. In such case,
+    :param ac_include: a tuple of explicit attribute names to include in autodict/repr/eq/hash (None means all)
+    :param ac_exclude: a tuple of explicit attribute names to exclude in autodict/repr/eq/hash. In such case,
         include should be None.
     :param autodict: a boolean to enable autodict on the class (default: True). By default it will be executed with
         `only_known_fields=True`.
