@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.3.1 - bugfix
+
+ - Fields order are preserved by `@autofields` even in the case of a field with just a type annotation. Fixed [#76](https://github.com/smarie/python-pyfields/issues/76)
+
 ### 1.3.0 - Support for Forward references, PEP563 and class-level access
 
  - String forward references in type hints, and PEP563 behaviour, is now supported. When this case happense, the type hint resolution is delayed until the field is first accessed. Fixes [#73](https://github.com/smarie/python-pyfields/issues/73)
