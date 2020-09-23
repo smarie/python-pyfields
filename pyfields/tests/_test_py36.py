@@ -202,7 +202,7 @@ def _test_autoclass2():
 
 def _test_autoclass3():
 
-    @autoclass(check_types=True, autodict=False)
+    @autoclass(typecheck=True, dict=False)
     class Foo:
         msg: str
         age: int = 12

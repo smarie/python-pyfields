@@ -5,7 +5,7 @@ import sys
 
 import pytest
 
-from pyfields import autofields, field, FieldTypeError, Field, get_fields
+from pyfields import autofields, field, FieldTypeError, Field, get_fields, autoclass
 from pyfields.core import NativeField
 
 
@@ -126,3 +126,66 @@ def test_issue_76_bis():
         age = field(default=12, type_hint=int)
 
     assert [f.name for f in get_fields(Foo)] == ['msg', 'age']
+
+
+def test_autoclass():
+    """"""
+
+    @autoclass
+    class Foo(object):
+        msg = field(type_hint=str)
+        age = field(default=12, type_hint=int)
+
+    f = Foo('hey')
+
+    # str repr
+    assert repr(f) == "Foo(msg='hey', age=12)"
+    assert str(f) == repr(f)
+
+    # dict and eq
+    assert f.to_dict() == {'msg': 'hey', 'age': 12}
+
+    same_dict = {'msg': 'hey', 'age': 12}
+    assert f == same_dict
+    assert f == Foo.from_dict(same_dict)
+
+    diff_dict = {'age': 13, 'msg': 'hey'}
+    assert f != diff_dict
+    assert f != Foo.from_dict(diff_dict)
+
+    assert f == Foo.from_dict(f.to_dict())
+
+    # hash
+    my_set = {f, f}
+    assert my_set == {f}
+    assert Foo('hey') in my_set
+    my_set.remove(Foo('hey'))
+    assert len(my_set) == 0
+
+    # subclass A
+    class Bar(Foo):
+        pass
+
+    b = Bar(msg='hey')
+    assert str(b) == "Bar(msg='hey', age=12)"
+    assert b == f
+    assert f == b
+
+    # hash
+    my_set = {f, b}
+    assert len(my_set) == 1  # yes: since the subclass does not define additional attributes.
+    assert my_set == {f}
+
+    # subclass B
+    @autoclass
+    class Bar2(Foo):
+        ho = 3
+
+    b2 = Bar2('hey')
+    assert str(b2) == "Bar2(msg='hey', age=12, ho=3)"
+    assert b2 != f
+    assert f != b2
+
+    # hash
+    my_set = {b2, b}
+    assert Bar2('hey') in my_set

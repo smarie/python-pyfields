@@ -456,10 +456,10 @@ def test_autoclass():
     assert [f.name for f in get_fields(Foo)] == ['msg', 'age']
 
     print(foo)  # automatic string representation
-    print(dict(foo))  # dict view
+    print(foo.to_dict())  # dict view
 
     assert str(foo) == "Foo(msg='hello', age=12)"
-    assert str(dict(foo)) in ("{'msg': 'hello', 'age': 12}", "{'age': 12, 'msg': 'hello'}")
+    assert str(foo.to_dict()) in ("{'msg': 'hello', 'age': 12}", "{'age': 12, 'msg': 'hello'}")
     assert foo == Foo(msg='hello', age=12)  # comparison (equality)
     assert foo == {'msg': 'hello', 'age': 12}  # comparison with dicts
 
@@ -474,7 +474,7 @@ def test_autoclass_2():
     foo = Foo(msg='hello')
 
     assert repr(foo) == "Foo(msg='hello', age=12, height=50)"  # automatic string representation
-    assert str(dict(foo))  # automatic dict view
+    assert str(foo.to_dict())  # automatic dict view
 
     assert foo == Foo(msg='hello', age=12, height=50)  # automatic equality comparison
     assert foo == {'msg': 'hello', 'age': 12, 'height': 50}  # automatic eq comparison with dicts
@@ -489,8 +489,8 @@ def test_autoclass_3():
 
     foo = Foo(msg='hello')
 
-    with pytest.raises(TypeError):
-        dict(foo)  # TypeError: 'Foo' object is not iterable
+    with pytest.raises(AttributeError):
+        foo.to_dict()  # method does not exist
 
     assert repr(foo) == "Foo(msg='hello', age=12, height=50)"  # automatic string representation
     assert foo == Foo(msg='hello', age=12, height=50)  # automatic equality comparison

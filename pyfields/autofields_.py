@@ -11,10 +11,21 @@ except ImportError:
     pass
 
 
-from pyfields import Field, field, make_init as mkinit, copy_value
+from .core import Field, field
+from .init_makers import make_init as mkinit
+from .helpers import copy_value, get_fields
 
 
 PY36 = sys.version_info >= (3, 6)
+
+
+def _make_init(cls):
+    """Utility method used in autofields and autoclass to create the constructor based on the class fields"""
+    if "__init__" not in cls.__dict__:
+        new_init = mkinit()
+        cls.__init__ = new_init
+        # attach explicitly to the class so that the descriptor is correctly completed.
+        new_init.__set_name__(cls, '__init__')
 
 
 def autofields(check_types=False,     # type: Union[bool, DecoratedClass]
@@ -195,11 +206,8 @@ def autofields(check_types=False,     # type: Union[bool, DecoratedClass]
                 new_field.set_as_cls_member(cls, member_name, type_hint=type_hint)
 
         # Finally, make init if not already explicitly present
-        if make_init and ('__init__' not in cls.__dict__):
-            new_init = mkinit()
-            cls.__init__ = new_init
-            # attach explicitly to the class so that the descriptor is correctly completed.
-            new_init.__set_name__(cls, '__init__')
+        if make_init:
+            _make_init(cls)
 
         return cls
     # end of _autofields(cls)
@@ -227,97 +235,292 @@ def is_reserved_dunder(name):
                     '__dict__', '__closure__', '__annotations__')  # '__defaults__', '__kwdefaults__')
 
 
-_AUTO = object()
+_dict, _hash = dict, hash
+"""Aliases for autoclass body"""
 
 
 def autoclass(
-        # from autofields
-        check_types=False,                # type: Union[bool, DecoratedClass]
-        autofields_include_upper=False,   # type: bool
-        autofields_include_dunder=False,  # type: bool
-        # from both (merging the names)
-        autoinit=True,                    # type: bool
-        # from autoclass
-        ac_include=None,                  # type: Union[str, Tuple[str]]
-        ac_exclude=None,                  # type: Union[str, Tuple[str]]
-        autodict=True,                    # type: bool
-        autorepr=_AUTO,                   # type: bool
-        autoeq=_AUTO,                     # type: bool
-        autohash=True,                    # type: bool
+        # --- autofields
+        fields=True,              # type: Union[bool, DecoratedClass]
+        typecheck=False,          # type: bool
+        # --- constructor
+        init=True,                # type: bool
+        # --- class methods
+        dict=True,                # type: bool
+        dict_public_only=True,    # type: bool
+        repr=True,                # type: bool
+        repr_curly_mode=False,    # type: bool
+        repr_public_only=True,    # type: bool
+        eq=True,                  # type: bool
+        eq_public_only=False,     # type: bool
+        hash=True,                # type: bool
+        hash_public_only=False,   # type: bool
+        # --- advanced
+        af_include_upper=False,   # type: bool
+        af_include_dunder=False,  # type: bool
+        ac_include=None,          # type: Union[str, Tuple[str]]
+        ac_exclude=None,          # type: Union[str, Tuple[str]]
     ):
     """
     A decorator to automate many things at once for your class.
-    First it executes `@autofields` to generate fields from attribute defined at class level, and generate the init.
 
-     - you can include attributes with dunder names or uppercase names with `autofields_include_dunder` and
-       `autofields_include_upper` respectively
+    First if `fields=True` (default) it executes `@autofields` to generate fields from attribute defined at class
+    level.
+
+     - you can include attributes with dunder names or uppercase names with `af_include_dunder` and
+       `af_include_upper` respectively
      - you can enable type checking on all fields at once by setting `check_types=True`
-     - you can disable constructor (init) creation by setting `autoinit=False`
+     - the constructor is not generated at this stage
 
-    Then it executes `@autoclass` to generate convenience methods for the class. By default the class gets a dictionary
-    behaviour (including string representation and equality comparison). You can disable this behaviour by setting
-    `autodict=False`. This will automatically enable an alternate string representation and equality comparison.
-    If you wish to disable them you can further set `autorepr=False` and `autoeq=False` explicitly. All those methods
-    have default include/exlude behaviours that you can override with `ac_include` or `ac_exclude` name lists.
+    Then it generates methods for the class:
 
-    Finally by default the class gets a `hash` implementation so that its instances can be inserted in sets or dict
-    keys. You can disable this with `autohash=False`.
+     - if `init=True` (default) it generates the constructor based on all fields present, using `make_init()`.
+     - if `dict=True` (default) it generates `to_dict` and `from_dict` methods. Only public fields are represented in
+       `to_dict`, you can change this with `dict_public_only=False`.
+     - if `repr=True` (default) it generates a `__repr__` method. Only public fields are represented, you can change
+       this with `repr_public_only=False`.
+     - if `eq=True` (default) it generates an `__eq__` method, so that instances can be compared to other instances and
+       to dicts. All fields are compared by default, you can change this with `eq_public_only=True`.
+     - if `hash=True` (default) it generates an `__hash__` method, so that instances can be inserted in sets or dict
+       keys. All fields are hashed by default, you can change this with `hash_public_only=True`.
 
-    See [autoclass documentation](https://smarie.github.io/python-autoclass/) for details on the lower-level methods.
+    You can specify an explicit list of fields to include or exclude in the dict/repr/eq/hash methods with the
+    `ac_include` and `ac_exclude` parameters.
 
-    :param check_types: boolean flag (default: False) indicating the value of `check_type` for created fields. Note that
-        the type hint of each created field is copied from the type hint of the member it originates from.
-    :param autofields_include_upper: boolean flag (default: False) indicating whether upper-case class members
-        should be also transformed to fields (usually such names are reserved for class constants, not for fields).
-    :param autofields_include_dunder: boolean flag (default: False) indicating whether dunder-named class members should
-        be also transformed to fields. Note that even if you set this to True, members with reserved python dunder names
-        will not be transformed. See `is_reserved_dunder` for the list of reserved names.
-    :param autoinit: boolean flag (default: True) indicating whether a constructor should be created for the class if
+    Note that this decorator is similar to the [autoclass library](https://smarie.github.io/python-autoclass/) but is
+    reimplemented here. In particular the parameter names and dictionary behaviour are different.
+
+    :param fields: boolean flag (default: True) indicating whether to create fields automatically. See `@autofields`
+        for details
+    :param typecheck: boolean flag (default: False) used when fields=True indicating the value of `check_type`
+        for created fields. Note that the type hint of each created field is copied from the type hint of the member it
+        originates from.
+    :param init: boolean flag (default: True) indicating whether a constructor should be created for the class if
         no `__init__` method is already present. Such constructor will be created using `__init__ = make_init()`.
-        This is the same behaviour than `make_init` in `@autofields`.
-    :param ac_include: a tuple of explicit attribute names to include in autodict/repr/eq/hash (None means all)
-    :param ac_exclude: a tuple of explicit attribute names to exclude in autodict/repr/eq/hash. In such case,
+        This is the same behaviour than `make_init` in `@autofields`. Note that this is *not* automatically disabled if
+        you set `fields=False`.
+    :param dict: a boolean to automatically create `cls.from_dict(dct)` and `obj.to_dict()` methods on the class
+        (default: True).
+    :param dict_public_only: a boolean (default: True) to indicate if only public fields should be
+        exposed in the dictionary view created by `to_dict` when `dict=True`.
+    :param repr: a boolean (default: True) to indicate if `__repr__` and `__str__` should be created for the class if
+        not explicitly present.
+    :param repr_curly_mode: a boolean (default: False) to turn on an alternate string representation when `repr=True`,
+        using curly braces.
+    :param repr_public_only: a boolean (default: True) to indicate if only public fields should be
+        exposed in the string representation when `repr=True`.
+    :param eq: a boolean (default: True) to indicate if `__eq__` should be created for the class if not explicitly
+        present.
+    :param eq_public_only: a boolean (default: False) to indicate if only public fields should be
+        compared in the equality method created when `eq=True`.
+    :param hash: a boolean (default: True) to indicate if `__hash__` should be created for the class if not explicitly
+        present.
+    :param hash_public_only: a boolean (default: False) to indicate if only public fields should be
+        hashed in the hash method created when `hash=True`.
+    :param af_include_upper: boolean flag (default: False) used when autofields=True indicating whether
+        upper-case class members should be also transformed to fields (usually such names are reserved for class
+        constants, not for fields).
+    :param af_include_dunder: boolean flag (default: False) used when autofields=True indicating whether
+        dunder-named class members should be also transformed to fields. Note that even if you set this to True,
+        members with reserved python dunder names will not be transformed. See `is_reserved_dunder` for the list of
+        reserved names.
+    :param ac_include: a tuple of explicit attribute names to include in dict/repr/eq/hash (None means all)
+    :param ac_exclude: a tuple of explicit attribute names to exclude in dict/repr/eq/hash. In such case,
         include should be None.
-    :param autodict: a boolean to enable autodict on the class (default: True). By default it will be executed with
-        `only_known_fields=True`.
-    :param autorepr: a boolean to enable autorepr on the class. By default it is `AUTO` and means "automatic
-        configuration". In that case, it will be defined as `not autodict`.
-    :param autoeq: a boolean to enable autoeq on the class. By default it is `AUTO` and means "automatic
-        configuration". In that case, it will be defined as `not autodict`.
-    :param autohash: a boolean to enable autohash on the class (default: True). By default it will be executed with
-        `only_known_fields=True`.
     :return:
     """
-    # lazy import autoclass to avoid circular imports (since autoclass has a static import of pyfields)
-    from autoclass import autoclass_decorate
-    from autoclass.autoclass_ import AUTO
+    if not fields and (af_include_dunder or af_include_upper or typecheck):
+        raise ValueError("Not able to set af_include_dunder or af_include_upper or typecheck when fields=False")
 
-    # replace local _AUTO with autoclass AUTO
-    if autorepr is _AUTO:
-        autorepr = AUTO
-    if autoeq is _AUTO:
-        autoeq = AUTO
+    # switch between args and actual symbols for readability
+    dict_on = dict
+    dict = _dict
+    hash_on = hash
+    hash = _hash
 
-    # create the decorator function
+    # Create the decorator function
     def _apply_decorator(cls):
-        # apply autofields
-        cls = autofields(check_types=check_types, include_upper=autofields_include_upper,
-                         include_dunder=autofields_include_dunder, make_init=autoinit)(cls)
-        # apply autoclass
-        return autoclass_decorate(cls,
-                                  # no need to enable autofields and autoinit anymore
-                                  autofields=False, autoinit=False,
-                                  # we know that those are irrelevant
-                                  autoargs=False, autoprops=False, autoslots=False,
-                                  # remaining arguments
-                                  include=ac_include, exclude=ac_exclude,
-                                  autodict=autodict, autohash=autohash, autorepr=autorepr, autoeq=autoeq)
 
-    if check_types is not None and isinstance(check_types, type):
+        # create fields automatically
+        if fields:
+            cls = autofields(check_types=typecheck, include_upper=af_include_upper,
+                             include_dunder=af_include_dunder, make_init=False)(cls)
+
+        # make init if not already explicitly present
+        if init:
+            _make_init(cls)
+
+        # list all fields
+        all_pyfields = get_fields(cls)
+        if len(all_pyfields) == 0:
+            raise ValueError("No fields detected on class %s (including inherited ones)" % cls)
+
+        # filter selected
+        all_names = tuple(f.name for f in all_pyfields)
+        selected_names = filter_names(all_names, include=ac_include, exclude=ac_exclude, caller="@autoclass")
+        public_selected_names = tuple(n for n in selected_names if not n.startswith('_'))
+
+        # to/from dict
+        if dict_on:
+            dict_names = public_selected_names if dict_public_only else selected_names
+            if "to_dict" not in cls.__dict__:
+
+                def to_dict(self):
+                    """ Generated by @pyfields.autoclass based on the class fields """
+                    return {n: getattr(self, n) for n in dict_names}
+
+                cls.to_dict = to_dict
+            if "from_dict" not in cls.__dict__:
+
+                def from_dict(cls, dct):
+                    """ Generated by @pyfields.autoclass """
+                    return cls(**dct)
+
+                cls.from_dict = classmethod(from_dict)
+
+        # __str__ and __repr__
+        if repr:
+            repr_names = public_selected_names if repr_public_only else selected_names
+            if not repr_curly_mode:  # default
+
+                def __repr__(self):
+                    """ Generated by @pyfields.autoclass based on the class fields """
+                    return '%s(%s)' % (self.__class__.__name__,
+                                       ', '.join('%s=%r' % (k, getattr(self, k))  for k in repr_names))
+            else:
+                def __repr__(self):
+                    """ Generated by @pyfields.autoclass based on the class fields """
+                    return '%s(**{%s})' % (self.__class__.__name__,
+                                           ', '.join('%r: %r' % (k, getattr(self, k)) for k in repr_names))
+
+            if "__repr__" not in cls.__dict__:
+                cls.__repr__ = __repr__
+            if "__str__" not in cls.__dict__:
+                cls.__str__ = __repr__
+
+        # __eq__
+        if eq:
+            eq_names = public_selected_names if eq_public_only else selected_names
+            def __eq__(self, other):
+                """ Generated by @pyfields.autoclass based on the class fields """
+                if isinstance(other, dict):
+                    # comparison with dicts only when a to_dict method is available
+                    try:
+                        _self_to_dict = self.to_dict
+                    except AttributeError:
+                        return False
+                    else:
+                        return _self_to_dict() == other
+                elif isinstance(self, other.__class__):
+                    # comparison with objects of the same class or a parent
+                    try:
+                        for att_name in eq_names:
+                            if getattr(self, att_name) != getattr(other, att_name):
+                                return False
+                    except AttributeError:
+                        return False
+                    else:
+                        return True
+                elif isinstance(other, self.__class__):
+                    # other is a subtype: call method on other
+                    return other.__eq__(self)  # same as NotImplemented ?
+                else:
+                    # classes are not related: False
+                    return False
+
+            if "__eq__" not in cls.__dict__:
+                cls.__eq__ = __eq__
+
+        # __hash__
+        if hash_on:
+            hash_names = public_selected_names if hash_public_only else selected_names
+
+            def __hash__(self):
+                """ Generated by @autoclass. Implements the __hash__ method by hashing a tuple of field values """
+
+                # note: Should we prepend a unique hash for the class as `attrs` does ?
+                # return hash(tuple([type(self)] + [getattr(self, att_name) for att_name in added]))
+                # > No, it seems more intuitive to not do that.
+                # Warning: the consequence is that instances of subtypes will have the same hash has instance of their
+                # parent class if they have all the same attribute values
+
+                return hash(tuple(getattr(self, att_name) for att_name in hash_names))
+
+            if "__hash__" not in cls.__dict__:
+                cls.__hash__ = __hash__
+
+        return cls
+
+    # Apply: Decorator vs decorator factory logic
+    if isinstance(fields, type):
         # called without parenthesis: directly apply decorator on first argument
-        cls = check_types
-        check_types = False  # set it back to default
+        cls = fields
+        fields = True  # set it back to its default value
         return _apply_decorator(cls)
     else:
         # called with parenthesis: return a decorator function
         return _apply_decorator
+
+
+def filter_names(all_names,
+                 include=None,  # type: Union[str, Tuple[str]]
+                 exclude=None,  # type: Union[str, Tuple[str]]
+                 caller=""      # type: str
+                 ):
+    # type: (...) -> Iterable[str]
+    """
+    Common validator for include and exclude arguments
+
+    :param all_names:
+    :param include:
+    :param exclude:
+    :param caller:
+    :return:
+    """
+    if include is not None and exclude is not None:
+        raise ValueError("Only one of 'include' or 'exclude' argument should be provided.")
+
+    # check that include/exclude don't contain names that are incorrect
+    selected_names = all_names
+    if include is not None:
+        if exclude is not None:
+            raise ValueError('Only one of \'include\' or \'exclude\' argument should be provided.')
+
+        # get the selected names and check that all names in 'include' are actually valid names
+        included = (include,) if isinstance(include, str) else tuple(include)
+        incorrect = set(included) - set(all_names)
+        if len(incorrect) > 0:
+            raise ValueError("`%s` definition exception: `include` contains %r that is/are "
+                             "not part of %r" % (caller, incorrect, all_names))
+        selected_names = included
+
+    elif exclude is not None:
+        excluded_set = {exclude} if isinstance(exclude, str) else set(exclude)
+        incorrect = excluded_set - set(all_names)
+        if len(incorrect) > 0:
+            raise ValueError("`%s` definition exception: exclude contains %r that is/are "
+                             "not part of %r" % (caller, incorrect, all_names))
+        selected_names = tuple(n for n in all_names if n not in excluded_set)
+
+    return selected_names
+
+
+# def method_already_there(cls,
+#                          method_name,           # type: str
+#                          this_class_only=False  # type: bool
+#                          ):
+#     # type: (...) -> bool
+#     """
+#     Returns True if method `method_name` is already implemented by object_type, that is, its implementation differs from
+#     the one in `object`.
+#
+#     :param cls:
+#     :param method_name:
+#     :param this_class_only:
+#     :return:
+#     """
+#     if this_class_only:
+#         return method_name in cls.__dict__  # or vars(cls)
+#     else:
+#         method = getattr(cls, method_name, None)
+#         return method is not None and method is not getattr(object, method_name, None)

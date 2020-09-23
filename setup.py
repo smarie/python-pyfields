@@ -13,11 +13,11 @@ pkg_resources.require("setuptools_scm")
 from setuptools_scm import get_version  # noqa: E402
 
 # *************** Dependencies *********
-INSTALL_REQUIRES = ['valid8>=5.0', 'makefun', 'autoclass>=2.2',
+INSTALL_REQUIRES = ['valid8>=5.0', 'makefun',
                     'funcsigs;python_version<"3.3"', 'enum34;python_version<"3.4"']  # 'sentinel',
 DEPENDENCY_LINKS = []
 SETUP_REQUIRES = ['pytest-runner', 'setuptools_scm']
-TESTS_REQUIRE = ['pytest', 'pytest-logging', 'mini-lambda', 'typing;python_version<"3.5"', 'vtypes']
+TESTS_REQUIRE = ['pytest', 'pytest-logging', 'mini-lambda', 'typing;python_version<"3.5"', 'vtypes', 'autoclass>=2.2']
 EXTRAS_REQUIRE = {}
 
 # ************** ID card *****************
