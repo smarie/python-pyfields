@@ -245,6 +245,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#160-we-now-have-our-own-version-of-autoclass" class="md-nav__link">
+    1.6.0 - we now have our own version of @autoclass
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#150-updated-autoclass-signature" class="md-nav__link">
     1.5.0 - updated @autoclass signature
   </a>
@@ -471,6 +478,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#160-we-now-have-our-own-version-of-autoclass" class="md-nav__link">
+    1.6.0 - we now have our own version of @autoclass
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#150-updated-autoclass-signature" class="md-nav__link">
     1.5.0 - updated @autoclass signature
   </a>
@@ -687,6 +701,10 @@
                 
                 
                 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
+<h3 id="160-we-now-have-our-own-version-of-autoclass">1.6.0 - we now have our own version of <code>@autoclass</code><a class="headerlink" href="#160-we-now-have-our-own-version-of-autoclass" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Copied the relevant contents from <code>autoclass</code> so as to get rid of the dependency. Since we are in a <code>pyfields</code> context there were many things that could be dropped and remaining code could be easily copied over. Also took this opportunity to replace the dict view with a <code>to_dict</code>/<code>from_dict</code> pair of methods, this seems less intrusive in the class design. Finally the parameter names have been simplified, see <a href="../api_reference/#autoclass">API reference</a> for details. Fixes <a href="https://github.com/smarie/python-pyfields/issues/79">#79</a></li>
+</ul>
 <h3 id="150-updated-autoclass-signature">1.5.0 - updated <code>@autoclass</code> signature<a class="headerlink" href="#150-updated-autoclass-signature" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Improved <code>@autoclass</code> so that it is much easier to access the relevant arguments from underlying <code>@autofields</code> and <code>@autoclass</code>. Fixed <a href="https://github.com/smarie/python-pyfields/issues/78">#78</a></li>
@@ -961,7 +979,7 @@
     </div>
     
       <script src="../assets/javascripts/vendor.2d1db4bd.min.js"></script>
-      <script src="../assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"search.config.separator": "[\\s\\-]+", "search.result.none": "No matching documents", "search.result.other": "# matching documents", "search.config.pipeline": "trimmer, stopWordFilter", "clipboard.copied": "Copied to clipboard", "search.result.one": "1 matching document", "clipboard.copy": "Copy to clipboard", "search.result.placeholder": "Type to start searching", "search.config.lang": "en"}</script>
+      <script src="../assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.result.none": "No matching documents", "search.result.placeholder": "Type to start searching", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "clipboard.copy": "Copy to clipboard", "search.result.other": "# matching documents", "search.result.one": "1 matching document"}</script>
       
       <script>
         app = initialize({
