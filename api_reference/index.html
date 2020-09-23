@@ -896,45 +896,66 @@ disabled by setting <code>make_init=False</code>.</p>
 
 <h2 id="autoclass"><code>@autoclass</code><a class="headerlink" href="#autoclass" title="Permanent link">&para;</a></h2>
 <div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">autoclass</span><span class="p">(</span>
-        <span class="c1"># from autofields</span>
-        <span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>                <span class="c1"># type: Union[bool, DecoratedClass]</span>
-        <span class="n">autofields_include_upper</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>   <span class="c1"># type: bool</span>
-        <span class="n">autofields_include_dunder</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># type: bool</span>
-        <span class="c1"># from both (merging the names)</span>
-        <span class="n">autoinit</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                    <span class="c1"># type: bool</span>
-        <span class="c1"># from autoclass</span>
-        <span class="n">ac_include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                  <span class="c1"># type: Union[str, Tuple[str]]</span>
-        <span class="n">ac_exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>                  <span class="c1"># type: Union[str, Tuple[str]]</span>
-        <span class="n">autodict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                    <span class="c1"># type: bool</span>
-        <span class="n">autorepr</span><span class="o">=</span><span class="n">_AUTO</span><span class="p">,</span>                   <span class="c1"># type: bool</span>
-        <span class="n">autoeq</span><span class="o">=</span><span class="n">_AUTO</span><span class="p">,</span>                     <span class="c1"># type: bool</span>
-        <span class="n">autohash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                    <span class="c1"># type: bool</span>
+        <span class="c1"># --- autofields</span>
+        <span class="n">fields</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>              <span class="c1"># type: Union[bool, DecoratedClass]</span>
+        <span class="n">typecheck</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>          <span class="c1"># type: bool</span>
+        <span class="c1"># --- constructor</span>
+        <span class="n">init</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                <span class="c1"># type: bool</span>
+        <span class="c1"># --- class methods</span>
+        <span class="nb">dict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                <span class="c1"># type: bool</span>
+        <span class="n">dict_public_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>    <span class="c1"># type: bool</span>
+        <span class="nb">repr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                <span class="c1"># type: bool</span>
+        <span class="n">repr_curly_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>    <span class="c1"># type: bool</span>
+        <span class="n">repr_public_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>    <span class="c1"># type: bool</span>
+        <span class="n">eq</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                  <span class="c1"># type: bool</span>
+        <span class="n">eq_public_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>     <span class="c1"># type: bool</span>
+        <span class="nb">hash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                <span class="c1"># type: bool</span>
+        <span class="n">hash_public_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>   <span class="c1"># type: bool</span>
+        <span class="c1"># --- advanced</span>
+        <span class="n">af_include_upper</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>   <span class="c1"># type: bool</span>
+        <span class="n">af_include_dunder</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># type: bool</span>
+        <span class="n">ac_include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>          <span class="c1"># type: Union[str, Tuple[str]]</span>
+        <span class="n">ac_exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>          <span class="c1"># type: Union[str, Tuple[str]]</span>
     <span class="p">):</span>
 </code></pre></div>
 
 
-<p>A decorator to automate many things at once for your class. First it executes <code>@autofields</code> to generate fields from attribute defined at class level, and generate the init.</p>
+<p>A decorator to automate many things at once for your class.</p>
+<p>First if <code>fields=True</code> (default) it executes <code>@autofields</code> to generate fields from attribute defined at class level.</p>
 <ul>
-<li>you can include attributes with dunder names or uppercase names with <code>autofields_include_dunder</code> and
-   <code>autofields_include_upper</code> respectively</li>
+<li>you can include attributes with dunder names or uppercase names with <code>af_include_dunder</code> and
+   <code>af_include_upper</code> respectively</li>
 <li>you can enable type checking on all fields at once by setting <code>check_types=True</code></li>
-<li>you can disable constructor (init) creation by setting <code>autoinit=False</code></li>
+<li>the constructor is not generated at this stage</li>
 </ul>
-<p>Then it executes <code>@autoclass</code> to generate convenience methods for the class. By default the class gets a dictionary behaviour (including string representation and equality comparison). You can disable this behaviour by setting <code>autodict=False</code>. This will automatically enable an alternate string representation and equality comparison. If you wish to disable them you can further set <code>autorepr=False</code> and <code>autoeq=False</code> explicitly. All those methods have default include/exlude behaviours that you can override with <code>ac_include</code> or <code>ac_exclude</code> name lists.</p>
-<p>Finally by default the class gets a <code>hash</code> implementation so that its instances can be inserted in sets or dict keys. You can disable this with <code>autohash=False</code>.</p>
-<p>See <a href="https://smarie.github.io/python-autoclass/">autoclass documentation</a> for details on the lower-level methods.</p>
+<p>Then it generates methods for the class:</p>
+<ul>
+<li>if <code>init=True</code> (default) it generates the constructor based on all fields present, using <code>make_init()</code>.</li>
+<li>if <code>dict=True</code> (default) it generates <code>to_dict</code> and <code>from_dict</code> methods. Only public fields are represented in <code>to_dict</code>, you can change this with <code>dict_public_only=False</code>.</li>
+<li>if <code>repr=True</code> (default) it generates a <code>__repr__</code> method. Only public fields are represented, you can change this with <code>repr_public_only=False</code>.</li>
+<li>if <code>eq=True</code> (default) it generates an <code>__eq__</code> method, so that instances can be compared to other instances and to dicts. All fields are compared by default, you can change this with <code>eq_public_only=True</code>.</li>
+<li>if <code>hash=True</code> (default) it generates an <code>__hash__</code> method, so that instances can be inserted in sets or dict keys. All fields are hashed by default, you can change this with <code>hash_public_only=True</code>.</li>
+</ul>
+<p>You can specify an explicit list of fields to include or exclude in the dict/repr/eq/hash methods with the <code>ac_include</code> and <code>ac_exclude</code> parameters.</p>
+<p>Note that this decorator is similar to the <a href="https://smarie.github.io/python-autoclass/">autoclass library</a> but is reimplemented here. In particular the parameter names and dictionary behaviour are different.</p>
 <p><strong>Parameters</strong></p>
 <ul>
-<li><code>check_types</code>: boolean flag (default: False) indicating the value of <code>check_type</code> for created fields. Note that the type hint of each created field is copied from the type hint of the member it originates from.</li>
-<li><code>autofields_include_upper</code>: boolean flag (default: False) indicating whether upper-case class members should be also transformed to fields (usually such names are reserved for class constants, not for fields).</li>
-<li><code>autofields_include_dunder</code>: boolean flag (default: False) indicating whether dunder-named class members should be also transformed to fields. Note that even if you set this to True, members with reserved python dunder names will not be transformed. See <code>is_reserved_dunder</code> for the list of reserved names.</li>
-<li><code>autoinit</code>: boolean flag (default: True) indicating whether a constructor should be created for the class if no <code>__init__</code> method is already present. Such constructor will be created using <code>__init__ = make_init()</code>. This is the same behaviour than <code>make_init</code> in <code>@autofields</code>.</li>
-<li><code>ac_include</code>: a tuple of explicit attribute names to include in the autodict/repr/eq/hash (None means all)</li>
-<li><code>ac_exclude</code>: a tuple of explicit attribute names to exclude in the autodict/repr/eq/hash. In such case, include should be None.</li>
-<li><code>autodict</code>: a boolean to enable autodict on the class (default: True). By default it will be executed with <code>only_known_fields=True</code>.</li>
-<li><code>autorepr</code>: a boolean to enable autorepr on the class. By default it is <code>AUTO</code> and means "automatic configuration". In that case, it will be defined as <code>not autodict</code>.</li>
-<li><code>autoeq</code>: a boolean to enable autoeq on the class. By default it is <code>AUTO</code> and means "automatic configuration". In that case, it will be defined as <code>not autodict</code>.</li>
-<li><code>autohash</code>: a boolean to enable autohash on the class (default: True). By default it will be executed with <code>only_known_fields=True</code>.</li>
+<li><code>fields</code>: boolean flag (default: True) indicating whether to create fields automatically. See <code>@autofields</code> for details</li>
+<li><code>typecheck</code>: boolean flag (default: False) used when fields=True indicating the value of <code>check_type</code> for created fields. Note that the type hint of each created field is copied from the type hint of the member it originates from.</li>
+<li><code>init</code>: boolean flag (default: True) indicating whether a constructor should be created for the class if no <code>__init__</code> method is already present. Such constructor will be created using <code>__init__ = make_init()</code>. This is the same behaviour than <code>make_init</code> in <code>@autofields</code>. Note that this is <em>not</em> automatically disabled if you set <code>fields=False</code>.</li>
+<li><code>dict</code>: a boolean to automatically create <code>cls.from_dict(dct)</code> and <code>obj.to_dict()</code> methods on the class (default: True).</li>
+<li><code>dict_public_only</code>: a boolean (default: True) to indicate if only public fields should be exposed in the dictionary view created by <code>to_dict</code> when <code>dict=True</code>.</li>
+<li><code>repr</code>: a boolean (default: True) to indicate if <code>__repr__</code> and <code>__str__</code> should be created for the class if not explicitly present.</li>
+<li><code>repr_curly_mode</code>: a boolean (default: False) to turn on an alternate string representation when <code>repr=True</code>, using curly braces.</li>
+<li><code>repr_public_only</code>: a boolean (default: True) to indicate if only public fields should be exposed in the string representation when <code>repr=True</code>.</li>
+<li><code>eq</code>: a boolean (default: True) to indicate if <code>__eq__</code> should be created for the class if not explicitly present.</li>
+<li><code>eq_public_only</code>: a boolean (default: False) to indicate if only public fields should be  compared in the equality method created when <code>eq=True</code>.</li>
+<li><code>hash</code>: a boolean (default: True) to indicate if <code>__hash__</code> should be created for the class if not explicitly present.</li>
+<li><code>hash_public_only</code>: a boolean (default: False) to indicate if only public fields should be hashed in the hash method created when <code>hash=True</code>.</li>
+<li><code>af_include_upper</code>: boolean flag (default: False) used when autofields=True indicating whether upper-case class members should be also transformed to fields (usually such names are reserved for class constants, not for fields).</li>
+<li><code>af_include_dunder</code>: boolean flag (default: False) used when autofields=True indicating whether dunder-named class members should be also transformed to fields. Note that even if you set this to True, members with reserved python dunder names will not be transformed. See <code>is_reserved_dunder</code> for the list of reserved names.</li>
+<li><code>ac_include</code>: a tuple of explicit attribute names to include in dict/repr/eq/hash (None means all)</li>
+<li><code>ac_exclude</code>: a tuple of explicit attribute names to exclude in dict/repr/eq/hash. In such case, include should be None.</li>
 </ul>
 <h2 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
 <h3 id="has_fields"><code>has_fields</code><a class="headerlink" href="#has_fields" title="Permanent link">&para;</a></h3>
@@ -1059,7 +1080,7 @@ If the member is not a field, a <code>NotAFieldError</code> is raised.</p>
     </div>
     
       <script src="../assets/javascripts/vendor.2d1db4bd.min.js"></script>
-      <script src="../assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"search.config.separator": "[\\s\\-]+", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.result.none": "No matching documents", "clipboard.copy": "Copy to clipboard", "search.result.placeholder": "Type to start searching", "search.result.other": "# matching documents", "clipboard.copied": "Copied to clipboard", "search.result.one": "1 matching document"}</script>
+      <script src="../assets/javascripts/bundle.6627ddf3.min.js"></script><script id="__lang" type="application/json">{"clipboard.copied": "Copied to clipboard", "search.config.separator": "[\\s\\-]+", "search.result.none": "No matching documents", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "clipboard.copy": "Copy to clipboard", "search.config.pipeline": "trimmer, stopWordFilter", "search.result.one": "1 matching document", "search.config.lang": "en"}</script>
       
       <script>
         app = initialize({
