@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.6.0 - we now have our own version of `@autoclass`
+
+ - Copied the relevant contents from `autoclass` so as to get rid of the dependency. Since we are in a `pyfields` context there were many things that could be dropped and remaining code could be easily copied over. Also took this opportunity to replace the dict view with a `to_dict`/`from_dict` pair of methods, this seems less intrusive in the class design. Finally the parameter names have been simplified, see [API reference](./api_reference.md#autoclass) for details. Fixes [#79](https://github.com/smarie/python-pyfields/issues/79)
+
 ### 1.5.0 - updated `@autoclass` signature
 
  - Improved `@autoclass` so that it is much easier to access the relevant arguments from underlying `@autofields` and `@autoclass`. Fixed [#78](https://github.com/smarie/python-pyfields/issues/78)
