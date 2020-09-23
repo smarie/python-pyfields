@@ -406,47 +406,68 @@ TypeError: __init__() got an unexpected keyword argument 'SENTENCE'
 
 ```python
 def autoclass(
-        # from autofields
-        check_types=False,                # type: Union[bool, DecoratedClass]
-        autofields_include_upper=False,   # type: bool
-        autofields_include_dunder=False,  # type: bool
-        # from both (merging the names)
-        autoinit=True,                    # type: bool
-        # from autoclass
-        ac_include=None,                  # type: Union[str, Tuple[str]]
-        ac_exclude=None,                  # type: Union[str, Tuple[str]]
-        autodict=True,                    # type: bool
-        autorepr=_AUTO,                   # type: bool
-        autoeq=_AUTO,                     # type: bool
-        autohash=True,                    # type: bool
+        # --- autofields
+        fields=True,              # type: Union[bool, DecoratedClass]
+        typecheck=False,          # type: bool
+        # --- constructor
+        init=True,                # type: bool
+        # --- class methods
+        dict=True,                # type: bool
+        dict_public_only=True,    # type: bool
+        repr=True,                # type: bool
+        repr_curly_mode=False,    # type: bool
+        repr_public_only=True,    # type: bool
+        eq=True,                  # type: bool
+        eq_public_only=False,     # type: bool
+        hash=True,                # type: bool
+        hash_public_only=False,   # type: bool
+        # --- advanced
+        af_include_upper=False,   # type: bool
+        af_include_dunder=False,  # type: bool
+        ac_include=None,          # type: Union[str, Tuple[str]]
+        ac_exclude=None,          # type: Union[str, Tuple[str]]
     ):
 ```
 
-A decorator to automate many things at once for your class. First it executes `@autofields` to generate fields from attribute defined at class level, and generate the init.
+A decorator to automate many things at once for your class.
 
- - you can include attributes with dunder names or uppercase names with `autofields_include_dunder` and
-   `autofields_include_upper` respectively
+First if `fields=True` (default) it executes `@autofields` to generate fields from attribute defined at class level.
+
+ - you can include attributes with dunder names or uppercase names with `af_include_dunder` and
+   `af_include_upper` respectively
  - you can enable type checking on all fields at once by setting `check_types=True`
- - you can disable constructor (init) creation by setting `autoinit=False`
+ - the constructor is not generated at this stage
 
-Then it executes `@autoclass` to generate convenience methods for the class. By default the class gets a dictionary behaviour (including string representation and equality comparison). You can disable this behaviour by setting `autodict=False`. This will automatically enable an alternate string representation and equality comparison. If you wish to disable them you can further set `autorepr=False` and `autoeq=False` explicitly. All those methods have default include/exlude behaviours that you can override with `ac_include` or `ac_exclude` name lists.
+Then it generates methods for the class:
 
-Finally by default the class gets a `hash` implementation so that its instances can be inserted in sets or dict keys. You can disable this with `autohash=False`.
+ - if `init=True` (default) it generates the constructor based on all fields present, using `make_init()`.
+ - if `dict=True` (default) it generates `to_dict` and `from_dict` methods. Only public fields are represented in `to_dict`, you can change this with `dict_public_only=False`.
+ - if `repr=True` (default) it generates a `__repr__` method. Only public fields are represented, you can change this with `repr_public_only=False`.
+ - if `eq=True` (default) it generates an `__eq__` method, so that instances can be compared to other instances and to dicts. All fields are compared by default, you can change this with `eq_public_only=True`.
+ - if `hash=True` (default) it generates an `__hash__` method, so that instances can be inserted in sets or dict keys. All fields are hashed by default, you can change this with `hash_public_only=True`.
 
-See [autoclass documentation](https://smarie.github.io/python-autoclass/) for details on the lower-level methods.
+You can specify an explicit list of fields to include or exclude in the dict/repr/eq/hash methods with the `ac_include` and `ac_exclude` parameters.
+
+Note that this decorator is similar to the [autoclass library](https://smarie.github.io/python-autoclass/) but is reimplemented here. In particular the parameter names and dictionary behaviour are different.
 
 **Parameters**
 
- - `check_types`: boolean flag (default: False) indicating the value of `check_type` for created fields. Note that the type hint of each created field is copied from the type hint of the member it originates from.
- - `autofields_include_upper`: boolean flag (default: False) indicating whether upper-case class members should be also transformed to fields (usually such names are reserved for class constants, not for fields).
- - `autofields_include_dunder`: boolean flag (default: False) indicating whether dunder-named class members should be also transformed to fields. Note that even if you set this to True, members with reserved python dunder names will not be transformed. See `is_reserved_dunder` for the list of reserved names.
- - `autoinit`: boolean flag (default: True) indicating whether a constructor should be created for the class if no `__init__` method is already present. Such constructor will be created using `__init__ = make_init()`. This is the same behaviour than `make_init` in `@autofields`.
- - `ac_include`: a tuple of explicit attribute names to include in the autodict/repr/eq/hash (None means all)
- - `ac_exclude`: a tuple of explicit attribute names to exclude in the autodict/repr/eq/hash. In such case, include should be None.
- - `autodict`: a boolean to enable autodict on the class (default: True). By default it will be executed with `only_known_fields=True`.
- - `autorepr`: a boolean to enable autorepr on the class. By default it is `AUTO` and means "automatic configuration". In that case, it will be defined as `not autodict`.
- - `autoeq`: a boolean to enable autoeq on the class. By default it is `AUTO` and means "automatic configuration". In that case, it will be defined as `not autodict`.
- - `autohash`: a boolean to enable autohash on the class (default: True). By default it will be executed with `only_known_fields=True`.
+ - `fields`: boolean flag (default: True) indicating whether to create fields automatically. See `@autofields` for details
+ - `typecheck`: boolean flag (default: False) used when fields=True indicating the value of `check_type` for created fields. Note that the type hint of each created field is copied from the type hint of the member it originates from.
+ - `init`: boolean flag (default: True) indicating whether a constructor should be created for the class if no `__init__` method is already present. Such constructor will be created using `__init__ = make_init()`. This is the same behaviour than `make_init` in `@autofields`. Note that this is *not* automatically disabled if you set `fields=False`.
+ - `dict`: a boolean to automatically create `cls.from_dict(dct)` and `obj.to_dict()` methods on the class (default: True).
+ - `dict_public_only`: a boolean (default: True) to indicate if only public fields should be exposed in the dictionary view created by `to_dict` when `dict=True`.
+ - `repr`: a boolean (default: True) to indicate if `__repr__` and `__str__` should be created for the class if not explicitly present.
+ - `repr_curly_mode`: a boolean (default: False) to turn on an alternate string representation when `repr=True`, using curly braces.
+ - `repr_public_only`: a boolean (default: True) to indicate if only public fields should be exposed in the string representation when `repr=True`.
+ - `eq`: a boolean (default: True) to indicate if `__eq__` should be created for the class if not explicitly present.
+ - `eq_public_only`: a boolean (default: False) to indicate if only public fields should be  compared in the equality method created when `eq=True`.
+ - `hash`: a boolean (default: True) to indicate if `__hash__` should be created for the class if not explicitly present.
+ - `hash_public_only`: a boolean (default: False) to indicate if only public fields should be hashed in the hash method created when `hash=True`.
+ - `af_include_upper`: boolean flag (default: False) used when autofields=True indicating whether upper-case class members should be also transformed to fields (usually such names are reserved for class constants, not for fields).
+ - `af_include_dunder`: boolean flag (default: False) used when autofields=True indicating whether dunder-named class members should be also transformed to fields. Note that even if you set this to True, members with reserved python dunder names will not be transformed. See `is_reserved_dunder` for the list of reserved names.
+ - `ac_include`: a tuple of explicit attribute names to include in dict/repr/eq/hash (None means all)
+ - `ac_exclude`: a tuple of explicit attribute names to exclude in dict/repr/eq/hash. In such case, include should be None.
 
 ## API
 

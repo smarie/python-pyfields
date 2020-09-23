@@ -656,9 +656,7 @@ By default type checking is not enabled on the generated fields, but you can ena
 
 #### b - `@autoclass`
 
-Do you **also** wish to have `hash`, `dict`, `eq`, and `repr` views automatically created for your class ? `pyfields` now works hand in hand with `autoclass`. That way, your field definitions can directly be reused for most of the class behaviour. From version `1.5` on, a dedicated `@autoclass` decorator is directly exported from `pyfields`. 
-
-This decorator combines `@autofields` (above) and `@autoclass` into one, with options that are relevant to `pyfields`. You can create fields, create the constructor, enable type checking, create a dictionary views, etc. all in one call.
+Do you **also** wish to have `hash`, `dict`, `eq`, and `repr` views automatically created for your class ? From version `1.6` on, `pyfields` provides an `@autoclass` decorator. That way, your field definitions can directly be reused for most of the class behaviour.
 
 ```python
 from pyfields import field, autoclass
@@ -671,8 +669,9 @@ class Foo:
 
 foo = Foo(msg='hello')
 
-print(foo)          # automatic string representation
-print(dict(foo))    # automatic dict view
+print(foo)              # automatic string representation
+print(foo.to_dict())    # automatic from/to dict
+assert foo == Foo.from_dict(foo.to_dict())
 
 assert foo == Foo(msg='hello', age=12, height=50)        # automatic equality comparison 
 assert foo == {'msg': 'hello', 'age': 12, 'height': 50}  # automatic eq comparison with dicts
@@ -685,6 +684,9 @@ Foo(msg='hello', age=12, height=50)
 {'msg': 'hello', 'age': 12, 'height': 50}
 ```
 
+!!!warning "use pyfields `@autoclass` over the one in `autoclass` library"
+    This decorator combines `@autofields` and `@autoclass` into one, with options that are relevant to `pyfields`. Therefore it is now the recommended one to use.
+    
 See [API reference](./api_reference.md#autoclass) for details.
 
 #### c - `VType`s
