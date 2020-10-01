@@ -23,6 +23,7 @@ EXTRAS_REQUIRE = {}
 # ************** ID card *****************
 DISTNAME = 'pyfields'
 DESCRIPTION = 'Define fields in python classes. Easily.'
+AUTHOR = 'Sylvain MARIE'
 MAINTAINER = 'Sylvain MARIE'
 MAINTAINER_EMAIL = 'sylvain.marie@se.com'
 URL = 'https://github.com/smarie/python-pyfields'
@@ -48,6 +49,7 @@ setup(
     # https://packaging.python.org/en/latest/single_source_version.html
     # version=VERSION, NOW HANDLED BY GIT
 
+    author=AUTHOR,
     maintainer=MAINTAINER,
     maintainer_email=MAINTAINER_EMAIL,
 
