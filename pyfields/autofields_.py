@@ -93,7 +93,9 @@ def autofields(check_types=False,     # type: Union[bool, DecoratedClass]
 
         try:
             # Are type hints present ?
-            cls_annotations = cls.__annotations__
+            # note: since this attribute can be inherited, we get the own attribute only
+            # cls_annotations = cls.__annotations__
+            cls_annotations = getownattr(cls, "__annotations__")
         except AttributeError:
             # No type hints: shortcut. note: do not return a generator since we'll modify __dict__ in the loop after
             members_defs = tuple((k, None, v) for k, v in cls.__dict__.items())
@@ -524,3 +526,36 @@ def filter_names(all_names,
 #     else:
 #         method = getattr(cls, method_name, None)
 #         return method is not None and method is not getattr(object, method_name, None)
+
+
+def getownattr(cls, attrib_name):
+    """
+    Return the value of `cls.<attrib_name>` if it is defined in the class (and not inherited).
+    If the attribute is not present or is inherited, an `AttributeError` is raised.
+
+    >>> class A(object):
+    ...     a = 1
+    >>>
+    >>> class B(A):
+    ...     pass
+    >>>
+    >>> getownattr(A, 'a')
+    1
+    >>> getownattr(A, 'unknown')
+    Traceback (most recent call last):
+        ...
+    AttributeError: type object 'A' has no attribute 'unknown'
+    >>> getownattr(B, 'a')
+    Traceback (most recent call last):
+        ...
+    AttributeError: type object 'B' has no directly defined attribute 'a'
+
+    """
+    attr = getattr(cls, attrib_name)
+
+    for base_cls in cls.__mro__[1:]:
+        a = getattr(base_cls, attrib_name, None)
+        if attr is a:
+            raise AttributeError("type object %r has no directly defined attribute %r" % (cls.__name__, attrib_name))
+
+    return attr
