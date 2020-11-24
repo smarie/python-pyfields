@@ -8,6 +8,8 @@
 
 !!! success "`pyfields` now has its own [`@autoclass`](#b-autoclass) with sensible defaults, to complement the existing [`@autofields`](#a-autofields) feature! No need to import it from `autoclass` anymore."
 
+!!! success "New [`marshmallow-pyfields`](https://smarie.github.io/python-marshmallow-pyfields/) project brings `pyfields` to the famous [`marshmallow`](https://marshmallow.readthedocs.io/en/stable/) ORM ecosystem!"
+
 `pyfields` provides a simple and elegant way to define fields in python classes. With `pyfields` you explicitly define all aspects of a field (default value/factory, type, validators, converters, documentation...) in a single place, and can refer to it from other places. 
 
 It is designed with **development freedom** as primary target: 
