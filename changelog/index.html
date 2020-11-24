@@ -8,8 +8,9 @@
       
       
       
+      
       <link rel="shortcut icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.0.2">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.1.6">
     
     
       
@@ -17,10 +18,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.38780c08.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.6910b76c.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.3f72e892.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.196e0c26.min.css">
         
       
     
@@ -65,7 +66,9 @@
       
     </div>
     
-      <header class="md-header" data-md-component="header">
+      
+
+<header class="md-header" data-md-component="header">
   <nav class="md-header-nav md-grid" aria-label="Header">
     <a href=".." title="pyfields" class="md-header-nav__button md-logo" aria-label="pyfields">
       
@@ -99,7 +102,7 @@
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
       <label class="md-search__icon md-icon" for="__search">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
@@ -150,7 +153,9 @@
               <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
                 <div class="md-sidebar__scrollwrap">
                   <div class="md-sidebar__inner">
-                    <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+                    
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="pyfields" class="md-nav__button md-logo" aria-label="pyfields">
       
@@ -247,6 +252,13 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#161-bugfix" class="md-nav__link">
+    1.6.1 - Bugfix
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#160-we-now-have-our-own-version-of-autoclass" class="md-nav__link">
@@ -482,6 +494,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#161-bugfix" class="md-nav__link">
+    1.6.1 - Bugfix
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#160-we-now-have-our-own-version-of-autoclass" class="md-nav__link">
     1.6.0 - we now have our own version of @autoclass
   </a>
@@ -702,6 +721,10 @@
                 
                 
                 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
+<h3 id="161-bugfix">1.6.1 - Bugfix<a class="headerlink" href="#161-bugfix" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Fixed an issue with <code>autofields</code> (and therefore <code>autoclass</code> too) where a field would be mistakenly recreated on a subclass when that subclass does not define type hints while the parent class defines type hints. Fixes <a href="https://github.com/smarie/python-pyfields/issues/81">#81</a></li>
+</ul>
 <h3 id="160-we-now-have-our-own-version-of-autoclass">1.6.0 - we now have our own version of <code>@autoclass</code><a class="headerlink" href="#160-we-now-have-our-own-version-of-autoclass" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Copied the relevant contents from <code>autoclass</code> so as to get rid of the dependency. Since we are in a <code>pyfields</code> context there were many things that could be dropped and remaining code could be easily copied over. Also took this opportunity to replace the dict view with a <code>to_dict</code>/<code>from_dict</code> pair of methods, this seems less intrusive in the class design. Finally the parameter names have been simplified, see <a href="../api_reference/#autoclass">API reference</a> for details. Fixes <a href="https://github.com/smarie/python-pyfields/issues/79">#79</a></li>
@@ -979,8 +1002,8 @@
       
     </div>
     
-      <script src="../assets/javascripts/vendor.77e55a48.min.js"></script>
-      <script src="../assets/javascripts/bundle.9554a270.min.js"></script><script id="__lang" type="application/json">{"search.result.one": "1 matching document", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.lang": "en", "search.config.separator": "[\\s\\-]+", "search.result.none": "No matching documents", "clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.result.term.missing": "Missing", "search.result.placeholder": "Type to start searching", "search.result.more.one": "1 more on this page", "search.result.other": "# matching documents", "search.result.more.other": "# more on this page"}</script>
+      <script src="../assets/javascripts/vendor.fd16492e.min.js"></script>
+      <script src="../assets/javascripts/bundle.7836ba4d.min.js"></script><script id="__lang" type="application/json">{"clipboard.copied": "Copied to clipboard", "search.config.separator": "[\\s\\-]+", "search.config.pipeline": "trimmer, stopWordFilter", "search.result.term.missing": "Missing", "search.result.one": "1 matching document", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.result.other": "# matching documents", "search.placeholder": "Search", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.more.one": "1 more on this page", "search.result.placeholder": "Type to start searching"}</script>
       
       <script>
         app = initialize({
