@@ -1,7 +1,3 @@
-#  Authors: Sylvain Marie <sylvain.marie@se.com>
-#
-#  Copyright (c) Schneider Electric Industries, 2019. All right reserved.
-
 # a clone of the ruby example https://gist.github.com/valeriomazzeo/5491aee76f758f7352e2e6611ce87ec1
 import os
 from os import path
