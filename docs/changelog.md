@@ -1,5 +1,9 @@
 # Changelog
 
+### 1.6.2 - CI/CD migration
+
+ - This is a technical release with no code change, to validate the new Github Actions workflow.
+
 ### 1.6.1 - Bugfix
 
  - Fixed an issue with `autofields` (and therefore `autoclass` too) where a field would be mistakenly recreated on a subclass when that subclass does not define type hints while the parent class defines type hints. Fixes [#81](https://github.com/smarie/python-pyfields/issues/81)
