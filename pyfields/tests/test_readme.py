@@ -9,10 +9,6 @@ from pyfields import field, MandatoryFieldInitError, make_init, init_fields, Rea
     FieldTypeError, autoclass, get_fields
 
 
-def runs_on_travis():
-    return "TRAVIS_PYTHON_VERSION" in os.environ
-
-
 def test_lazy_fields():
 
     class Wall(object):
@@ -254,29 +250,30 @@ def test_native_descriptors():
 
     f = Foo()
 
-    def set_a(): f.a = 12
+    def set_native(): f.a = 12
 
-    def set_b(): f.b = 12
+    def set_descript(): f.b = 12
 
-    def set_c(): f.c = 12
-
-    ta = timeit.Timer(set_a).timeit()
-    tb = timeit.Timer(set_b).timeit()
-    tc = timeit.Timer(set_c).timeit()
-
-    print("Average time (ns) setting the field:")
-    print("%0.2f (normal python) ; %0.2f (native field) ; %0.2f (descriptor field)" % (tc, ta, tb))
-
-    print("Ratio is %.2f" % (ta / tc))
+    def set_pynative(): f.c = 12
 
     # make sure that the access time for native field and native are identical
-    # for reproducibility on travis, we have to get rid of the first init
-    if runs_on_travis():
-        print("increasing tolerance on travis.")
-        assert ta / tc <= 2.0
-    else:
-        assert ta / tc <= 1.1
-    # assert abs(round(t_field_native * 10) - round(t_native * 10)) <= 1
+    # --get rid of the first init since it is a bit longer (replacement of the descriptor with a native field
+    set_native()
+    set_descript()
+    set_pynative()
+
+    # --now compare the executiong= times
+    t_native = timeit.Timer(set_native).timeit(10000000)
+    t_descript = timeit.Timer(set_descript).timeit(10000000)
+    t_pynative = timeit.Timer(set_pynative).timeit(10000000)
+
+    print("Average time (ns) setting the field:")
+    print("%0.2f (normal python) ; %0.2f (native field) ; %0.2f (descriptor field)"
+          % (t_pynative, t_native, t_descript))
+
+    ratio = t_native / t_pynative
+    print("Ratio is %.2f" % ratio)
+    assert ratio <= 1.2
 
 
 # def decompose(number):
