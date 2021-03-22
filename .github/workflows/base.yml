@@ -52,6 +52,7 @@ jobs:
           # auto-update-conda: true
           python-version: 3.7
           activate-environment: noxenv
+          restore-free-channel: true  # on pyfields we need this channel for 3.5.3
       - run: conda info
         shell: bash -l {0}  # so that conda works
       - run: conda list
