@@ -25,10 +25,10 @@ ENVS = {
     # --- python 2.7
     (PY27, "no-typechecker"): {"coverage": False, "type_checker": None, "pkg_specs": {"pip": ">19"}},
     (PY27, "pytypes"): {"coverage": False, "type_checker": "pytypes", "pkg_specs": {"pip": ">19"}},
-    # --- python 3.5.3
-    ("3.5.3", "no-typechecker"): {"coverage": False, "type_checker": None, "pkg_specs": {"pip": ">19"}},
-    ("3.5.3", "pytypes"): {"coverage": False, "type_checker": "pytypes", "pkg_specs": {"pip": ">19"}},
-    ("3.5.3", "typeguard"): {"coverage": False, "type_checker": "typeguard", "pkg_specs": {"pip": ">19"}},
+    # --- python 3.5.3 > requires free channel > hard to make it work on GHA
+    # ("3.5.3", "no-typechecker"): {"coverage": False, "type_checker": None, "pkg_specs": {"pip": ">19"}},
+    # ("3.5.3", "pytypes"): {"coverage": False, "type_checker": "pytypes", "pkg_specs": {"pip": ">19"}},
+    # ("3.5.3", "typeguard"): {"coverage": False, "type_checker": "typeguard", "pkg_specs": {"pip": ">19"}},
     # --- python 3.5
     (PY35, "no-typechecker"): {"coverage": False, "type_checker": None, "pkg_specs": {"pip": ">19"}},
     (PY35, "pytypes"): {"coverage": False, "type_checker": "pytypes", "pkg_specs": {"pip": ">19"}},
@@ -38,10 +38,10 @@ ENVS = {
     (PY36, "pytypes"): {"coverage": False, "type_checker": "pytypes", "pkg_specs": {"pip": ">19"}},
     (PY36, "typeguard"): {"coverage": False, "type_checker": "typeguard", "pkg_specs": {"pip": ">19"}},
     # --- python 3.7
+    (PY37, "no-typechecker"): {"coverage": False, "type_checker": None, "pkg_specs": {"pip": ">19"}},
     #(PY37, "pytypes"): {"coverage": False, "type_checker": "pytypes", "pkg_specs": {"pip": ">19"}},
-    (PY37, "typeguard"): {"coverage": False, "type_checker": "typeguard", "pkg_specs": {"pip": ">19"}},
     # IMPORTANT: this should be last so that the folder docs/reports is not deleted afterwards
-    (PY37, "no-typechecker"): {"coverage": True, "type_checker": None, "pkg_specs": {"pip": ">19"}}
+    (PY37, "typeguard"): {"coverage": True, "type_checker": "typeguard", "pkg_specs": {"pip": ">19"}}
 }
 
 # set the default activated sessions, minimal for CI
