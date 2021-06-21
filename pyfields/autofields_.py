@@ -6,7 +6,7 @@ from copy import deepcopy
 from inspect import isdatadescriptor, ismethoddescriptor
 
 try:
-    from typing import Union, Callable, Type, Any, TypeVar, Tuple
+    from typing import Union, Callable, Type, Any, TypeVar, Tuple, Iterable
     DecoratedClass = TypeVar("DecoratedClass", bound=Type[Any])
 except ImportError:
     pass
@@ -18,6 +18,7 @@ from .helpers import copy_value, get_fields
 
 
 PY36 = sys.version_info >= (3, 6)
+DEFAULT_EXCLUDED = ('_abc_impl',)
 
 
 def _make_init(cls):
@@ -29,10 +30,11 @@ def _make_init(cls):
         new_init.__set_name__(cls, '__init__')
 
 
-def autofields(check_types=False,     # type: Union[bool, DecoratedClass]
-               include_upper=False,   # type: bool
-               include_dunder=False,  # type: bool
-               make_init=True         # type: bool
+def autofields(check_types=False,         # type: Union[bool, DecoratedClass]
+               include_upper=False,       # type: bool
+               include_dunder=False,      # type: bool
+               exclude=DEFAULT_EXCLUDED,  # type: Iterable[str]
+               make_init=True,            # type: bool
                ):
     # type: (...) -> Union[Callable[[DecoratedClass], DecoratedClass], DecoratedClass]
     """
@@ -78,14 +80,16 @@ def autofields(check_types=False,     # type: Union[bool, DecoratedClass]
     TypeError: __init__() got an unexpected keyword argument 'SENTENCE'
 
 
-    :param check_types: boolean flag (default: False) indicating the value of `check_type` for created fields. Note that
-        the type hint of each created field is copied from the type hint of the member it originates from.
-    :param include_upper: boolean flag (default: False) indicating whether upper-case class members should be also
+    :param check_types: boolean flag (default: `False`) indicating the value of `check_type` for created fields. Note
+        that the type hint of each created field is copied from the type hint of the member it originates from.
+    :param include_upper: boolean flag (default: `False`) indicating whether upper-case class members should be also
         transformed to fields (usually such names are reserved for class constants, not for fields).
-    :param include_dunder: boolean flag (default: False) indicating whether dunder-named class members should be also
+    :param include_dunder: boolean flag (default: `False`) indicating whether dunder-named class members should be also
         transformed to fields. Note that even if you set this to True, members with reserved python dunder names will
         not be transformed. See `is_reserved_dunder` for the list of reserved names.
-    :param make_init: boolean flag (default: True) indicating whether a constructor should be created for the class if
+    :param exclude: a tuple of field names that should be excluded from automatic creation. By default this is set to
+        `DEFAULT_EXCLUDED`, which eliminates fields created by `ABC`.
+    :param make_init: boolean flag (default: `True`) indicating whether a constructor should be created for the class if
         no `__init__` method is present. Such constructor will be created using `__init__ = make_init()`.
     :return:
     """
@@ -165,7 +169,10 @@ def autofields(check_types=False,     # type: Union[bool, DecoratedClass]
 
         # Main loop : for each member, possibly create a field()
         for member_name, type_hint, default_value in members_defs:
-            if not include_upper and member_name == member_name.upper():
+            if member_name in exclude:
+                # excluded explicitly
+                continue
+            elif not include_upper and member_name == member_name.upper():
                 # excluded uppercase
                 continue
             elif (include_dunder and is_reserved_dunder(member_name)) \
@@ -251,25 +258,26 @@ _dict, _hash = dict, hash
 
 def autoclass(
         # --- autofields
-        fields=True,              # type: Union[bool, DecoratedClass]
-        typecheck=False,          # type: bool
+        fields=True,                  # type: Union[bool, DecoratedClass]
+        typecheck=False,              # type: bool
         # --- constructor
-        init=True,                # type: bool
+        init=True,                    # type: bool
         # --- class methods
-        dict=True,                # type: bool
-        dict_public_only=True,    # type: bool
-        repr=True,                # type: bool
-        repr_curly_mode=False,    # type: bool
-        repr_public_only=True,    # type: bool
-        eq=True,                  # type: bool
-        eq_public_only=False,     # type: bool
-        hash=True,                # type: bool
-        hash_public_only=False,   # type: bool
+        dict=True,                    # type: bool
+        dict_public_only=True,        # type: bool
+        repr=True,                    # type: bool
+        repr_curly_mode=False,        # type: bool
+        repr_public_only=True,        # type: bool
+        eq=True,                      # type: bool
+        eq_public_only=False,         # type: bool
+        hash=True,                    # type: bool
+        hash_public_only=False,       # type: bool
         # --- advanced
-        af_include_upper=False,   # type: bool
-        af_include_dunder=False,  # type: bool
-        ac_include=None,          # type: Union[str, Tuple[str]]
-        ac_exclude=None,          # type: Union[str, Tuple[str]]
+        af_include_upper=False,       # type: bool
+        af_include_dunder=False,      # type: bool
+        af_exclude=DEFAULT_EXCLUDED,  # type: Iterable[str]
+        ac_include=None,              # type: Union[str, Tuple[str]]
+        ac_exclude=None,              # type: Union[str, Tuple[str]]
     ):
     """
     A decorator to automate many things at once for your class.
@@ -334,6 +342,8 @@ def autoclass(
         dunder-named class members should be also transformed to fields. Note that even if you set this to True,
         members with reserved python dunder names will not be transformed. See `is_reserved_dunder` for the list of
         reserved names.
+    :param af_exclude: a tuple of explicit attribute names to exclude from automatic fields creation. See
+        `@autofields(exclude=...)` for details.
     :param ac_include: a tuple of explicit attribute names to include in dict/repr/eq/hash (None means all)
     :param ac_exclude: a tuple of explicit attribute names to exclude in dict/repr/eq/hash. In such case,
         include should be None.
@@ -354,7 +364,7 @@ def autoclass(
         # create fields automatically
         if fields:
             cls = autofields(check_types=typecheck, include_upper=af_include_upper,
-                             include_dunder=af_include_dunder, make_init=False)(cls)
+                             exclude=af_exclude, include_dunder=af_include_dunder, make_init=False)(cls)
 
         # make init if not already explicitly present
         if init:

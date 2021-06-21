@@ -2,7 +2,7 @@ from abc import ABC
 
 import pytest
 
-from pyfields import autofields, field, copy_value
+from pyfields import autofields, field, copy_value, autoclass
 
 
 @pytest.mark.parametrize("auto,deep", [(False, False), (False, True), (True, None)])
@@ -34,3 +34,38 @@ def test_issue_deepcopy_autofields(auto, deep):
         assert str(exc_info.value).startswith("The provided default value %r can not be %scopied"
                                               % (default_value, extra))
 
+
+def test_issue_84_autofields():
+    """Make sure that the _abc_impl field from ABC is excluded automatically"""
+
+    @autofields
+    class Foo(ABC):
+        a = 0
+
+    g = Foo()
+    assert g.a == 0
+
+    with pytest.raises(ValueError) as exc_info:
+        @autofields(exclude=())
+        class Foo(ABC):
+            a = 0
+
+    assert str(exc_info.value).startswith("The provided default value for field '_abc_impl'=")
+
+
+def test_issue_84_autoclass():
+    """Make sure that the _abc_impl field from ABC is excluded automatically"""
+
+    @autoclass
+    class Foo(ABC):
+        a = 0
+
+    f = Foo()
+    assert str(f) == "Foo(a=0)"
+
+    with pytest.raises(ValueError) as exc_info:
+        @autoclass(af_exclude=())
+        class Foo(ABC):
+            a = 0
+
+    assert str(exc_info.value).startswith("The provided default value for field '_abc_impl'=")

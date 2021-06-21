@@ -355,10 +355,11 @@ Wall<height=1, color='white'>
 ## `@autofields`
 
 ```python
-def autofields(check_types=False,     # type: bool
-               include_upper=False,   # type: bool
-               include_dunder=False,  # type: bool
-               make_init=True         # type: bool
+def autofields(check_types=False,         # type: bool
+               include_upper=False,       # type: bool
+               include_dunder=False,      # type: bool
+               exclude=DEFAULT_EXCLUDED,  # type: Iterable[str]
+               make_init=True             # type: bool
                ):
 ```
 
@@ -401,6 +402,18 @@ Traceback (most recent call last):
 TypeError: __init__() got an unexpected keyword argument 'SENTENCE'
 ```
 
+**Parameters**
+
+ - `check_types`: boolean flag (default: `False`) indicating the value of `check_type` for created fields. Note that the type hint of each created field is copied from the type hint of the member it originates from.
+
+ - `include_upper`: boolean flag (default: `False`) indicating whether upper-case class members should be also  transformed to fields (usually such names are reserved for class constants, not for fields).
+
+ - `include_dunder`: boolean flag (default: `False`) indicating whether dunder-named class members should be also transformed to fields. Note that even if you set this to True, members with reserved python dunder names will not be transformed. See `is_reserved_dunder` for the list of reserved names.
+
+ - `exclude`: a tuple of field names that should be excluded from automatic creation. By default this is set to `DEFAULT_EXCLUDED`, which eliminates fields created by `ABC`. 
+
+ - `make_init`: boolean flag (default: `True`) indicating whether a constructor should be created for the class if no `__init__` method is present. Such constructor will be created using `__init__ = make_init()`.
+
 ## `@autoclass`
 
 ```python
@@ -423,6 +436,7 @@ def autoclass(
         # --- advanced
         af_include_upper=False,   # type: bool
         af_include_dunder=False,  # type: bool
+        af_exclude=DEFAULT_EXCLUDED,  # type: Iterable[str] 
         ac_include=None,          # type: Union[str, Tuple[str]]
         ac_exclude=None,          # type: Union[str, Tuple[str]]
     ):
@@ -465,6 +479,7 @@ Note that this decorator is similar to the [autoclass library](https://smarie.gi
  - `hash_public_only`: a boolean (default: False) to indicate if only public fields should be hashed in the hash method created when `hash=True`.
  - `af_include_upper`: boolean flag (default: False) used when autofields=True indicating whether upper-case class members should be also transformed to fields (usually such names are reserved for class constants, not for fields).
  - `af_include_dunder`: boolean flag (default: False) used when autofields=True indicating whether dunder-named class members should be also transformed to fields. Note that even if you set this to True, members with reserved python dunder names will not be transformed. See `is_reserved_dunder` for the list of reserved names.
+ - `af_exclude`: a tuple of explicit attribute names to exclude from automatic fields creation. See `@autofields(exclude=...)` for details.
  - `ac_include`: a tuple of explicit attribute names to include in dict/repr/eq/hash (None means all)
  - `ac_exclude`: a tuple of explicit attribute names to exclude in dict/repr/eq/hash. In such case, include should be None.
 
