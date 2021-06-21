@@ -2,6 +2,7 @@
 #
 #  Copyright (c) Schneider Electric Industries, 2019. All right reserved.
 import sys
+from copy import deepcopy
 from inspect import isdatadescriptor, ismethoddescriptor
 
 try:
@@ -196,8 +197,14 @@ def autofields(check_types=False,     # type: Union[bool, DecoratedClass]
                     new_field = field(check_type=need_to_check_type)
                 else:
                     # optional field : copy the default value by default
+                    try:
+                        # autocheck: make sure that we will be able to create copies later
+                        deepcopy(default_value)
+                    except Exception as e:
+                        raise ValueError("The provided default value for field %r=%r can not be deep-copied: "
+                                         "caught error %r" % (member_name, default_value, e))
                     new_field = field(check_type=need_to_check_type,
-                                      default_factory=copy_value(default_value, autocheck=True))
+                                      default_factory=copy_value(default_value, autocheck=False))
 
                 # Attach the newly created field to the class. Delete attr first so that order is preserved
                 # even if one of them had only an annotation.
