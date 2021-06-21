@@ -1,5 +1,12 @@
 # Changelog
 
+### 1.7.0 - Better support for non-deep-copiable default values in `@autofields`
+
+ - `@autofields` and `@autoclass` now raise an error when a field definition can not be valid, because the default value can not be deep-copied. This will help users detect issues such as [#84](https://github.com/smarie/python-pyfields/issues/84) earlier. Implementation is done through a new `autocheck` option in the `copy_value` factory.
+
+ - `@autofields` and `@autoclass` now provide an `exclude` (resp. `af_exclude`) list, to list names for fields that should not be created. By default this contains a reserved name from `abc.ABCMeta`, for convenience. Fixes [#84](https://github.com/smarie/python-pyfields/issues/84).
+
+
 ### 1.6.2 - CI/CD migration
 
  - This is a technical release with no code change, to validate the new Github Actions workflow.
