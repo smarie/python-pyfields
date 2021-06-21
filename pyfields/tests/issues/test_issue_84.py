@@ -55,7 +55,7 @@ def test_issue_84_autofields():
     g = Foo()
     assert g.a == 0
 
-    if sys.version_info < (3,):
+    if sys.version_info < (3, 7):
         # errors below wont be raised anyway
         return
 
@@ -77,7 +77,7 @@ def test_issue_84_autoclass():
     f = Foo()
     assert str(f) == "Foo(a=0)"
 
-    if sys.version_info < (3,):
+    if sys.version_info < (3, 7):
         # errors below wont be raised anyway
         return
 
