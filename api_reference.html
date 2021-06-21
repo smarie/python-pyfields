@@ -9,8 +9,8 @@
       
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.0">
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.1, mkdocs-material-7.1.8">
     
     
       
@@ -18,10 +18,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.33e2939f.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.ca7ac06f.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ef6f36e2.min.css">
+        <link rel="stylesheet" href="assets/stylesheets/palette.f1a3b89f.min.css">
         
       
     
@@ -38,6 +38,8 @@
     
     
       
+
+
     
     
   </head>
@@ -51,7 +53,7 @@
     <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
   
     
-    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    <script>function __prefix(e){return new URL(".",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -70,7 +72,7 @@
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="pyfields" class="md-header__button md-logo" aria-label="pyfields" data-md-component="logo">
+    <a href="index.html" title="pyfields" class="md-header__button md-logo" aria-label="pyfields" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -163,7 +165,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="pyfields" class="md-nav__button md-logo" aria-label="pyfields" data-md-component="logo">
+    <a href="index.html" title="pyfields" class="md-nav__button md-logo" aria-label="pyfields" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -195,7 +197,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="index.html" class="md-nav__link">
         Home
       </a>
     </li>
@@ -210,7 +212,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../why/" class="md-nav__link">
+      <a href="why.html" class="md-nav__link">
         Why fields
       </a>
     </li>
@@ -230,6 +232,7 @@
       
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
       
+      
         
       
       
@@ -238,12 +241,13 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <a href="./" class="md-nav__link md-nav__link--active">
+      <a href="api_reference.html" class="md-nav__link md-nav__link--active">
         API reference
       </a>
       
         
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
   
   
     
@@ -394,7 +398,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../changelog/" class="md-nav__link">
+      <a href="changelog.html" class="md-nav__link">
         Changelog
       </a>
     </li>
@@ -414,6 +418,7 @@
                   <div class="md-sidebar__inner">
                     
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
   
   
     
@@ -672,8 +677,7 @@ default.</p>
 <p>Several helper functions are available to create default factories:</p>
 <ul>
 <li>
-<p><code>copy_value(&lt;value&gt;)</code> returns a factory that creates a copy of the provided <code>val</code> everytime it is called. Handy if you wish to use mutable
-    objects as default values for your fields ; for example lists.</p>
+<p><code>copy_value(&lt;value&gt;, deep=True, autocheck=True)</code> returns a factory that creates a copy of the provided <code>val</code> everytime it is called. Handy if you wish to use mutable objects as default values for your fields ; for example lists. Not that starting in version 1.7, <code>copy_value</code> will automatically check that the (deep) copy operation is feasible, at initial call time. You can disable this by setting <code>autocheck=False</code>.</p>
 </li>
 <li>
 <p><code>copy_attr(&lt;att_name&gt;, deep=True)</code> returns a factory that creates a (deep or not) copy of the value in the given attribute everytime it is called.</p>
@@ -848,10 +852,11 @@ object so that users can manually execute the fields initialization. This is don
 <li><code>fields</code>: list of fields to initialize before entering the decorated <code>__init__</code> method. For each of these fields a corresponding argument will be added in the method's signature. If an empty list is provided, all fields from the class will be used including inherited fields following the mro.</li>
 </ul>
 <h2 id="autofields"><code>@autofields</code><a class="headerlink" href="#autofields" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">autofields</span><span class="p">(</span><span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>     <span class="c1"># type: bool</span>
-               <span class="n">include_upper</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>   <span class="c1"># type: bool</span>
-               <span class="n">include_dunder</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># type: bool</span>
-               <span class="n">make_init</span><span class="o">=</span><span class="kc">True</span>         <span class="c1"># type: bool</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">autofields</span><span class="p">(</span><span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>         <span class="c1"># type: bool</span>
+               <span class="n">include_upper</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>       <span class="c1"># type: bool</span>
+               <span class="n">include_dunder</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>      <span class="c1"># type: bool</span>
+               <span class="n">exclude</span><span class="o">=</span><span class="n">DEFAULT_EXCLUDED</span><span class="p">,</span>  <span class="c1"># type: Iterable[str]</span>
+               <span class="n">make_init</span><span class="o">=</span><span class="kc">True</span>             <span class="c1"># type: bool</span>
                <span class="p">):</span>
 </code></pre></div>
 <p>Decorator to automatically create fields and constructor on a class.</p>
@@ -887,6 +892,24 @@ disabled by setting <code>make_init=False</code>.</p>
 <span class="o">...</span>
 <span class="ne">TypeError</span><span class="p">:</span> <span class="fm">__init__</span><span class="p">()</span> <span class="n">got</span> <span class="n">an</span> <span class="n">unexpected</span> <span class="n">keyword</span> <span class="n">argument</span> <span class="s1">&#39;SENTENCE&#39;</span>
 </code></pre></div>
+<p><strong>Parameters</strong></p>
+<ul>
+<li>
+<p><code>check_types</code>: boolean flag (default: <code>False</code>) indicating the value of <code>check_type</code> for created fields. Note that the type hint of each created field is copied from the type hint of the member it originates from.</p>
+</li>
+<li>
+<p><code>include_upper</code>: boolean flag (default: <code>False</code>) indicating whether upper-case class members should be also  transformed to fields (usually such names are reserved for class constants, not for fields).</p>
+</li>
+<li>
+<p><code>include_dunder</code>: boolean flag (default: <code>False</code>) indicating whether dunder-named class members should be also transformed to fields. Note that even if you set this to True, members with reserved python dunder names will not be transformed. See <code>is_reserved_dunder</code> for the list of reserved names.</p>
+</li>
+<li>
+<p><code>exclude</code>: a tuple of field names that should be excluded from automatic creation. By default this is set to <code>DEFAULT_EXCLUDED</code>, which eliminates fields created by <code>ABC</code>. </p>
+</li>
+<li>
+<p><code>make_init</code>: boolean flag (default: <code>True</code>) indicating whether a constructor should be created for the class if no <code>__init__</code> method is present. Such constructor will be created using <code>__init__ = make_init()</code>.</p>
+</li>
+</ul>
 <h2 id="autoclass"><code>@autoclass</code><a class="headerlink" href="#autoclass" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">autoclass</span><span class="p">(</span>
         <span class="c1"># --- autofields</span>
@@ -907,6 +930,7 @@ disabled by setting <code>make_init=False</code>.</p>
         <span class="c1"># --- advanced</span>
         <span class="n">af_include_upper</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>   <span class="c1"># type: bool</span>
         <span class="n">af_include_dunder</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># type: bool</span>
+        <span class="n">af_exclude</span><span class="o">=</span><span class="n">DEFAULT_EXCLUDED</span><span class="p">,</span>  <span class="c1"># type: Iterable[str] </span>
         <span class="n">ac_include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>          <span class="c1"># type: Union[str, Tuple[str]]</span>
         <span class="n">ac_exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>          <span class="c1"># type: Union[str, Tuple[str]]</span>
     <span class="p">):</span>
@@ -945,6 +969,7 @@ disabled by setting <code>make_init=False</code>.</p>
 <li><code>hash_public_only</code>: a boolean (default: False) to indicate if only public fields should be hashed in the hash method created when <code>hash=True</code>.</li>
 <li><code>af_include_upper</code>: boolean flag (default: False) used when autofields=True indicating whether upper-case class members should be also transformed to fields (usually such names are reserved for class constants, not for fields).</li>
 <li><code>af_include_dunder</code>: boolean flag (default: False) used when autofields=True indicating whether dunder-named class members should be also transformed to fields. Note that even if you set this to True, members with reserved python dunder names will not be transformed. See <code>is_reserved_dunder</code> for the list of reserved names.</li>
+<li><code>af_exclude</code>: a tuple of explicit attribute names to exclude from automatic fields creation. See <code>@autofields(exclude=...)</code> for details.</li>
 <li><code>ac_include</code>: a tuple of explicit attribute names to include in dict/repr/eq/hash (None means all)</li>
 <li><code>ac_exclude</code>: a tuple of explicit attribute names to exclude in dict/repr/eq/hash. In such case, include should be None.</li>
 </ul>
@@ -1012,7 +1037,8 @@ If the member is not a field, a <code>NotAFieldError</code> is raised.</p>
   
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
-        <a href="../why/" class="md-footer__link md-footer__link--prev" rel="prev">
+        
+        <a href="why.html" class="md-footer__link md-footer__link--prev" aria-label="Previous: Why fields" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -1027,7 +1053,8 @@ If the member is not a field, a <code>NotAFieldError</code> is raised.</p>
         </a>
       
       
-        <a href="../changelog/" class="md-footer__link md-footer__link--next" rel="next">
+        
+        <a href="changelog.html" class="md-footer__link md-footer__link--next" aria-label="Next: Changelog" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
@@ -1062,10 +1089,10 @@ If the member is not a field, a <code>NotAFieldError</code> is raised.</p>
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "../assets/javascripts/workers/search.fe42c31b.min.js", "version": null}</script>
+    <script id="__config" type="application/json">{"base": ".", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "assets/javascripts/workers/search.b0710199.min.js", "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.d892486b.min.js"></script>
+      <script src="assets/javascripts/bundle.76f349be.min.js"></script>
       
     
   </body>

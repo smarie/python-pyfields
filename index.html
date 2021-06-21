@@ -10,7 +10,7 @@
       
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.0">
+      <meta name="generator" content="mkdocs-1.2.1, mkdocs-material-7.1.8">
     
     
       
@@ -18,10 +18,10 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.33e2939f.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.ca7ac06f.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.ef6f36e2.min.css">
+        <link rel="stylesheet" href="assets/stylesheets/palette.f1a3b89f.min.css">
         
       
     
@@ -38,6 +38,8 @@
     
     
       
+
+
     
     
   </head>
@@ -70,7 +72,7 @@
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="pyfields" class="md-header__button md-logo" aria-label="pyfields" data-md-component="logo">
+    <a href="index.html" title="pyfields" class="md-header__button md-logo" aria-label="pyfields" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -163,7 +165,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="pyfields" class="md-nav__button md-logo" aria-label="pyfields" data-md-component="logo">
+    <a href="index.html" title="pyfields" class="md-nav__button md-logo" aria-label="pyfields" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
@@ -200,6 +202,7 @@
       
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
       
+      
         
       
       
@@ -208,12 +211,13 @@
           <span class="md-nav__icon md-icon"></span>
         </label>
       
-      <a href="." class="md-nav__link md-nav__link--active">
+      <a href="index.html" class="md-nav__link md-nav__link--active">
         Home
       </a>
       
         
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
   
   
     
@@ -452,7 +456,7 @@
   
   
     <li class="md-nav__item">
-      <a href="why/" class="md-nav__link">
+      <a href="why.html" class="md-nav__link">
         Why fields
       </a>
     </li>
@@ -467,7 +471,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api_reference/" class="md-nav__link">
+      <a href="api_reference.html" class="md-nav__link">
         API reference
       </a>
     </li>
@@ -482,7 +486,7 @@
   
   
     <li class="md-nav__item">
-      <a href="changelog/" class="md-nav__link">
+      <a href="changelog.html" class="md-nav__link">
         Changelog
       </a>
     </li>
@@ -502,6 +506,7 @@
                   <div class="md-sidebar__inner">
                     
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
   
   
     
@@ -782,8 +787,8 @@
 <p>you can automate fields creation with <code>@autofields</code> or even automatically add hash/dict/eq/repr to your class based on the fields using <code>@autoclass</code>.</p>
 </li>
 </ul>
-<p>Finally, it offers an API that other libraries can leverage to <a href="api_reference/#api">get the list of fields</a>.</p>
-<p>If your first reaction is "what about <code>attrs</code> / <code>dataclasses</code> / <code>pydantic</code> / <code>characteristic</code> / <code>traits</code> / <code>traitlets</code> / ...", well all of these inspired <code>pyfields</code> a great deal, but all of these have stronger constraints on the class - which I did not want. Please have a look <a href="why/">here</a> for a complete list of inspirators.</p>
+<p>Finally, it offers an API that other libraries can leverage to <a href="api_reference.html#api">get the list of fields</a>.</p>
+<p>If your first reaction is "what about <code>attrs</code> / <code>dataclasses</code> / <code>pydantic</code> / <code>characteristic</code> / <code>traits</code> / <code>traitlets</code> / ...", well all of these inspired <code>pyfields</code> a great deal, but all of these have stronger constraints on the class - which I did not want. Please have a look <a href="why.html">here</a> for a complete list of inspirators.</p>
 <h2 id="installing">Installing<a class="headerlink" href="#installing" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>&gt; pip install pyfields
 </code></pre></div>
@@ -1021,7 +1026,7 @@ valid8.entry_points.ValidationError[ValueError]:
         <span class="k">if</span> <span class="n">width_value</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidWidth</span><span class="p">(</span><span class="n">width_value</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
 </code></pre></div>
-<p>See <code>API reference</code> for details on <a href="api_reference/#ltfieldgtvalidator"><code>@&lt;field&gt;.validator</code></a>.</p>
+<p>See <code>API reference</code> for details on <a href="api_reference.html#ltfieldgtvalidator"><code>@&lt;field&gt;.validator</code></a>.</p>
 <p>See <code>valid8</code> documentation for details about the <a href="https://smarie.github.io/python-valid8/validation_funcs/c_simple_syntax/">syntax</a> and available <a href="https://smarie.github.io/python-valid8/validation_funcs/b_base_validation_lib/">validation lib</a>.</p>
 <h4 id="g-converters">g - Converters<a class="headerlink" href="#g-converters" title="Permanent link">&para;</a></h4>
 <p>You can add converters to a field by providing <code>converters</code>. </p>
@@ -1188,7 +1193,7 @@ Help on function __init__ in module &lt;...&gt;:
     <span class="fm">__init__</span> <span class="o">=</span> <span class="n">make_init</span><span class="p">(</span><span class="n">Wall</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
 </code></pre></div>
 <p>Note: a pending <a href="https://github.com/smarie/python-pyfields/issues/12">issue</a> prevents the above example to work, you have to use <code>Wall.__dict__['height']</code> instead of <code>Wall.height</code> to reference the field from the other class.</p>
-<p>Finally, you can customize the created constructor by declaring a post-init method as the <code>post_init_fun</code> argument. This is roughly equivalent to <code>@init_fields</code> so we do not present it here, see <a href="api_reference/#make_init">documentation</a>.</p>
+<p>Finally, you can customize the created constructor by declaring a post-init method as the <code>post_init_fun</code> argument. This is roughly equivalent to <code>@init_fields</code> so we do not present it here, see <a href="api_reference.html#make_init">documentation</a>.</p>
 <h4 id="b-init_fields">b - <code>@init_fields</code><a class="headerlink" href="#b-init_fields" title="Permanent link">&para;</a></h4>
 <p>If you prefer to write an init function as usual, you can use the <code>@init_fields</code> decorator to augment this init function's signature with all or some fields.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span><span class="p">,</span> <span class="n">init_fields</span>
@@ -1221,7 +1226,7 @@ post init ! height=1, color=white, msg=hey
 &gt;&gt;&gt; vars(w)
 {&#39;height&#39;: 1, &#39;color&#39;: &#39;white&#39;, &#39;non_field_attr&#39;: &#39;hey&#39;}
 </code></pre></div>
-<p>Note on the order of arguments in the resulting <code>__init__</code> signature: as you can see, <code>msg</code> appears between <code>height</code> and <code>color</code> in the signature. This is because all mandatory arguments appear first, then the optionals - and within each group, the user-provided ones (e.g. <code>msg</code>) appear first. You can change this behaviour by setting <code>init_args_before=False</code>. See <a href="api_reference/">API reference</a> for details.</p>
+<p>Note on the order of arguments in the resulting <code>__init__</code> signature: as you can see, <code>msg</code> appears between <code>height</code> and <code>color</code> in the signature. This is because all mandatory arguments appear first, then the optionals - and within each group, the user-provided ones (e.g. <code>msg</code>) appear first. You can change this behaviour by setting <code>init_args_before=False</code>. See <a href="api_reference.html">API reference</a> for details.</p>
 <h3 id="3-simplifying">3. Simplifying<a class="headerlink" href="#3-simplifying" title="Permanent link">&para;</a></h3>
 <h4 id="a-autofields">a - <code>@autofields</code><a class="headerlink" href="#a-autofields" title="Permanent link">&para;</a></h4>
 <p>Do you think that the above is still too verbose to define a class ? You can use <code>@autofields</code> to create fields and the constructor for you :</p>
@@ -1280,7 +1285,7 @@ post init ! height=1, color=white, msg=hey
 <p class="admonition-title">use pyfields <code>@autoclass</code> over the one in <code>autoclass</code> library</p>
 <p>This decorator combines <code>@autofields</code> and <code>@autoclass</code> into one, with options that are relevant to <code>pyfields</code>. Therefore it is now the recommended one to use.</p>
 </div>
-<p>See <a href="api_reference/#autoclass">API reference</a> for details.</p>
+<p>See <a href="api_reference.html#autoclass">API reference</a> for details.</p>
 <h4 id="c-vtypes">c - <code>VType</code>s<a class="headerlink" href="#c-vtypes" title="Permanent link">&para;</a></h4>
 <p>Instead of registering validators in the field, you can now use <code>vtypes</code>. That way, everything is in the type: type checking AND value validation. </p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">pyfields</span> <span class="kn">import</span> <span class="n">field</span>
@@ -1319,7 +1324,7 @@ post init ! height=1, color=white, msg=hey
 <p>Since from <a href="https://docs.python.org/3/reference/datamodel.html#slots">python documentation</a>, <em>"class attributes cannot be used to set default values for instance variables defined by <code>__slots__</code>"</em>, <strong>native fields are not supported with <code>__slots__</code></strong>. If you run python <code>3.6</code> or greater, <code>field</code> will automatically detect that a field is used on a class with <code>__slots__</code> and will replace the native field with a descriptor field. However with older python versions this is not always possible, so it is recommended that you explicitly state <code>native=False</code>.</p>
 <p>Note that if your class is a dual class (meaning that it declares a slot named <code>__dict__</code>), then <strong>native fields are supported</strong> and you do not have anything special to do (not even declaring a slot for the field).</p>
 <h2 id="main-features-benefits">Main features / benefits<a class="headerlink" href="#main-features-benefits" title="Permanent link">&para;</a></h2>
-<p>See <a href=".">top of the page</a></p>
+<p>See <a href="index.html">top of the page</a></p>
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <p>This library was inspired by:</p>
 <ul>
@@ -1352,7 +1357,8 @@ post init ! height=1, color=white, msg=hey
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
       
-        <a href="why/" class="md-footer__link md-footer__link--next" rel="next">
+        
+        <a href="why.html" class="md-footer__link md-footer__link--next" aria-label="Next: Why fields" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
@@ -1387,10 +1393,10 @@ post init ! height=1, color=white, msg=hey
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": ".", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "assets/javascripts/workers/search.fe42c31b.min.js", "version": null}</script>
+    <script id="__config" type="application/json">{"base": ".", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "assets/javascripts/workers/search.b0710199.min.js", "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.d892486b.min.js"></script>
+      <script src="assets/javascripts/bundle.76f349be.min.js"></script>
       
     
   </body>
