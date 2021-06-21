@@ -134,8 +134,7 @@ generating default value for <pyfields.core.Pocket object ...
 
 Several helper functions are available to create default factories:
 
- - `copy_value(<value>)` returns a factory that creates a copy of the provided `val` everytime it is called. Handy if you wish to use mutable
-    objects as default values for your fields ; for example lists.
+ - `copy_value(<value>, deep=True, autocheck=True)` returns a factory that creates a copy of the provided `val` everytime it is called. Handy if you wish to use mutable objects as default values for your fields ; for example lists. Not that starting in version 1.7, `copy_value` will automatically check that the (deep) copy operation is feasible, at initial call time. You can disable this by setting `autocheck=False`.
   
  - `copy_attr(<att_name>, deep=True)` returns a factory that creates a (deep or not) copy of the value in the given attribute everytime it is called.
 
