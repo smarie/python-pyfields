@@ -196,7 +196,8 @@ def autofields(check_types=False,     # type: Union[bool, DecoratedClass]
                     new_field = field(check_type=need_to_check_type)
                 else:
                     # optional field : copy the default value by default
-                    new_field = field(check_type=need_to_check_type, default_factory=copy_value(default_value))
+                    new_field = field(check_type=need_to_check_type,
+                                      default_factory=copy_value(default_value, autocheck=True))
 
                 # Attach the newly created field to the class. Delete attr first so that order is preserved
                 # even if one of them had only an annotation.

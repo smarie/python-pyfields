@@ -249,7 +249,8 @@ def get_fields(cls_or_obj,
 
 
 def copy_value(val,
-               deep=True  # type: bool
+               deep=True,      # type: bool
+               autocheck=True  # type: bool
                ):
     """
     Returns a default value factory to be used in a `field(default_factory=...)`.
@@ -259,12 +260,28 @@ def copy_value(val,
 
     :param val: the (mutable) value to copy
     :param deep: by default deep copies will be created. You can change this behaviour by setting this to `False`
+    :param autocheck: if this is True (default), an initial copy will be created when the method is called, so as to
+        alert the user early if this leads to errors.
     :return:
     """
     if deep:
+        if autocheck:
+            try:
+                # autocheck: make sure that we will be able to create copies later
+                deepcopy(val)
+            except Exception as e:
+                raise ValueError("The provided default value %r can not be deep-copied: caught error %r" % (val, e))
+
         def create_default(obj):
             return deepcopy(val)
     else:
+        if autocheck:
+            try:
+                # autocheck: make sure that we will be able to create copies later
+                copy(val)
+            except Exception as e:
+                raise ValueError("The provided default value %r can not be copied: caught error %r" % (val, e))
+
         def create_default(obj):
             return copy(val)
 
