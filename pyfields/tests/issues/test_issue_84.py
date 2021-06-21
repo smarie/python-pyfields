@@ -1,10 +1,20 @@
-from abc import ABC
+import sys
 
 import pytest
+
+try:
+    from abc import ABC
+except ImportError:
+    from abc import ABCMeta
+
+    class ABC:
+        __metaclass__ = ABCMeta
+
 
 from pyfields import autofields, field, copy_value, autoclass
 
 
+@pytest.mark.skipif(sys.version_info < (3,), reason="This test does not yet reproduce the exception in python 2")
 @pytest.mark.parametrize("auto,deep", [(False, False), (False, True), (True, None)])
 def test_issue_deepcopy_autofields(auto, deep):
     """Make sure that """
@@ -45,6 +55,10 @@ def test_issue_84_autofields():
     g = Foo()
     assert g.a == 0
 
+    if sys.version_info < (3,):
+        # errors below wont be raised anyway
+        return
+
     with pytest.raises(ValueError) as exc_info:
         @autofields(exclude=())
         class Foo(ABC):
@@ -62,6 +76,10 @@ def test_issue_84_autoclass():
 
     f = Foo()
     assert str(f) == "Foo(a=0)"
+
+    if sys.version_info < (3,):
+        # errors below wont be raised anyway
+        return
 
     with pytest.raises(ValueError) as exc_info:
         @autoclass(af_exclude=())
