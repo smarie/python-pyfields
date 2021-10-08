@@ -146,7 +146,7 @@ def tests(session: PowerSession, coverage, type_checker, pkg_specs):
 
         # --coverage + junit html reports
         session.run2("coverage run --source {pkg_name} "
-                     "-m pytest --cache-clear --junitxml={test_xml} --html={test_html} -v tests/"
+                     "-m pytest --cache-clear --junitxml={test_xml} --html={test_html} -v {pkg_name}/tests/"
                      "".format(pkg_name=pkg_name, test_xml=Folders.test_xml, test_html=Folders.test_html))
         session.run2("coverage report")
         session.run2("coverage xml -o {covxml}".format(covxml=Folders.coverage_xml))
