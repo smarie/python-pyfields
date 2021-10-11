@@ -9,9 +9,9 @@ from inspect import getmro
 
 try:
     from inspect import signature, Parameter
-except ImportError:  # noqa
+except ImportError:
     # noinspection PyUnresolvedReferences,PyPackageRequirements
-    from funcsigs import signature, Parameter
+    from funcsigs import signature, Parameter  # noqa
 
 from valid8 import ValidationFailure, is_pep484_nonable
 
