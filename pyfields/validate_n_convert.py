@@ -1,6 +1,7 @@
-#  Authors: Sylvain Marie <sylvain.marie@se.com>
+# Authors: Sylvain MARIE <sylvain.marie@se.com>
+#          + All contributors to <https://github.com/smarie/python-pyfields>
 #
-#  Copyright (c) Schneider Electric Industries, 2019. All right reserved.
+# License: 3-clause BSD, <https://github.com/smarie/python-pyfields/blob/master/LICENSE>
 import sys
 from collections import OrderedDict
 
@@ -29,7 +30,7 @@ if use_type_hints:
     ValidationFunc = Union[Callable[[Any], Any],
                            Callable[[Any, Any], Any],
                            Callable[[Any, Any, Any], Any]]
-    """A validation function is a callable with signature (val), (obj, val) or (obj, field, val), returning `True` 
+    """A validation function is a callable with signature (val), (obj, val) or (obj, field, val), returning `True`
     or `None` in case of success"""
 
     try:
@@ -55,8 +56,8 @@ if use_type_hints:
                                       Iterable[ValidatorDef],
                                       Mapping[VFDefinitionElement, Union[VFDefinitionElement,
                                                                          Tuple[VFDefinitionElement, ...]]]]
-    """Several validators can be provided as a singleton, iterable, or dict-like. In that case the value can be a 
-    single variable or a tuple, and it will be combined with the key to form the validator. So you can use any of 
+    """Several validators can be provided as a singleton, iterable, or dict-like. In that case the value can be a
+    single variable or a tuple, and it will be combined with the key to form the validator. So you can use any of
     the elements defining a validators as the key."""
 
     # shortcut name used everywhere. Less explicit
@@ -171,7 +172,7 @@ class FieldValidator(Validator):
                 raise ValueError(
                     "validation function should accept 1, 2, or 3 arguments at least. `f(val)`, `f(obj, val)` or "
                     "`f(obj, field, val)`")
-            elif nb_args == 1 or (nb_args == 0 and nbvarargs >= 1):  # varargs default to one argument (compliance with old mini lambda)
+            elif nb_args == 1 or (nb_args == 0 and nbvarargs >= 1):  # varargs default to one argument (compliance with old mini lambda)  # noqa
                 # `f(val)`
                 def new_validation_callable(val, **ctx):
                     return validation_callable(val)
@@ -337,7 +338,7 @@ if use_type_hints:
     ConverterFunc = Union[Callable[[Any], Any],
                           Callable[[Any, Any], Any],
                           Callable[[Any, Any, Any], Any]]
-    """A converter function is a callable with signature (val), (obj, val) or (obj, field, val), returning the 
+    """A converter function is a callable with signature (val), (obj, val) or (obj, field, val), returning the
     converted value in case of success"""
 
     try:
@@ -364,7 +365,7 @@ if use_type_hints:
     Converters = OneOrSeveralConverterDefinitions
 
 
-def make_3params_callable(f,                    # Union[ValidationFunc, ConverterFunc]
+def make_3params_callable(f,                    # type: Union[ValidationFunc, ConverterFunc]
                           is_mini_lambda=False  # type: bool
                           ):
     # type: (...) -> Callable[[Any, 'Field', Any], Any]
@@ -372,7 +373,8 @@ def make_3params_callable(f,                    # Union[ValidationFunc, Converte
     Transforms the provided validation or conversion callable into a callable with 3 arguments (obj, field, val).
 
     :param f:
-    :param is_mini_lambda: a boolean indicating if the function comes from a mini lambda. In which case we know the signature has one param only (x)
+    :param is_mini_lambda: a boolean indicating if the function comes from a mini lambda. In which case we know the
+        signature has one param only (x)
     :return:
     """
     # support several cases for the function signature
@@ -600,7 +602,7 @@ class ConversionError(Exception):
                % (self.value_to_convert, err_dct_to_str(self.err_dct))
 
 
-def err_dct_to_str(err_dct  # Dict[Converter, str]
+def err_dct_to_str(err_dct  # type: Dict[Converter, str]
                    ):
     # type: (...) -> str
     msg = ""
@@ -617,7 +619,7 @@ class DetailedConversionResults(object):
     __slots__ = 'value_to_convert', 'field', 'obj', 'err_dct', 'winning_converter', 'converted_value'
 
     def __init__(self, value_to_convert, field, obj, err_dct, winning_converter, converted_value):
-        self.value_to_convert= value_to_convert
+        self.value_to_convert = value_to_convert
         self.field = field
         self.obj = obj
         self.err_dct = err_dct

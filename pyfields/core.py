@@ -1,7 +1,7 @@
-#  Authors: Sylvain Marie <sylvain.marie@se.com>
+# Authors: Sylvain MARIE <sylvain.marie@se.com>
+#          + All contributors to <https://github.com/smarie/python-pyfields>
 #
-#  Copyright (c) Schneider Electric Industries, 2019. All right reserved.
-
+# License: 3-clause BSD, <https://github.com/smarie/python-pyfields/blob/master/LICENSE>
 import sys
 from enum import Enum
 from textwrap import dedent

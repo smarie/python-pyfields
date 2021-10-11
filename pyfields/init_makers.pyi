@@ -1,3 +1,7 @@
+# Authors: Sylvain MARIE <sylvain.marie@se.com>
+#          + All contributors to <https://github.com/smarie/python-pyfields>
+#
+# License: 3-clause BSD, <https://github.com/smarie/python-pyfields/blob/master/LICENSE>
 from typing import Union, Any, Callable, Iterable
 
 from pyfields.core import Field
