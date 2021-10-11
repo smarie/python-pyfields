@@ -18,7 +18,7 @@ class FieldTypeError(TypeError):  # FieldError
         try:
             if len(expected_types) == 1:
                 expected_types = expected_types[0]
-        except:
+        except BaseException:
             pass
         self.expected_types = expected_types
 
@@ -74,12 +74,12 @@ def _make_assert_is_of_type():
                 else:
                     # iterate and try them all
                     e = None
-                    for t in t_gen:
+                    for _t in t_gen:
                         try:
                             check_type(field.qualname, value, typ)
                             return  # success !!!!
-                        except Exception as e:
-                            pass    # failed: lets try another one
+                        except Exception as e1:
+                            e = e1  # failed: lets try another one
 
                     # raise from
                     if e is not None:
@@ -131,7 +131,7 @@ def _make_assert_is_of_type():
                         raise FieldTypeError(field, value, typ)
 
         except ImportError:
-            from valid8.utils.typing_inspect import is_typevar, is_union_type, get_args
+            # from valid8.utils.typing_inspect import is_typevar, is_union_type, get_args
             from valid8.utils.typing_tools import resolve_union_and_typevar
 
             def assert_is_of_type(field, value, typ):
@@ -164,7 +164,7 @@ def _make_assert_is_of_type():
 
 try:  # very minimal way to check if typing it available, for runtime type checking
     # noinspection PyUnresolvedReferences
-    from typing import Tuple
+    from typing import Tuple  # noqa
     assert_is_of_type = _make_assert_is_of_type()
 except ImportError:
     assert_is_of_type = None
