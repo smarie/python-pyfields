@@ -16,7 +16,7 @@ from valid8.validation_lib import instance_of
 try:  # python 3.5+
     # noinspection PyUnresolvedReferences
     from typing import Callable, Type, Any, TypeVar, Union, Iterable, Tuple, Mapping, Optional, Dict, Literal
-    from valid8.common_syntax import ValidationFuncs
+    # from valid8.common_syntax import ValidationFuncs
     use_type_hints = sys.version_info > (3, 0)
 except ImportError:
     use_type_hints = False

@@ -13,8 +13,7 @@ except ImportError:
 
 
 try:  # python 3.5+
-    from typing import Optional, Set, List, Callable, Dict, Type, Any, TypeVar, Union, Iterable, Tuple, Mapping
-    from valid8.common_syntax import ValidationFuncs
+    from typing import List, Callable, Any, Union, Iterable, Tuple
     use_type_hints = sys.version_info > (3, 0)
 except ImportError:
     use_type_hints = False
@@ -330,7 +329,8 @@ class InitDescriptor(object):
                                user_init_fun=self.user_init_fun, user_init_args_before=self.user_init_args_before)
 
         # replace it forever in the class
-        setattr(objtype, '__init__', new_init)
+        # setattr(objtype, '__init__', new_init)
+        objtype.__init__ = new_init
 
         # return the new init
         return new_init.__get__(obj, objtype)

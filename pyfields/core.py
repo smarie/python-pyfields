@@ -9,7 +9,7 @@ from inspect import getmro
 
 try:
     from inspect import signature, Parameter
-except ImportError:
+except ImportError:  # noqa
     # noinspection PyUnresolvedReferences,PyPackageRequirements
     from funcsigs import signature, Parameter
 
@@ -20,7 +20,7 @@ from pyfields.validate_n_convert import FieldValidator, make_converters_list, tr
 
 try:  # python 3.5+
     # noinspection PyUnresolvedReferences
-    from typing import List, Callable, Type, Any, Union, Iterable, Tuple, TypeVar
+    from typing import Callable, Type, Any, Union, Iterable, Tuple, TypeVar
     _NoneType = type(None)
     use_type_hints = sys.version_info > (3, 0)
     if use_type_hints:
@@ -708,7 +708,7 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
 
      - @lazy_attribute (sagemath)
      - @cached_property (werkzeug) and https://stackoverflow.com/questions/24704147/python-what-is-a-lazy-property
-     - https://stackoverflow.com/questions/42023852/how-can-i-get-the-attribute-name-when-working-with-descriptor-protocol-in-python
+     - https://stackoverflow.com/q/42023852/7262247
      - attrs / dataclasses
 
     :param type_hint: an optional explicit type hint for the field, to override the type hint defined by PEP484
@@ -718,8 +718,8 @@ def field(type_hint=None,        # type: Union[Type[T], Iterable[Type[T]]]
     :param nonable: a boolean that can be used to explicitly declare that a field can contain `None`. When this is set
         to an explicit `True` or `False` value, usual type checking and validation (*if any*) are not anymore executed
         on `None` values. Instead ; if this is `True`, type checking and validation will be *deactivated* when the field
-        is set to `None` so as to always accept the value. If this is `False`, an `None`error will be raised when `None` is
-        set on the field.
+        is set to `None` so as to always accept the value. If this is `False`, an `None`error will be raised when `None`
+        is set on the field.
         When this is left as `GUESS` (default), the behaviour is "automatic". This means that
          - if the field (a) is optional with default value `None` or (b) has type hint `typing.Optional[]`, the
            behaviour will be the same as with `nonable=True`.
@@ -1082,7 +1082,7 @@ class DescriptorField(Field):
                 try:
                     # does the converter accept this input ?
                     accepted = converter.accepts(obj, self, value)
-                except Exception:
+                except Exception:  # noqa
                     # ignore all exceptions from converters
                     continue
                 else:
@@ -1090,7 +1090,7 @@ class DescriptorField(Field):
                         # if so, let's try to convert
                         try:
                             converted_value = converter.convert(obj, self, value)
-                        except Exception:
+                        except Exception:  # noqa
                             # ignore all exceptions from converters
                             continue
                         else:
