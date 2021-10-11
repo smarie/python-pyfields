@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>pyfields/autofields_.py - flake8 annotated source</title>
+      <meta http-equiv="Content-Type" value="text/html; charset=UTF-8">
+      <link rel="stylesheet" href="styles.css">
+   </head>
+   <body>
+      <div id="masthead" class="sev-3"></div>
+      <div id="page">
+         <h1>
+            <a href="pyfields.autofields_.report.html">
+               <img src="back.svg" alt="&#x2B05;">
+               pyfields/autofields_.py source
+            </a>
+         </h1>
+
+         <div id="doc">
+            <div id="l1"
+               class="code sev- "><tt><i>1</i> <span class="c1"># Authors: Sylvain MARIE &lt;sylvain.marie@se.com&gt;</span></tt>
+            </div>
+            <div id="l2"
+               class="code sev- "><tt><i>2</i> <span class="c1">#          + All contributors to &lt;https://github.com/smarie/python-pyfields&gt;</span></tt>
+            </div>
+            <div id="l3"
+               class="code sev- "><tt><i>3</i> <span class="c1">#</span></tt>
+            </div>
+            <div id="l4"
+               class="code sev- "><tt><i>4</i> <span class="c1"># License: 3-clause BSD, &lt;https://github.com/smarie/python-pyfields/blob/master/LICENSE&gt;</span></tt>
+            </div>
+            <div id="l5"
+               class="code sev- "><tt><i>5</i> <span class="kn">import</span> <span class="nn">sys</span></tt>
+            </div>
+            <div id="l6"
+               class="code sev- "><tt><i>6</i> <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span></tt>
+            </div>
+            <div id="l7"
+               class="code sev- "><tt><i>7</i> <span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">isdatadescriptor</span><span class="p">,</span> <span class="n">ismethoddescriptor</span></tt>
+            </div>
+            <div id="l8"
+               class="code sev- "><tt><i>8</i> &nbsp;</tt>
+            </div>
+            <div id="l9"
+               class="code sev- "><tt><i>9</i> <span class="k">try</span><span class="p">:</span></tt>
+            </div>
+            <div id="l10"
+               class="code sev- "><tt><i>10</i>     <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Iterable</span></tt>
+            </div>
+            <div id="l11"
+               class="code sev- "><tt><i>11</i>     <span class="n">DecoratedClass</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;DecoratedClass&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Type</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span></tt>
+            </div>
+            <div id="l12"
+               class="code sev- "><tt><i>12</i> <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span></tt>
+            </div>
+            <div id="l13"
+               class="code sev- "><tt><i>13</i>     <span class="k">pass</span></tt>
+            </div>
+            <div id="l14"
+               class="code sev- "><tt><i>14</i> &nbsp;</tt>
+            </div>
+            <div id="l15"
+               class="code sev- "><tt><i>15</i> &nbsp;</tt>
+            </div>
+            <div id="l16"
+               class="code sev- "><tt><i>16</i> <span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">field</span></tt>
+            </div>
+            <div id="l17"
+               class="code sev- "><tt><i>17</i> <span class="kn">from</span> <span class="nn">.init_makers</span> <span class="kn">import</span> <span class="n">make_init</span> <span class="k">as</span> <span class="n">mkinit</span></tt>
+            </div>
+            <div id="l18"
+               class="code sev- "><tt><i>18</i> <span class="kn">from</span> <span class="nn">.helpers</span> <span class="kn">import</span> <span class="n">copy_value</span><span class="p">,</span> <span class="n">get_fields</span></tt>
+            </div>
+            <div id="l19"
+               class="code sev- "><tt><i>19</i> &nbsp;</tt>
+            </div>
+            <div id="l20"
+               class="code sev- "><tt><i>20</i> &nbsp;</tt>
+            </div>
+            <div id="l21"
+               class="code sev- "><tt><i>21</i> <span class="n">PY36</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span></tt>
+            </div>
+            <div id="l22"
+               class="code sev- "><tt><i>22</i> <span class="n">DEFAULT_EXCLUDED</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;_abc_impl&#39;</span><span class="p">,)</span></tt>
+            </div>
+            <div id="l23"
+               class="code sev- "><tt><i>23</i> &nbsp;</tt>
+            </div>
+            <div id="l24"
+               class="code sev- "><tt><i>24</i> &nbsp;</tt>
+            </div>
+            <div id="l25"
+               class="code sev- "><tt><i>25</i> <span class="k">def</span> <span class="nf">_make_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span></tt>
+            </div>
+            <div id="l26"
+               class="code sev- "><tt><i>26</i>     <span class="sd">&quot;&quot;&quot;Utility method used in autofields and autoclass to create the constructor based on the class fields&quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l27"
+               class="code sev- "><tt><i>27</i>     <span class="k">if</span> <span class="s2">&quot;__init__&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span></tt>
+            </div>
+            <div id="l28"
+               class="code sev- "><tt><i>28</i>         <span class="n">new_init</span> <span class="o">=</span> <span class="n">mkinit</span><span class="p">()</span></tt>
+            </div>
+            <div id="l29"
+               class="code sev- "><tt><i>29</i>         <span class="bp">cls</span><span class="o">.</span><span class="fm">__init__</span> <span class="o">=</span> <span class="n">new_init</span></tt>
+            </div>
+            <div id="l30"
+               class="code sev- "><tt><i>30</i>         <span class="c1"># attach explicitly to the class so that the descriptor is correctly completed.</span></tt>
+            </div>
+            <div id="l31"
+               class="code sev- "><tt><i>31</i>         <span class="n">new_init</span><span class="o">.</span><span class="n">__set_name__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;__init__&#39;</span><span class="p">)</span></tt>
+            </div>
+            <div id="l32"
+               class="code sev- "><tt><i>32</i> &nbsp;</tt>
+            </div>
+            <div id="l33"
+               class="code sev- "><tt><i>33</i> &nbsp;</tt>
+            </div>
+            <div id="l34"
+               class="code sev- "><tt><i>34</i> <span class="k">def</span> <span class="nf">autofields</span><span class="p">(</span><span class="n">check_types</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>         <span class="c1"># type: Union[bool, DecoratedClass]</span></tt>
+            </div>
+            <div id="l35"
+               class="code sev- "><tt><i>35</i>                <span class="n">include_upper</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>       <span class="c1"># type: bool</span></tt>
+            </div>
+            <div id="l36"
+               class="code sev- "><tt><i>36</i>                <span class="n">include_dunder</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>      <span class="c1"># type: bool</span></tt>
+            </div>
+            <div id="l37"
+               class="code sev- "><tt><i>37</i>                <span class="n">exclude</span><span class="o">=</span><span class="n">DEFAULT_EXCLUDED</span><span class="p">,</span>  <span class="c1"># type: Iterable[str]</span></tt>
+            </div>
+            <div id="l38"
+               class="code sev- "><tt><i>38</i>                <span class="n">make_init</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>            <span class="c1"># type: bool</span></tt>
+            </div>
+            <div id="l39"
+               class="code sev- "><tt><i>39</i>                <span class="p">):</span></tt>
+            </div>
+            <div id="l40"
+               class="code sev- "><tt><i>40</i>     <span class="c1"># type: (...) -&gt; Union[Callable[[DecoratedClass], DecoratedClass], DecoratedClass]</span></tt>
+            </div>
+            <div id="l41"
+               class="code sev- "><tt><i>41</i>     <span class="sd">&quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l42"
+               class="code sev- "><tt><i>42</i> <span class="sd">    Decorator to automatically create fields and constructor on a class.</span></tt>
+            </div>
+            <div id="l43"
+               class="code sev- "><tt><i>43</i> &nbsp;</tt>
+            </div>
+            <div id="l44"
+               class="code sev- "><tt><i>44</i> <span class="sd">    When a class is decorated with `@autofields`, all of its members are automatically transformed to fields.</span></tt>
+            </div>
+            <div id="l45"
+               class="code sev- "><tt><i>45</i> <span class="sd">    More precisely: members that only contain a type annotation become mandatory fields, while members that contain a</span></tt>
+            </div>
+            <div id="l46"
+               class="code sev- "><tt><i>46</i> <span class="sd">    value (with or without type annotation) become optional fields with a `copy_value` default_factory.</span></tt>
+            </div>
+            <div id="l47"
+               class="code sev- "><tt><i>47</i> &nbsp;</tt>
+            </div>
+            <div id="l48"
+               class="code sev- "><tt><i>48</i> <span class="sd">    By default, the following members are NOT transformed into fields:</span></tt>
+            </div>
+            <div id="l49"
+               class="code sev- "><tt><i>49</i> &nbsp;</tt>
+            </div>
+            <div id="l50"
+               class="code sev- "><tt><i>50</i> <span class="sd">     * members with upper-case names. This is because this kind of name formatting usually denotes class constants. They</span></tt>
+            </div>
+            <div id="l51"
+               class="code sev- "><tt><i>51</i> <span class="sd">       can be transformed to fields by setting `include_upper=True`.</span></tt>
+            </div>
+            <div id="l52"
+               class="code sev- "><tt><i>52</i> <span class="sd">     * members with dunder-like names. They can be included using `include_dunder=True`. Note that reserved python</span></tt>
+            </div>
+            <div id="l53"
+               class="code sev- "><tt><i>53</i> <span class="sd">       dunder names such as `__name__`, `__setattr__`, etc. can not be transformed to fields, even when</span></tt>
+            </div>
+            <div id="l54"
+               class="code sev- "><tt><i>54</i> <span class="sd">       `include_dunder=True`.</span></tt>
+            </div>
+            <div id="l55"
+               class="code sev- "><tt><i>55</i> <span class="sd">     * members that are classes or methods defined in the class (that is, where their `.__name__` is the same name than</span></tt>
+            </div>
+            <div id="l56"
+               class="code sev- "><tt><i>56</i> <span class="sd">       the member name).</span></tt>
+            </div>
+            <div id="l57"
+               class="code sev- "><tt><i>57</i> <span class="sd">     * members that are already fields. Therefore you can continue to use `field()` on certain members explicitly if</span></tt>
+            </div>
+            <div id="l58"
+               class="code sev- "><tt><i>58</i> <span class="sd">       you need to add custom validators, converters, etc.</span></tt>
+            </div>
+            <div id="l59"
+               class="code sev- "><tt><i>59</i> &nbsp;</tt>
+            </div>
+            <div id="l60"
+               class="code sev- "><tt><i>60</i> <span class="sd">    All created fields have their `type_hint` filled with the type hint associated with the member, and have</span></tt>
+            </div>
+            <div id="l61"
+               class="code sev- "><tt><i>61</i> <span class="sd">    `check_type=False` by default. This can be changed by setting `check_types=True`.</span></tt>
+            </div>
+            <div id="l62"
+               class="code sev- "><tt><i>62</i> &nbsp;</tt>
+            </div>
+            <div id="l63"
+               class="code sev- "><tt><i>63</i> <span class="sd">    Finally, in addition, an init method (constructor) is generated for the class, using `make_init()`. This may be</span></tt>
+            </div>
+            <div id="l64"
+               class="code sev- "><tt><i>64</i> <span class="sd">    disabled by setting `make_init=False`..</span></tt>
+            </div>
+            <div id="l65"
+               class="code sev- "><tt><i>65</i> &nbsp;</tt>
+            </div>
+            <div id="l66"
+               class="code sev- "><tt><i>66</i> <span class="sd">    &gt;&gt;&gt; import sys, pytest</span></tt>
+            </div>
+            <div id="l67"
+               class="code sev- "><tt><i>67</i> <span class="sd">    &gt;&gt;&gt; if sys.version_info &lt; (3, 6): pytest.skip(&quot;doctest skipped for python &lt; 3.6&quot;)</span></tt>
+            </div>
+            <div id="l68"
+               class="code sev- "><tt><i>68</i> <span class="sd">    ...</span></tt>
+            </div>
+            <div id="l69"
+               class="code sev- "><tt><i>69</i> <span class="sd">    &gt;&gt;&gt; @autofields</span></tt>
+            </div>
+            <div id="l70"
+               class="code sev- "><tt><i>70</i> <span class="sd">    ... class Pocket:</span></tt>
+            </div>
+            <div id="l71"
+               class="code sev- "><tt><i>71</i> <span class="sd">    ...     SENTENCE = &quot;hello world&quot;  # uppercase: not a field</span></tt>
+            </div>
+            <div id="l72"
+               class="code sev- "><tt><i>72</i> <span class="sd">    ...     size: int   # mandatory field</span></tt>
+            </div>
+            <div id="l73"
+               class="code sev- "><tt><i>73</i> <span class="sd">    ...     items = []  # optional - default value will be a factory</span></tt>
+            </div>
+            <div id="l74"
+               class="code sev- "><tt><i>74</i> <span class="sd">    ...</span></tt>
+            </div>
+            <div id="l75"
+               class="code sev- "><tt><i>75</i> <span class="sd">    &gt;&gt;&gt; p = Pocket(size=10)</span></tt>
+            </div>
+            <div id="l76"
+               class="code sev- "><tt><i>76</i> <span class="sd">    &gt;&gt;&gt; p.items</span></tt>
+            </div>
+            <div id="l77"
+               class="code sev- "><tt><i>77</i> <span class="sd">    []</span></tt>
+            </div>
+            <div id="l78"
+               class="code sev- "><tt><i>78</i> <span class="sd">    &gt;&gt;&gt; Pocket(size=10, SENTENCE=&quot;hello&quot;)</span></tt>
+            </div>
+            <div id="l79"
+               class="code sev- "><tt><i>79</i> <span class="sd">    Traceback (most recent call last):</span></tt>
+            </div>
+            <div id="l80"
+               class="code sev- "><tt><i>80</i> <span class="sd">    ...</span></tt>
+            </div>
+            <div id="l81"
+               class="code sev- "><tt><i>81</i> <span class="sd">    TypeError: __init__() got an unexpected keyword argument &#39;SENTENCE&#39;</span></tt>
+            </div>
+            <div id="l82"
+               class="code sev- "><tt><i>82</i> &nbsp;</tt>
+            </div>
+            <div id="l83"
+               class="code sev- "><tt><i>83</i> &nbsp;</tt>
+            </div>
+            <div id="l84"
+               class="code sev- "><tt><i>84</i> <span class="sd">    :param check_types: boolean flag (default: `False`) indicating the value of `check_type` for created fields. Note</span></tt>
+            </div>
+            <div id="l85"
+               class="code sev- "><tt><i>85</i> <span class="sd">        that the type hint of each created field is copied from the type hint of the member it originates from.</span></tt>
+            </div>
+            <div id="l86"
+               class="code sev- "><tt><i>86</i> <span class="sd">    :param include_upper: boolean flag (default: `False`) indicating whether upper-case class members should be also</span></tt>
+            </div>
+            <div id="l87"
+               class="code sev- "><tt><i>87</i> <span class="sd">        transformed to fields (usually such names are reserved for class constants, not for fields).</span></tt>
+            </div>
+            <div id="l88"
+               class="code sev- "><tt><i>88</i> <span class="sd">    :param include_dunder: boolean flag (default: `False`) indicating whether dunder-named class members should be also</span></tt>
+            </div>
+            <div id="l89"
+               class="code sev- "><tt><i>89</i> <span class="sd">        transformed to fields. Note that even if you set this to True, members with reserved python dunder names will</span></tt>
+            </div>
+            <div id="l90"
+               class="code sev- "><tt><i>90</i> <span class="sd">        not be transformed. See `is_reserved_dunder` for the list of reserved names.</span></tt>
+            </div>
+            <div id="l91"
+               class="code sev- "><tt><i>91</i> <span class="sd">    :param exclude: a tuple of field names that should be excluded from automatic creation. By default this is set to</span></tt>
+            </div>
+            <div id="l92"
+               class="code sev- "><tt><i>92</i> <span class="sd">        `DEFAULT_EXCLUDED`, which eliminates fields created by `ABC`.</span></tt>
+            </div>
+            <div id="l93"
+               class="code sev- "><tt><i>93</i> <span class="sd">    :param make_init: boolean flag (default: `True`) indicating whether a constructor should be created for the class if</span></tt>
+            </div>
+            <div id="l94"
+               class="code sev- "><tt><i>94</i> <span class="sd">        no `__init__` method is present. Such constructor will be created using `__init__ = make_init()`.</span></tt>
+            </div>
+            <div id="l95"
+               class="code sev- "><tt><i>95</i> <span class="sd">    :return:</span></tt>
+            </div>
+            <div id="l96"
+               class="code sev- "><tt><i>96</i> <span class="sd">    &quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l97"
+               class="code sev- "><tt><i>97</i>     <span class="k">def</span> <span class="nf">_autofields</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span></tt>
+            </div>
+            <div id="l98"
+               class="code sev- "><tt><i>98</i>         <span class="n">NO_DEFAULT</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span></tt>
+            </div>
+            <div id="l99"
+               class="code sev- "><tt><i>99</i> &nbsp;</tt>
+            </div>
+            <div id="l100"
+               class="code sev- "><tt><i>100</i>         <span class="k">try</span><span class="p">:</span></tt>
+            </div>
+            <div id="l101"
+               class="code sev- "><tt><i>101</i>             <span class="c1"># Are type hints present ?</span></tt>
+            </div>
+            <div id="l102"
+               class="code sev- "><tt><i>102</i>             <span class="c1"># note: since this attribute can be inherited, we get the own attribute only</span></tt>
+            </div>
+            <div id="l103"
+               class="code sev- "><tt><i>103</i>             <span class="c1"># cls_annotations = cls.__annotations__</span></tt>
+            </div>
+            <div id="l104"
+               class="code sev- "><tt><i>104</i>             <span class="n">cls_annotations</span> <span class="o">=</span> <span class="n">getownattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;__annotations__&quot;</span><span class="p">)</span></tt>
+            </div>
+            <div id="l105"
+               class="code sev- "><tt><i>105</i>         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span></tt>
+            </div>
+            <div id="l106"
+               class="code sev- "><tt><i>106</i>             <span class="c1"># No type hints: shortcut. note: do not return a generator since we&#39;ll modify __dict__ in the loop after</span></tt>
+            </div>
+            <div id="l107"
+               class="code sev- "><tt><i>107</i>             <span class="n">members_defs</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">())</span></tt>
+            </div>
+            <div id="l108"
+               class="code sev- "><tt><i>108</i>         <span class="k">else</span><span class="p">:</span></tt>
+            </div>
+            <div id="l109"
+               class="code sev- "><tt><i>109</i>             <span class="c1"># Fill the list of potential fields definitions</span></tt>
+            </div>
+            <div id="l110"
+               class="code sev- "><tt><i>110</i>             <span class="n">members_defs</span> <span class="o">=</span> <span class="p">[]</span></tt>
+            </div>
+            <div id="l111"
+               class="code sev- "><tt><i>111</i>             <span class="n">cls_dict</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__dict__</span></tt>
+            </div>
+            <div id="l112"
+               class="code sev- "><tt><i>112</i> &nbsp;</tt>
+            </div>
+            <div id="l113"
+               class="code sev- "><tt><i>113</i>             <span class="k">if</span> <span class="ow">not</span> <span class="n">PY36</span><span class="p">:</span></tt>
+            </div>
+            <div id="l114"
+               class="code sev- "><tt><i>114</i>                 <span class="c1"># Is this even possible ? does not seem so. Raising an error until this is reported</span></tt>
+            </div>
+            <div id="l115"
+               class="code sev- "><tt><i>115</i>                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported case: `__annotations__` is present while python is &lt; 3.6 - please report&quot;</span><span class="p">)</span></tt>
+            </div>
+            <div id="l116"
+               class="code sev- "><tt><i>116</i>             <span class="c1">#     # dont care about the order, it is not preserved</span></tt>
+            </div>
+            <div id="l117"
+               class="code sev- "><tt><i>117</i>             <span class="c1">#     # -- fields with type hint</span></tt>
+            </div>
+            <div id="l118"
+               class="code sev- "><tt><i>118</i>             <span class="c1">#     for member_name, type_hint in cls_annotations.items():</span></tt>
+            </div>
+            <div id="l119"
+               class="code sev- "><tt><i>119</i>             <span class="c1">#         members_defs.append((member_name, type_hint, cls_dict.get(member_name, NO_DEFAULT)))</span></tt>
+            </div>
+            <div id="l120"
+               class="code sev- "><tt><i>120</i>             <span class="c1">#</span></tt>
+            </div>
+            <div id="l121"
+               class="code sev- "><tt><i>121</i>             <span class="c1">#     # -- fields without type hint</span></tt>
+            </div>
+            <div id="l122"
+               class="code sev- "><tt><i>122</i>             <span class="c1">#     members_with_type = set(cls_annotations.keys())</span></tt>
+            </div>
+            <div id="l123"
+               class="code sev- "><tt><i>123</i>             <span class="c1">#     for member_name, default_value in cls_dict.items():</span></tt>
+            </div>
+            <div id="l124"
+               class="code sev- "><tt><i>124</i>             <span class="c1">#         if member_name not in members_with_type:</span></tt>
+            </div>
+            <div id="l125"
+               class="code sev- "><tt><i>125</i>             <span class="c1">#             members_defs.append((member_name, None, default_value))</span></tt>
+            </div>
+            <div id="l126"
+               class="code sev- "><tt><i>126</i>             <span class="c1">#</span></tt>
+            </div>
+            <div id="l127"
+               class="code sev- "><tt><i>127</i>             <span class="k">else</span><span class="p">:</span></tt>
+            </div>
+            <div id="l128"
+               class="code sev- "><tt><i>128</i>                 <span class="c1"># create a list of members with consistent order</span></tt>
+            </div>
+            <div id="l129"
+               class="code sev- "><tt><i>129</i>                 <span class="n">members_with_type_and_value</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">cls_annotations</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">cls_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></tt>
+            </div>
+            <div id="l130"
+               class="code sev- "><tt><i>130</i> &nbsp;</tt>
+            </div>
+            <div id="l131"
+               class="code sev- "><tt><i>131</i>                 <span class="n">in_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">cls_annotations</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">members_with_type_and_value</span><span class="p">]</span></tt>
+            </div>
+            <div id="l132"
+               class="code sev- "><tt><i>132</i>                 <span class="n">in_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">cls_dict</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">members_with_type_and_value</span><span class="p">]</span></tt>
+            </div>
+            <div id="l133"
+               class="code sev-3  le">
+               <ul class="violations">
+               
+                  <li>
+                     <span class="count sev-3">
+                        S101
+                     </span>
+                     Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.</li>
+               
+               </ul><tt><i>133</i>                 <span class="k">assert</span> <span class="n">in_types</span> <span class="o">==</span> <span class="n">in_values</span></tt>
+            </div>
+            <div id="l134"
+               class="code sev- "><tt><i>134</i> &nbsp;</tt>
+            </div>
+            <div id="l135"
+               class="code sev- "><tt><i>135</i>                 <span class="k">def</span> <span class="nf">t_gen</span><span class="p">():</span></tt>
+            </div>
+            <div id="l136"
+               class="code sev- "><tt><i>136</i>                     <span class="sd">&quot;&quot;&quot; generator used to fill the definitions for members only in annotations dict &quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l137"
+               class="code sev- "><tt><i>137</i>                     <span class="n">next_stop_name</span> <span class="o">=</span> <span class="k">yield</span></tt>
+            </div>
+            <div id="l138"
+               class="code sev- "><tt><i>138</i>                     <span class="k">for</span> <span class="n">_name</span><span class="p">,</span> <span class="n">_type_hint</span> <span class="ow">in</span> <span class="n">cls_annotations</span><span class="o">.</span><span class="n">items</span><span class="p">():</span></tt>
+            </div>
+            <div id="l139"
+               class="code sev- "><tt><i>139</i>                         <span class="k">if</span> <span class="n">_name</span> <span class="o">!=</span> <span class="n">next_stop_name</span><span class="p">:</span></tt>
+            </div>
+            <div id="l140"
+               class="code sev- "><tt><i>140</i>                             <span class="n">members_defs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">_name</span><span class="p">,</span> <span class="n">_type_hint</span><span class="p">,</span> <span class="n">NO_DEFAULT</span><span class="p">))</span></tt>
+            </div>
+            <div id="l141"
+               class="code sev- "><tt><i>141</i>                         <span class="k">else</span><span class="p">:</span></tt>
+            </div>
+            <div id="l142"
+               class="code sev- "><tt><i>142</i>                             <span class="n">next_stop_name</span> <span class="o">=</span> <span class="k">yield</span></tt>
+            </div>
+            <div id="l143"
+               class="code sev- "><tt><i>143</i> &nbsp;</tt>
+            </div>
+            <div id="l144"
+               class="code sev- "><tt><i>144</i>                 <span class="k">def</span> <span class="nf">v_gen</span><span class="p">():</span></tt>
+            </div>
+            <div id="l145"
+               class="code sev- "><tt><i>145</i>                     <span class="sd">&quot;&quot;&quot; generator used to fill the definitions for members only in the values dict &quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l146"
+               class="code sev- "><tt><i>146</i>                     <span class="n">next_stop_name</span><span class="p">,</span> <span class="n">next_stop_type_hint</span> <span class="o">=</span> <span class="k">yield</span></tt>
+            </div>
+            <div id="l147"
+               class="code sev- "><tt><i>147</i>                     <span class="k">for</span> <span class="n">_name</span><span class="p">,</span> <span class="n">_default_value</span> <span class="ow">in</span> <span class="n">cls_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span></tt>
+            </div>
+            <div id="l148"
+               class="code sev- "><tt><i>148</i>                         <span class="k">if</span> <span class="n">_name</span> <span class="o">!=</span> <span class="n">next_stop_name</span><span class="p">:</span></tt>
+            </div>
+            <div id="l149"
+               class="code sev- "><tt><i>149</i>                             <span class="n">members_defs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">_default_value</span><span class="p">))</span></tt>
+            </div>
+            <div id="l150"
+               class="code sev- "><tt><i>150</i>                         <span class="k">else</span><span class="p">:</span></tt>
+            </div>
+            <div id="l151"
+               class="code sev- "><tt><i>151</i>                             <span class="n">members_defs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">_name</span><span class="p">,</span> <span class="n">next_stop_type_hint</span><span class="p">,</span> <span class="n">_default_value</span><span class="p">))</span></tt>
+            </div>
+            <div id="l152"
+               class="code sev- "><tt><i>152</i>                             <span class="n">next_stop_name</span><span class="p">,</span> <span class="n">next_stop_type_hint</span> <span class="o">=</span> <span class="k">yield</span></tt>
+            </div>
+            <div id="l153"
+               class="code sev- "><tt><i>153</i> &nbsp;</tt>
+            </div>
+            <div id="l154"
+               class="code sev- "><tt><i>154</i>                 <span class="n">types_gen</span> <span class="o">=</span> <span class="n">t_gen</span><span class="p">()</span></tt>
+            </div>
+            <div id="l155"
+               class="code sev- "><tt><i>155</i>                 <span class="n">types_gen</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></tt>
+            </div>
+            <div id="l156"
+               class="code sev- "><tt><i>156</i>                 <span class="n">values_gen</span> <span class="o">=</span> <span class="n">v_gen</span><span class="p">()</span></tt>
+            </div>
+            <div id="l157"
+               class="code sev- "><tt><i>157</i>                 <span class="n">values_gen</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></tt>
+            </div>
+            <div id="l158"
+               class="code sev- "><tt><i>158</i>                 <span class="k">for</span> <span class="n">common_name</span> <span class="ow">in</span> <span class="n">in_types</span><span class="p">:</span></tt>
+            </div>
+            <div id="l159"
+               class="code sev- "><tt><i>159</i>                     <span class="n">types_gen</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">common_name</span><span class="p">)</span></tt>
+            </div>
+            <div id="l160"
+               class="code sev- "><tt><i>160</i>                     <span class="n">values_gen</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="n">common_name</span><span class="p">,</span> <span class="n">cls_annotations</span><span class="p">[</span><span class="n">common_name</span><span class="p">]))</span></tt>
+            </div>
+            <div id="l161"
+               class="code sev- "><tt><i>161</i>                 <span class="c1"># last one</span></tt>
+            </div>
+            <div id="l162"
+               class="code sev- "><tt><i>162</i>                 <span class="k">try</span><span class="p">:</span></tt>
+            </div>
+            <div id="l163"
+               class="code sev- "><tt><i>163</i>                     <span class="n">types_gen</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></tt>
+            </div>
+            <div id="l164"
+               class="code sev- "><tt><i>164</i>                 <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span></tt>
+            </div>
+            <div id="l165"
+               class="code sev- "><tt><i>165</i>                     <span class="k">pass</span></tt>
+            </div>
+            <div id="l166"
+               class="code sev- "><tt><i>166</i>                 <span class="k">try</span><span class="p">:</span></tt>
+            </div>
+            <div id="l167"
+               class="code sev- "><tt><i>167</i>                     <span class="n">values_gen</span><span class="o">.</span><span class="n">send</span><span class="p">((</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span></tt>
+            </div>
+            <div id="l168"
+               class="code sev- "><tt><i>168</i>                 <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span></tt>
+            </div>
+            <div id="l169"
+               class="code sev- "><tt><i>169</i>                     <span class="k">pass</span></tt>
+            </div>
+            <div id="l170"
+               class="code sev- "><tt><i>170</i> &nbsp;</tt>
+            </div>
+            <div id="l171"
+               class="code sev- "><tt><i>171</i>         <span class="c1"># Main loop : for each member, possibly create a field()</span></tt>
+            </div>
+            <div id="l172"
+               class="code sev- "><tt><i>172</i>         <span class="k">for</span> <span class="n">member_name</span><span class="p">,</span> <span class="n">type_hint</span><span class="p">,</span> <span class="n">default_value</span> <span class="ow">in</span> <span class="n">members_defs</span><span class="p">:</span></tt>
+            </div>
+            <div id="l173"
+               class="code sev- "><tt><i>173</i>             <span class="k">if</span> <span class="n">member_name</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">:</span></tt>
+            </div>
+            <div id="l174"
+               class="code sev- "><tt><i>174</i>                 <span class="c1"># excluded explicitly</span></tt>
+            </div>
+            <div id="l175"
+               class="code sev- "><tt><i>175</i>                 <span class="k">continue</span></tt>
+            </div>
+            <div id="l176"
+               class="code sev- "><tt><i>176</i>             <span class="k">elif</span> <span class="ow">not</span> <span class="n">include_upper</span> <span class="ow">and</span> <span class="n">member_name</span> <span class="o">==</span> <span class="n">member_name</span><span class="o">.</span><span class="n">upper</span><span class="p">():</span></tt>
+            </div>
+            <div id="l177"
+               class="code sev- "><tt><i>177</i>                 <span class="c1"># excluded uppercase</span></tt>
+            </div>
+            <div id="l178"
+               class="code sev- "><tt><i>178</i>                 <span class="k">continue</span></tt>
+            </div>
+            <div id="l179"
+               class="code sev- "><tt><i>179</i>             <span class="k">elif</span> <span class="p">(</span><span class="n">include_dunder</span> <span class="ow">and</span> <span class="n">is_reserved_dunder</span><span class="p">(</span><span class="n">member_name</span><span class="p">))</span> \</tt>
+            </div>
+            <div id="l180"
+               class="code sev- "><tt><i>180</i>                     <span class="ow">or</span> <span class="n">is_dunder</span><span class="p">(</span><span class="n">member_name</span><span class="p">):</span></tt>
+            </div>
+            <div id="l181"
+               class="code sev- "><tt><i>181</i>                 <span class="c1"># excluded dunder</span></tt>
+            </div>
+            <div id="l182"
+               class="code sev- "><tt><i>182</i>                 <span class="k">continue</span></tt>
+            </div>
+            <div id="l183"
+               class="code sev- "><tt><i>183</i>             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_value</span><span class="p">,</span> <span class="n">Field</span><span class="p">):</span></tt>
+            </div>
+            <div id="l184"
+               class="code sev- "><tt><i>184</i>                 <span class="c1"># already a field, no need to create</span></tt>
+            </div>
+            <div id="l185"
+               class="code sev- "><tt><i>185</i>                 <span class="c1"># but in order to preserve relative order with generated fields, detach and attach again</span></tt>
+            </div>
+            <div id="l186"
+               class="code sev- "><tt><i>186</i>                 <span class="k">try</span><span class="p">:</span></tt>
+            </div>
+            <div id="l187"
+               class="code sev- "><tt><i>187</i>                     <span class="nb">delattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">member_name</span><span class="p">)</span></tt>
+            </div>
+            <div id="l188"
+               class="code sev- "><tt><i>188</i>                 <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span></tt>
+            </div>
+            <div id="l189"
+               class="code sev- "><tt><i>189</i>                     <span class="k">pass</span></tt>
+            </div>
+            <div id="l190"
+               class="code sev- "><tt><i>190</i>                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">member_name</span><span class="p">,</span> <span class="n">default_value</span><span class="p">)</span></tt>
+            </div>
+            <div id="l191"
+               class="code sev- "><tt><i>191</i>                 <span class="k">continue</span></tt>
+            </div>
+            <div id="l192"
+               class="code sev- "><tt><i>192</i>             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default_value</span><span class="p">,</span> <span class="nb">property</span><span class="p">)</span> <span class="ow">or</span> <span class="n">isdatadescriptor</span><span class="p">(</span><span class="n">default_value</span><span class="p">)</span> \</tt>
+            </div>
+            <div id="l193"
+               class="code sev- "><tt><i>193</i>                     <span class="ow">or</span> <span class="n">ismethoddescriptor</span><span class="p">(</span><span class="n">default_value</span><span class="p">):</span></tt>
+            </div>
+            <div id="l194"
+               class="code sev- "><tt><i>194</i>                 <span class="c1"># a property or a data or non-data descriptor &gt; exclude</span></tt>
+            </div>
+            <div id="l195"
+               class="code sev- "><tt><i>195</i>                 <span class="k">continue</span></tt>
+            </div>
+            <div id="l196"
+               class="code sev- "><tt><i>196</i>             <span class="k">elif</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">default_value</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">or</span> <span class="n">callable</span><span class="p">(</span><span class="n">default_value</span><span class="p">))</span> \</tt>
+            </div>
+            <div id="l197"
+               class="code sev- "><tt><i>197</i>                     <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">default_value</span><span class="p">,</span> <span class="s1">&#39;__name__&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">member_name</span><span class="p">:</span></tt>
+            </div>
+            <div id="l198"
+               class="code sev- "><tt><i>198</i>                 <span class="c1"># a function/class defined in the class &gt; exclude</span></tt>
+            </div>
+            <div id="l199"
+               class="code sev- "><tt><i>199</i>                 <span class="k">continue</span></tt>
+            </div>
+            <div id="l200"
+               class="code sev- "><tt><i>200</i>             <span class="k">else</span><span class="p">:</span></tt>
+            </div>
+            <div id="l201"
+               class="code sev- "><tt><i>201</i>                 <span class="c1"># Create a field !!</span></tt>
+            </div>
+            <div id="l202"
+               class="code sev- "><tt><i>202</i>                 <span class="n">need_to_check_type</span> <span class="o">=</span> <span class="n">check_types</span> <span class="ow">and</span> <span class="p">(</span><span class="n">type_hint</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span></tt>
+            </div>
+            <div id="l203"
+               class="code sev- "><tt><i>203</i>                 <span class="k">if</span> <span class="n">default_value</span> <span class="ow">is</span> <span class="n">NO_DEFAULT</span><span class="p">:</span></tt>
+            </div>
+            <div id="l204"
+               class="code sev- "><tt><i>204</i>                     <span class="c1"># mandatory field</span></tt>
+            </div>
+            <div id="l205"
+               class="code sev- "><tt><i>205</i>                     <span class="n">new_field</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">check_type</span><span class="o">=</span><span class="n">need_to_check_type</span><span class="p">)</span></tt>
+            </div>
+            <div id="l206"
+               class="code sev- "><tt><i>206</i>                 <span class="k">else</span><span class="p">:</span></tt>
+            </div>
+            <div id="l207"
+               class="code sev- "><tt><i>207</i>                     <span class="c1"># optional field : copy the default value by default</span></tt>
+            </div>
+            <div id="l208"
+               class="code sev- "><tt><i>208</i>                     <span class="k">try</span><span class="p">:</span></tt>
+            </div>
+            <div id="l209"
+               class="code sev- "><tt><i>209</i>                         <span class="c1"># autocheck: make sure that we will be able to create copies later</span></tt>
+            </div>
+            <div id="l210"
+               class="code sev- "><tt><i>210</i>                         <span class="n">deepcopy</span><span class="p">(</span><span class="n">default_value</span><span class="p">)</span></tt>
+            </div>
+            <div id="l211"
+               class="code sev- "><tt><i>211</i>                     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span></tt>
+            </div>
+            <div id="l212"
+               class="code sev- "><tt><i>212</i>                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The provided default value for field </span><span class="si">%r</span><span class="s2">=</span><span class="si">%r</span><span class="s2"> can not be deep-copied: &quot;</span></tt>
+            </div>
+            <div id="l213"
+               class="code sev- "><tt><i>213</i>                                          <span class="s2">&quot;caught error </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">member_name</span><span class="p">,</span> <span class="n">default_value</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span></tt>
+            </div>
+            <div id="l214"
+               class="code sev- "><tt><i>214</i>                     <span class="n">new_field</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">check_type</span><span class="o">=</span><span class="n">need_to_check_type</span><span class="p">,</span></tt>
+            </div>
+            <div id="l215"
+               class="code sev- "><tt><i>215</i>                                       <span class="n">default_factory</span><span class="o">=</span><span class="n">copy_value</span><span class="p">(</span><span class="n">default_value</span><span class="p">,</span> <span class="n">autocheck</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span></tt>
+            </div>
+            <div id="l216"
+               class="code sev- "><tt><i>216</i> &nbsp;</tt>
+            </div>
+            <div id="l217"
+               class="code sev- "><tt><i>217</i>                 <span class="c1"># Attach the newly created field to the class. Delete attr first so that order is preserved</span></tt>
+            </div>
+            <div id="l218"
+               class="code sev- "><tt><i>218</i>                 <span class="c1"># even if one of them had only an annotation.</span></tt>
+            </div>
+            <div id="l219"
+               class="code sev- "><tt><i>219</i>                 <span class="k">try</span><span class="p">:</span></tt>
+            </div>
+            <div id="l220"
+               class="code sev- "><tt><i>220</i>                     <span class="nb">delattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">member_name</span><span class="p">)</span></tt>
+            </div>
+            <div id="l221"
+               class="code sev- "><tt><i>221</i>                 <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span></tt>
+            </div>
+            <div id="l222"
+               class="code sev- "><tt><i>222</i>                     <span class="k">pass</span></tt>
+            </div>
+            <div id="l223"
+               class="code sev- "><tt><i>223</i>                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">member_name</span><span class="p">,</span> <span class="n">new_field</span><span class="p">)</span></tt>
+            </div>
+            <div id="l224"
+               class="code sev- "><tt><i>224</i>                 <span class="n">new_field</span><span class="o">.</span><span class="n">set_as_cls_member</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">member_name</span><span class="p">,</span> <span class="n">type_hint</span><span class="o">=</span><span class="n">type_hint</span><span class="p">)</span></tt>
+            </div>
+            <div id="l225"
+               class="code sev- "><tt><i>225</i> &nbsp;</tt>
+            </div>
+            <div id="l226"
+               class="code sev- "><tt><i>226</i>         <span class="c1"># Finally, make init if not already explicitly present</span></tt>
+            </div>
+            <div id="l227"
+               class="code sev- "><tt><i>227</i>         <span class="k">if</span> <span class="n">make_init</span><span class="p">:</span></tt>
+            </div>
+            <div id="l228"
+               class="code sev- "><tt><i>228</i>             <span class="n">_make_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span></tt>
+            </div>
+            <div id="l229"
+               class="code sev- "><tt><i>229</i> &nbsp;</tt>
+            </div>
+            <div id="l230"
+               class="code sev- "><tt><i>230</i>         <span class="k">return</span> <span class="bp">cls</span></tt>
+            </div>
+            <div id="l231"
+               class="code sev- "><tt><i>231</i>     <span class="c1"># end of _autofields(cls)</span></tt>
+            </div>
+            <div id="l232"
+               class="code sev- "><tt><i>232</i> &nbsp;</tt>
+            </div>
+            <div id="l233"
+               class="code sev- "><tt><i>233</i>     <span class="c1"># Main logic of autofield(**kwargs)</span></tt>
+            </div>
+            <div id="l234"
+               class="code sev- "><tt><i>234</i>     <span class="k">if</span> <span class="n">check_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">check_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">check_types</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span></tt>
+            </div>
+            <div id="l235"
+               class="code sev- "><tt><i>235</i>         <span class="c1"># called without arguments @autofields: check_types is the decorated class</span></tt>
+            </div>
+            <div id="l236"
+               class="code sev-3  le">
+               <ul class="violations">
+               
+                  <li>
+                     <span class="count sev-3">
+                        S101
+                     </span>
+                     Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.</li>
+               
+               </ul><tt><i>236</i>         <span class="k">assert</span> <span class="n">include_upper</span> <span class="ow">is</span> <span class="kc">False</span></tt>
+            </div>
+            <div id="l237"
+               class="code sev-3  le">
+               <ul class="violations">
+               
+                  <li>
+                     <span class="count sev-3">
+                        S101
+                     </span>
+                     Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.</li>
+               
+               </ul><tt><i>237</i>         <span class="k">assert</span> <span class="n">include_dunder</span> <span class="ow">is</span> <span class="kc">False</span></tt>
+            </div>
+            <div id="l238"
+               class="code sev- "><tt><i>238</i>         <span class="c1"># use the parameter and use the correct check_types default value now</span></tt>
+            </div>
+            <div id="l239"
+               class="code sev- "><tt><i>239</i>         <span class="n">_cls</span> <span class="o">=</span> <span class="n">check_types</span></tt>
+            </div>
+            <div id="l240"
+               class="code sev- "><tt><i>240</i>         <span class="n">check_types</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># &lt;-- important: variable is in the local context of _autofields</span></tt>
+            </div>
+            <div id="l241"
+               class="code sev- "><tt><i>241</i>         <span class="k">return</span> <span class="n">_autofields</span><span class="p">(</span><span class="bp">cls</span><span class="o">=</span><span class="n">_cls</span><span class="p">)</span></tt>
+            </div>
+            <div id="l242"
+               class="code sev- "><tt><i>242</i>     <span class="k">else</span><span class="p">:</span></tt>
+            </div>
+            <div id="l243"
+               class="code sev- "><tt><i>243</i>         <span class="c1"># called with arguments @autofields(...): return the decorator</span></tt>
+            </div>
+            <div id="l244"
+               class="code sev- "><tt><i>244</i>         <span class="k">return</span> <span class="n">_autofields</span></tt>
+            </div>
+            <div id="l245"
+               class="code sev- "><tt><i>245</i> &nbsp;</tt>
+            </div>
+            <div id="l246"
+               class="code sev- "><tt><i>246</i> &nbsp;</tt>
+            </div>
+            <div id="l247"
+               class="code sev- "><tt><i>247</i> <span class="k">def</span> <span class="nf">is_dunder</span><span class="p">(</span><span class="n">name</span><span class="p">):</span></tt>
+            </div>
+            <div id="l248"
+               class="code sev- "><tt><i>248</i>     <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">4</span> <span class="ow">and</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">)</span></tt>
+            </div>
+            <div id="l249"
+               class="code sev- "><tt><i>249</i> &nbsp;</tt>
+            </div>
+            <div id="l250"
+               class="code sev- "><tt><i>250</i> &nbsp;</tt>
+            </div>
+            <div id="l251"
+               class="code sev- "><tt><i>251</i> <span class="k">def</span> <span class="nf">is_reserved_dunder</span><span class="p">(</span><span class="n">name</span><span class="p">):</span></tt>
+            </div>
+            <div id="l252"
+               class="code sev- "><tt><i>252</i>     <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;__doc__&#39;</span><span class="p">,</span> <span class="s1">&#39;__name__&#39;</span><span class="p">,</span> <span class="s1">&#39;__qualname__&#39;</span><span class="p">,</span> <span class="s1">&#39;__module__&#39;</span><span class="p">,</span> <span class="s1">&#39;__code__&#39;</span><span class="p">,</span> <span class="s1">&#39;__globals__&#39;</span><span class="p">,</span></tt>
+            </div>
+            <div id="l253"
+               class="code sev- "><tt><i>253</i>                     <span class="s1">&#39;__dict__&#39;</span><span class="p">,</span> <span class="s1">&#39;__closure__&#39;</span><span class="p">,</span> <span class="s1">&#39;__annotations__&#39;</span><span class="p">)</span>  <span class="c1"># &#39;__defaults__&#39;, &#39;__kwdefaults__&#39;)</span></tt>
+            </div>
+            <div id="l254"
+               class="code sev- "><tt><i>254</i> &nbsp;</tt>
+            </div>
+            <div id="l255"
+               class="code sev- "><tt><i>255</i> &nbsp;</tt>
+            </div>
+            <div id="l256"
+               class="code sev- "><tt><i>256</i> <span class="n">_dict</span><span class="p">,</span> <span class="n">_hash</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">hash</span></tt>
+            </div>
+            <div id="l257"
+               class="code sev- "><tt><i>257</i> <span class="sd">&quot;&quot;&quot;Aliases for autoclass body&quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l258"
+               class="code sev- "><tt><i>258</i> &nbsp;</tt>
+            </div>
+            <div id="l259"
+               class="code sev- "><tt><i>259</i> &nbsp;</tt>
+            </div>
+            <div id="l260"
+               class="code sev- "><tt><i>260</i> <span class="k">def</span> <span class="nf">autoclass</span><span class="p">(</span></tt>
+            </div>
+            <div id="l261"
+               class="code sev- "><tt><i>261</i>     <span class="c1"># --- autofields</span></tt>
+            </div>
+            <div id="l262"
+               class="code sev- "><tt><i>262</i>     <span class="n">fields</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                  <span class="c1"># type: Union[bool, DecoratedClass]</span></tt>
+            </div>
+            <div id="l263"
+               class="code sev- "><tt><i>263</i>     <span class="n">typecheck</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>              <span class="c1"># type: bool</span></tt>
+            </div>
+            <div id="l264"
+               class="code sev- "><tt><i>264</i>     <span class="c1"># --- constructor</span></tt>
+            </div>
+            <div id="l265"
+               class="code sev- "><tt><i>265</i>     <span class="n">init</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                    <span class="c1"># type: bool</span></tt>
+            </div>
+            <div id="l266"
+               class="code sev- "><tt><i>266</i>     <span class="c1"># --- class methods</span></tt>
+            </div>
+            <div id="l267"
+               class="code sev- "><tt><i>267</i>     <span class="nb">dict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                    <span class="c1"># type: bool</span></tt>
+            </div>
+            <div id="l268"
+               class="code sev- "><tt><i>268</i>     <span class="n">dict_public_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>        <span class="c1"># type: bool</span></tt>
+            </div>
+            <div id="l269"
+               class="code sev- "><tt><i>269</i>     <span class="nb">repr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                    <span class="c1"># type: bool</span></tt>
+            </div>
+            <div id="l270"
+               class="code sev- "><tt><i>270</i>     <span class="n">repr_curly_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>        <span class="c1"># type: bool</span></tt>
+            </div>
+            <div id="l271"
+               class="code sev- "><tt><i>271</i>     <span class="n">repr_public_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>        <span class="c1"># type: bool</span></tt>
+            </div>
+            <div id="l272"
+               class="code sev- "><tt><i>272</i>     <span class="n">eq</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                      <span class="c1"># type: bool</span></tt>
+            </div>
+            <div id="l273"
+               class="code sev- "><tt><i>273</i>     <span class="n">eq_public_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>         <span class="c1"># type: bool</span></tt>
+            </div>
+            <div id="l274"
+               class="code sev- "><tt><i>274</i>     <span class="nb">hash</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                    <span class="c1"># type: bool</span></tt>
+            </div>
+            <div id="l275"
+               class="code sev- "><tt><i>275</i>     <span class="n">hash_public_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>       <span class="c1"># type: bool</span></tt>
+            </div>
+            <div id="l276"
+               class="code sev- "><tt><i>276</i>     <span class="c1"># --- advanced</span></tt>
+            </div>
+            <div id="l277"
+               class="code sev- "><tt><i>277</i>     <span class="n">af_include_upper</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>       <span class="c1"># type: bool</span></tt>
+            </div>
+            <div id="l278"
+               class="code sev- "><tt><i>278</i>     <span class="n">af_include_dunder</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>      <span class="c1"># type: bool</span></tt>
+            </div>
+            <div id="l279"
+               class="code sev- "><tt><i>279</i>     <span class="n">af_exclude</span><span class="o">=</span><span class="n">DEFAULT_EXCLUDED</span><span class="p">,</span>  <span class="c1"># type: Iterable[str]</span></tt>
+            </div>
+            <div id="l280"
+               class="code sev- "><tt><i>280</i>     <span class="n">ac_include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>              <span class="c1"># type: Union[str, Tuple[str]]</span></tt>
+            </div>
+            <div id="l281"
+               class="code sev- "><tt><i>281</i>     <span class="n">ac_exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>              <span class="c1"># type: Union[str, Tuple[str]]</span></tt>
+            </div>
+            <div id="l282"
+               class="code sev- "><tt><i>282</i> <span class="p">):</span></tt>
+            </div>
+            <div id="l283"
+               class="code sev- "><tt><i>283</i>     <span class="sd">&quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l284"
+               class="code sev- "><tt><i>284</i> <span class="sd">    A decorator to automate many things at once for your class.</span></tt>
+            </div>
+            <div id="l285"
+               class="code sev- "><tt><i>285</i> &nbsp;</tt>
+            </div>
+            <div id="l286"
+               class="code sev- "><tt><i>286</i> <span class="sd">    First if `fields=True` (default) it executes `@autofields` to generate fields from attribute defined at class</span></tt>
+            </div>
+            <div id="l287"
+               class="code sev- "><tt><i>287</i> <span class="sd">    level.</span></tt>
+            </div>
+            <div id="l288"
+               class="code sev- "><tt><i>288</i> &nbsp;</tt>
+            </div>
+            <div id="l289"
+               class="code sev- "><tt><i>289</i> <span class="sd">     - you can include attributes with dunder names or uppercase names with `af_include_dunder` and</span></tt>
+            </div>
+            <div id="l290"
+               class="code sev- "><tt><i>290</i> <span class="sd">       `af_include_upper` respectively</span></tt>
+            </div>
+            <div id="l291"
+               class="code sev- "><tt><i>291</i> <span class="sd">     - you can enable type checking on all fields at once by setting `check_types=True`</span></tt>
+            </div>
+            <div id="l292"
+               class="code sev- "><tt><i>292</i> <span class="sd">     - the constructor is not generated at this stage</span></tt>
+            </div>
+            <div id="l293"
+               class="code sev- "><tt><i>293</i> &nbsp;</tt>
+            </div>
+            <div id="l294"
+               class="code sev- "><tt><i>294</i> <span class="sd">    Then it generates methods for the class:</span></tt>
+            </div>
+            <div id="l295"
+               class="code sev- "><tt><i>295</i> &nbsp;</tt>
+            </div>
+            <div id="l296"
+               class="code sev- "><tt><i>296</i> <span class="sd">     - if `init=True` (default) it generates the constructor based on all fields present, using `make_init()`.</span></tt>
+            </div>
+            <div id="l297"
+               class="code sev- "><tt><i>297</i> <span class="sd">     - if `dict=True` (default) it generates `to_dict` and `from_dict` methods. Only public fields are represented in</span></tt>
+            </div>
+            <div id="l298"
+               class="code sev- "><tt><i>298</i> <span class="sd">       `to_dict`, you can change this with `dict_public_only=False`.</span></tt>
+            </div>
+            <div id="l299"
+               class="code sev- "><tt><i>299</i> <span class="sd">     - if `repr=True` (default) it generates a `__repr__` method. Only public fields are represented, you can change</span></tt>
+            </div>
+            <div id="l300"
+               class="code sev- "><tt><i>300</i> <span class="sd">       this with `repr_public_only=False`.</span></tt>
+            </div>
+            <div id="l301"
+               class="code sev- "><tt><i>301</i> <span class="sd">     - if `eq=True` (default) it generates an `__eq__` method, so that instances can be compared to other instances and</span></tt>
+            </div>
+            <div id="l302"
+               class="code sev- "><tt><i>302</i> <span class="sd">       to dicts. All fields are compared by default, you can change this with `eq_public_only=True`.</span></tt>
+            </div>
+            <div id="l303"
+               class="code sev- "><tt><i>303</i> <span class="sd">     - if `hash=True` (default) it generates an `__hash__` method, so that instances can be inserted in sets or dict</span></tt>
+            </div>
+            <div id="l304"
+               class="code sev- "><tt><i>304</i> <span class="sd">       keys. All fields are hashed by default, you can change this with `hash_public_only=True`.</span></tt>
+            </div>
+            <div id="l305"
+               class="code sev- "><tt><i>305</i> &nbsp;</tt>
+            </div>
+            <div id="l306"
+               class="code sev- "><tt><i>306</i> <span class="sd">    You can specify an explicit list of fields to include or exclude in the dict/repr/eq/hash methods with the</span></tt>
+            </div>
+            <div id="l307"
+               class="code sev- "><tt><i>307</i> <span class="sd">    `ac_include` and `ac_exclude` parameters.</span></tt>
+            </div>
+            <div id="l308"
+               class="code sev- "><tt><i>308</i> &nbsp;</tt>
+            </div>
+            <div id="l309"
+               class="code sev- "><tt><i>309</i> <span class="sd">    Note that this decorator is similar to the [autoclass library](https://smarie.github.io/python-autoclass/) but is</span></tt>
+            </div>
+            <div id="l310"
+               class="code sev- "><tt><i>310</i> <span class="sd">    reimplemented here. In particular the parameter names and dictionary behaviour are different.</span></tt>
+            </div>
+            <div id="l311"
+               class="code sev- "><tt><i>311</i> &nbsp;</tt>
+            </div>
+            <div id="l312"
+               class="code sev- "><tt><i>312</i> <span class="sd">    :param fields: boolean flag (default: True) indicating whether to create fields automatically. See `@autofields`</span></tt>
+            </div>
+            <div id="l313"
+               class="code sev- "><tt><i>313</i> <span class="sd">        for details</span></tt>
+            </div>
+            <div id="l314"
+               class="code sev- "><tt><i>314</i> <span class="sd">    :param typecheck: boolean flag (default: False) used when fields=True indicating the value of `check_type`</span></tt>
+            </div>
+            <div id="l315"
+               class="code sev- "><tt><i>315</i> <span class="sd">        for created fields. Note that the type hint of each created field is copied from the type hint of the member it</span></tt>
+            </div>
+            <div id="l316"
+               class="code sev- "><tt><i>316</i> <span class="sd">        originates from.</span></tt>
+            </div>
+            <div id="l317"
+               class="code sev- "><tt><i>317</i> <span class="sd">    :param init: boolean flag (default: True) indicating whether a constructor should be created for the class if</span></tt>
+            </div>
+            <div id="l318"
+               class="code sev- "><tt><i>318</i> <span class="sd">        no `__init__` method is already present. Such constructor will be created using `__init__ = make_init()`.</span></tt>
+            </div>
+            <div id="l319"
+               class="code sev- "><tt><i>319</i> <span class="sd">        This is the same behaviour than `make_init` in `@autofields`. Note that this is *not* automatically disabled if</span></tt>
+            </div>
+            <div id="l320"
+               class="code sev- "><tt><i>320</i> <span class="sd">        you set `fields=False`.</span></tt>
+            </div>
+            <div id="l321"
+               class="code sev- "><tt><i>321</i> <span class="sd">    :param dict: a boolean to automatically create `cls.from_dict(dct)` and `obj.to_dict()` methods on the class</span></tt>
+            </div>
+            <div id="l322"
+               class="code sev- "><tt><i>322</i> <span class="sd">        (default: True).</span></tt>
+            </div>
+            <div id="l323"
+               class="code sev- "><tt><i>323</i> <span class="sd">    :param dict_public_only: a boolean (default: True) to indicate if only public fields should be</span></tt>
+            </div>
+            <div id="l324"
+               class="code sev- "><tt><i>324</i> <span class="sd">        exposed in the dictionary view created by `to_dict` when `dict=True`.</span></tt>
+            </div>
+            <div id="l325"
+               class="code sev- "><tt><i>325</i> <span class="sd">    :param repr: a boolean (default: True) to indicate if `__repr__` and `__str__` should be created for the class if</span></tt>
+            </div>
+            <div id="l326"
+               class="code sev- "><tt><i>326</i> <span class="sd">        not explicitly present.</span></tt>
+            </div>
+            <div id="l327"
+               class="code sev- "><tt><i>327</i> <span class="sd">    :param repr_curly_mode: a boolean (default: False) to turn on an alternate string representation when `repr=True`,</span></tt>
+            </div>
+            <div id="l328"
+               class="code sev- "><tt><i>328</i> <span class="sd">        using curly braces.</span></tt>
+            </div>
+            <div id="l329"
+               class="code sev- "><tt><i>329</i> <span class="sd">    :param repr_public_only: a boolean (default: True) to indicate if only public fields should be</span></tt>
+            </div>
+            <div id="l330"
+               class="code sev- "><tt><i>330</i> <span class="sd">        exposed in the string representation when `repr=True`.</span></tt>
+            </div>
+            <div id="l331"
+               class="code sev- "><tt><i>331</i> <span class="sd">    :param eq: a boolean (default: True) to indicate if `__eq__` should be created for the class if not explicitly</span></tt>
+            </div>
+            <div id="l332"
+               class="code sev- "><tt><i>332</i> <span class="sd">        present.</span></tt>
+            </div>
+            <div id="l333"
+               class="code sev- "><tt><i>333</i> <span class="sd">    :param eq_public_only: a boolean (default: False) to indicate if only public fields should be</span></tt>
+            </div>
+            <div id="l334"
+               class="code sev- "><tt><i>334</i> <span class="sd">        compared in the equality method created when `eq=True`.</span></tt>
+            </div>
+            <div id="l335"
+               class="code sev- "><tt><i>335</i> <span class="sd">    :param hash: a boolean (default: True) to indicate if `__hash__` should be created for the class if not explicitly</span></tt>
+            </div>
+            <div id="l336"
+               class="code sev- "><tt><i>336</i> <span class="sd">        present.</span></tt>
+            </div>
+            <div id="l337"
+               class="code sev- "><tt><i>337</i> <span class="sd">    :param hash_public_only: a boolean (default: False) to indicate if only public fields should be</span></tt>
+            </div>
+            <div id="l338"
+               class="code sev- "><tt><i>338</i> <span class="sd">        hashed in the hash method created when `hash=True`.</span></tt>
+            </div>
+            <div id="l339"
+               class="code sev- "><tt><i>339</i> <span class="sd">    :param af_include_upper: boolean flag (default: False) used when autofields=True indicating whether</span></tt>
+            </div>
+            <div id="l340"
+               class="code sev- "><tt><i>340</i> <span class="sd">        upper-case class members should be also transformed to fields (usually such names are reserved for class</span></tt>
+            </div>
+            <div id="l341"
+               class="code sev- "><tt><i>341</i> <span class="sd">        constants, not for fields).</span></tt>
+            </div>
+            <div id="l342"
+               class="code sev- "><tt><i>342</i> <span class="sd">    :param af_include_dunder: boolean flag (default: False) used when autofields=True indicating whether</span></tt>
+            </div>
+            <div id="l343"
+               class="code sev- "><tt><i>343</i> <span class="sd">        dunder-named class members should be also transformed to fields. Note that even if you set this to True,</span></tt>
+            </div>
+            <div id="l344"
+               class="code sev- "><tt><i>344</i> <span class="sd">        members with reserved python dunder names will not be transformed. See `is_reserved_dunder` for the list of</span></tt>
+            </div>
+            <div id="l345"
+               class="code sev- "><tt><i>345</i> <span class="sd">        reserved names.</span></tt>
+            </div>
+            <div id="l346"
+               class="code sev- "><tt><i>346</i> <span class="sd">    :param af_exclude: a tuple of explicit attribute names to exclude from automatic fields creation. See</span></tt>
+            </div>
+            <div id="l347"
+               class="code sev- "><tt><i>347</i> <span class="sd">        `@autofields(exclude=...)` for details.</span></tt>
+            </div>
+            <div id="l348"
+               class="code sev- "><tt><i>348</i> <span class="sd">    :param ac_include: a tuple of explicit attribute names to include in dict/repr/eq/hash (None means all)</span></tt>
+            </div>
+            <div id="l349"
+               class="code sev- "><tt><i>349</i> <span class="sd">    :param ac_exclude: a tuple of explicit attribute names to exclude in dict/repr/eq/hash. In such case,</span></tt>
+            </div>
+            <div id="l350"
+               class="code sev- "><tt><i>350</i> <span class="sd">        include should be None.</span></tt>
+            </div>
+            <div id="l351"
+               class="code sev- "><tt><i>351</i> <span class="sd">    :return:</span></tt>
+            </div>
+            <div id="l352"
+               class="code sev- "><tt><i>352</i> <span class="sd">    &quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l353"
+               class="code sev- "><tt><i>353</i>     <span class="k">if</span> <span class="ow">not</span> <span class="n">fields</span> <span class="ow">and</span> <span class="p">(</span><span class="n">af_include_dunder</span> <span class="ow">or</span> <span class="n">af_include_upper</span> <span class="ow">or</span> <span class="n">typecheck</span><span class="p">):</span></tt>
+            </div>
+            <div id="l354"
+               class="code sev- "><tt><i>354</i>         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not able to set af_include_dunder or af_include_upper or typecheck when fields=False&quot;</span><span class="p">)</span></tt>
+            </div>
+            <div id="l355"
+               class="code sev- "><tt><i>355</i> &nbsp;</tt>
+            </div>
+            <div id="l356"
+               class="code sev- "><tt><i>356</i>     <span class="c1"># switch between args and actual symbols for readability</span></tt>
+            </div>
+            <div id="l357"
+               class="code sev- "><tt><i>357</i>     <span class="n">dict_on</span> <span class="o">=</span> <span class="nb">dict</span></tt>
+            </div>
+            <div id="l358"
+               class="code sev- "><tt><i>358</i>     <span class="nb">dict</span> <span class="o">=</span> <span class="n">_dict</span></tt>
+            </div>
+            <div id="l359"
+               class="code sev- "><tt><i>359</i>     <span class="n">hash_on</span> <span class="o">=</span> <span class="nb">hash</span></tt>
+            </div>
+            <div id="l360"
+               class="code sev- "><tt><i>360</i>     <span class="nb">hash</span> <span class="o">=</span> <span class="n">_hash</span></tt>
+            </div>
+            <div id="l361"
+               class="code sev- "><tt><i>361</i> &nbsp;</tt>
+            </div>
+            <div id="l362"
+               class="code sev- "><tt><i>362</i>     <span class="c1"># Create the decorator function</span></tt>
+            </div>
+            <div id="l363"
+               class="code sev- "><tt><i>363</i>     <span class="k">def</span> <span class="nf">_apply_decorator</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span></tt>
+            </div>
+            <div id="l364"
+               class="code sev- "><tt><i>364</i> &nbsp;</tt>
+            </div>
+            <div id="l365"
+               class="code sev- "><tt><i>365</i>         <span class="c1"># create fields automatically</span></tt>
+            </div>
+            <div id="l366"
+               class="code sev- "><tt><i>366</i>         <span class="k">if</span> <span class="n">fields</span><span class="p">:</span></tt>
+            </div>
+            <div id="l367"
+               class="code sev- "><tt><i>367</i>             <span class="bp">cls</span> <span class="o">=</span> <span class="n">autofields</span><span class="p">(</span><span class="n">check_types</span><span class="o">=</span><span class="n">typecheck</span><span class="p">,</span> <span class="n">include_upper</span><span class="o">=</span><span class="n">af_include_upper</span><span class="p">,</span></tt>
+            </div>
+            <div id="l368"
+               class="code sev- "><tt><i>368</i>                              <span class="n">exclude</span><span class="o">=</span><span class="n">af_exclude</span><span class="p">,</span> <span class="n">include_dunder</span><span class="o">=</span><span class="n">af_include_dunder</span><span class="p">,</span> <span class="n">make_init</span><span class="o">=</span><span class="kc">False</span><span class="p">)(</span><span class="bp">cls</span><span class="p">)</span></tt>
+            </div>
+            <div id="l369"
+               class="code sev- "><tt><i>369</i> &nbsp;</tt>
+            </div>
+            <div id="l370"
+               class="code sev- "><tt><i>370</i>         <span class="c1"># make init if not already explicitly present</span></tt>
+            </div>
+            <div id="l371"
+               class="code sev- "><tt><i>371</i>         <span class="k">if</span> <span class="n">init</span><span class="p">:</span></tt>
+            </div>
+            <div id="l372"
+               class="code sev- "><tt><i>372</i>             <span class="n">_make_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span></tt>
+            </div>
+            <div id="l373"
+               class="code sev- "><tt><i>373</i> &nbsp;</tt>
+            </div>
+            <div id="l374"
+               class="code sev- "><tt><i>374</i>         <span class="c1"># list all fields</span></tt>
+            </div>
+            <div id="l375"
+               class="code sev- "><tt><i>375</i>         <span class="n">all_pyfields</span> <span class="o">=</span> <span class="n">get_fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span></tt>
+            </div>
+            <div id="l376"
+               class="code sev- "><tt><i>376</i>         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_pyfields</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span></tt>
+            </div>
+            <div id="l377"
+               class="code sev- "><tt><i>377</i>             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No fields detected on class </span><span class="si">%s</span><span class="s2"> (including inherited ones)&quot;</span> <span class="o">%</span> <span class="bp">cls</span><span class="p">)</span></tt>
+            </div>
+            <div id="l378"
+               class="code sev- "><tt><i>378</i> &nbsp;</tt>
+            </div>
+            <div id="l379"
+               class="code sev- "><tt><i>379</i>         <span class="c1"># filter selected</span></tt>
+            </div>
+            <div id="l380"
+               class="code sev- "><tt><i>380</i>         <span class="n">all_names</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">all_pyfields</span><span class="p">)</span></tt>
+            </div>
+            <div id="l381"
+               class="code sev- "><tt><i>381</i>         <span class="n">selected_names</span> <span class="o">=</span> <span class="n">filter_names</span><span class="p">(</span><span class="n">all_names</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="n">ac_include</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="n">ac_exclude</span><span class="p">,</span> <span class="n">caller</span><span class="o">=</span><span class="s2">&quot;@autoclass&quot;</span><span class="p">)</span></tt>
+            </div>
+            <div id="l382"
+               class="code sev- "><tt><i>382</i>         <span class="n">public_selected_names</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">selected_names</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">n</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">))</span></tt>
+            </div>
+            <div id="l383"
+               class="code sev- "><tt><i>383</i> &nbsp;</tt>
+            </div>
+            <div id="l384"
+               class="code sev- "><tt><i>384</i>         <span class="c1"># to/from dict</span></tt>
+            </div>
+            <div id="l385"
+               class="code sev- "><tt><i>385</i>         <span class="k">if</span> <span class="n">dict_on</span><span class="p">:</span></tt>
+            </div>
+            <div id="l386"
+               class="code sev- "><tt><i>386</i>             <span class="n">dict_names</span> <span class="o">=</span> <span class="n">public_selected_names</span> <span class="k">if</span> <span class="n">dict_public_only</span> <span class="k">else</span> <span class="n">selected_names</span></tt>
+            </div>
+            <div id="l387"
+               class="code sev- "><tt><i>387</i>             <span class="k">if</span> <span class="s2">&quot;to_dict&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span></tt>
+            </div>
+            <div id="l388"
+               class="code sev- "><tt><i>388</i> &nbsp;</tt>
+            </div>
+            <div id="l389"
+               class="code sev- "><tt><i>389</i>                 <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></tt>
+            </div>
+            <div id="l390"
+               class="code sev- "><tt><i>390</i>                     <span class="sd">&quot;&quot;&quot; Generated by @pyfields.autoclass based on the class fields &quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l391"
+               class="code sev- "><tt><i>391</i>                     <span class="k">return</span> <span class="p">{</span><span class="n">n</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">dict_names</span><span class="p">}</span></tt>
+            </div>
+            <div id="l392"
+               class="code sev- "><tt><i>392</i> &nbsp;</tt>
+            </div>
+            <div id="l393"
+               class="code sev- "><tt><i>393</i>                 <span class="bp">cls</span><span class="o">.</span><span class="n">to_dict</span> <span class="o">=</span> <span class="n">to_dict</span></tt>
+            </div>
+            <div id="l394"
+               class="code sev- "><tt><i>394</i>             <span class="k">if</span> <span class="s2">&quot;from_dict&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span></tt>
+            </div>
+            <div id="l395"
+               class="code sev- "><tt><i>395</i> &nbsp;</tt>
+            </div>
+            <div id="l396"
+               class="code sev- "><tt><i>396</i>                 <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dct</span><span class="p">):</span></tt>
+            </div>
+            <div id="l397"
+               class="code sev- "><tt><i>397</i>                     <span class="sd">&quot;&quot;&quot; Generated by @pyfields.autoclass &quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l398"
+               class="code sev- "><tt><i>398</i>                     <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">dct</span><span class="p">)</span></tt>
+            </div>
+            <div id="l399"
+               class="code sev- "><tt><i>399</i> &nbsp;</tt>
+            </div>
+            <div id="l400"
+               class="code sev- "><tt><i>400</i>                 <span class="bp">cls</span><span class="o">.</span><span class="n">from_dict</span> <span class="o">=</span> <span class="nb">classmethod</span><span class="p">(</span><span class="n">from_dict</span><span class="p">)</span></tt>
+            </div>
+            <div id="l401"
+               class="code sev- "><tt><i>401</i> &nbsp;</tt>
+            </div>
+            <div id="l402"
+               class="code sev- "><tt><i>402</i>         <span class="c1"># __str__ and __repr__</span></tt>
+            </div>
+            <div id="l403"
+               class="code sev- "><tt><i>403</i>         <span class="k">if</span> <span class="nb">repr</span><span class="p">:</span></tt>
+            </div>
+            <div id="l404"
+               class="code sev- "><tt><i>404</i>             <span class="n">repr_names</span> <span class="o">=</span> <span class="n">public_selected_names</span> <span class="k">if</span> <span class="n">repr_public_only</span> <span class="k">else</span> <span class="n">selected_names</span></tt>
+            </div>
+            <div id="l405"
+               class="code sev- "><tt><i>405</i>             <span class="k">if</span> <span class="ow">not</span> <span class="n">repr_curly_mode</span><span class="p">:</span>  <span class="c1"># default</span></tt>
+            </div>
+            <div id="l406"
+               class="code sev- "><tt><i>406</i> &nbsp;</tt>
+            </div>
+            <div id="l407"
+               class="code sev- "><tt><i>407</i>                 <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></tt>
+            </div>
+            <div id="l408"
+               class="code sev- "><tt><i>408</i>                     <span class="sd">&quot;&quot;&quot; Generated by @pyfields.autoclass based on the class fields &quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l409"
+               class="code sev- "><tt><i>409</i>                     <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span></tt>
+            </div>
+            <div id="l410"
+               class="code sev- "><tt><i>410</i>                                        <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">=</span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">repr_names</span><span class="p">))</span></tt>
+            </div>
+            <div id="l411"
+               class="code sev- "><tt><i>411</i>             <span class="k">else</span><span class="p">:</span></tt>
+            </div>
+            <div id="l412"
+               class="code sev- "><tt><i>412</i>                 <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></tt>
+            </div>
+            <div id="l413"
+               class="code sev- "><tt><i>413</i>                     <span class="sd">&quot;&quot;&quot; Generated by @pyfields.autoclass based on the class fields &quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l414"
+               class="code sev- "><tt><i>414</i>                     <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(**{</span><span class="si">%s</span><span class="s1">})&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span></tt>
+            </div>
+            <div id="l415"
+               class="code sev- "><tt><i>415</i>                                            <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%r</span><span class="s1">: </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">repr_names</span><span class="p">))</span></tt>
+            </div>
+            <div id="l416"
+               class="code sev- "><tt><i>416</i> &nbsp;</tt>
+            </div>
+            <div id="l417"
+               class="code sev- "><tt><i>417</i>             <span class="k">if</span> <span class="s2">&quot;__repr__&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span></tt>
+            </div>
+            <div id="l418"
+               class="code sev- "><tt><i>418</i>                 <span class="bp">cls</span><span class="o">.</span><span class="fm">__repr__</span> <span class="o">=</span> <span class="fm">__repr__</span></tt>
+            </div>
+            <div id="l419"
+               class="code sev- "><tt><i>419</i>             <span class="k">if</span> <span class="s2">&quot;__str__&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span></tt>
+            </div>
+            <div id="l420"
+               class="code sev- "><tt><i>420</i>                 <span class="bp">cls</span><span class="o">.</span><span class="fm">__str__</span> <span class="o">=</span> <span class="fm">__repr__</span></tt>
+            </div>
+            <div id="l421"
+               class="code sev- "><tt><i>421</i> &nbsp;</tt>
+            </div>
+            <div id="l422"
+               class="code sev- "><tt><i>422</i>         <span class="c1"># __eq__</span></tt>
+            </div>
+            <div id="l423"
+               class="code sev- "><tt><i>423</i>         <span class="k">if</span> <span class="n">eq</span><span class="p">:</span></tt>
+            </div>
+            <div id="l424"
+               class="code sev- "><tt><i>424</i>             <span class="n">eq_names</span> <span class="o">=</span> <span class="n">public_selected_names</span> <span class="k">if</span> <span class="n">eq_public_only</span> <span class="k">else</span> <span class="n">selected_names</span></tt>
+            </div>
+            <div id="l425"
+               class="code sev- "><tt><i>425</i> &nbsp;</tt>
+            </div>
+            <div id="l426"
+               class="code sev- "><tt><i>426</i>             <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span></tt>
+            </div>
+            <div id="l427"
+               class="code sev- "><tt><i>427</i>                 <span class="sd">&quot;&quot;&quot; Generated by @pyfields.autoclass based on the class fields &quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l428"
+               class="code sev- "><tt><i>428</i>                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span></tt>
+            </div>
+            <div id="l429"
+               class="code sev- "><tt><i>429</i>                     <span class="c1"># comparison with dicts only when a to_dict method is available</span></tt>
+            </div>
+            <div id="l430"
+               class="code sev- "><tt><i>430</i>                     <span class="k">try</span><span class="p">:</span></tt>
+            </div>
+            <div id="l431"
+               class="code sev- "><tt><i>431</i>                         <span class="n">_self_to_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span></tt>
+            </div>
+            <div id="l432"
+               class="code sev- "><tt><i>432</i>                     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span></tt>
+            </div>
+            <div id="l433"
+               class="code sev- "><tt><i>433</i>                         <span class="k">return</span> <span class="kc">False</span></tt>
+            </div>
+            <div id="l434"
+               class="code sev- "><tt><i>434</i>                     <span class="k">else</span><span class="p">:</span></tt>
+            </div>
+            <div id="l435"
+               class="code sev- "><tt><i>435</i>                         <span class="k">return</span> <span class="n">_self_to_dict</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span></tt>
+            </div>
+            <div id="l436"
+               class="code sev- "><tt><i>436</i>                 <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span></tt>
+            </div>
+            <div id="l437"
+               class="code sev- "><tt><i>437</i>                     <span class="c1"># comparison with objects of the same class or a parent</span></tt>
+            </div>
+            <div id="l438"
+               class="code sev- "><tt><i>438</i>                     <span class="k">try</span><span class="p">:</span></tt>
+            </div>
+            <div id="l439"
+               class="code sev- "><tt><i>439</i>                         <span class="k">for</span> <span class="n">att_name</span> <span class="ow">in</span> <span class="n">eq_names</span><span class="p">:</span></tt>
+            </div>
+            <div id="l440"
+               class="code sev- "><tt><i>440</i>                             <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">att_name</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">att_name</span><span class="p">):</span></tt>
+            </div>
+            <div id="l441"
+               class="code sev- "><tt><i>441</i>                                 <span class="k">return</span> <span class="kc">False</span></tt>
+            </div>
+            <div id="l442"
+               class="code sev- "><tt><i>442</i>                     <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span></tt>
+            </div>
+            <div id="l443"
+               class="code sev- "><tt><i>443</i>                         <span class="k">return</span> <span class="kc">False</span></tt>
+            </div>
+            <div id="l444"
+               class="code sev- "><tt><i>444</i>                     <span class="k">else</span><span class="p">:</span></tt>
+            </div>
+            <div id="l445"
+               class="code sev- "><tt><i>445</i>                         <span class="k">return</span> <span class="kc">True</span></tt>
+            </div>
+            <div id="l446"
+               class="code sev- "><tt><i>446</i>                 <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span></tt>
+            </div>
+            <div id="l447"
+               class="code sev- "><tt><i>447</i>                     <span class="c1"># other is a subtype: call method on other</span></tt>
+            </div>
+            <div id="l448"
+               class="code sev- "><tt><i>448</i>                     <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>  <span class="c1"># same as NotImplemented ?</span></tt>
+            </div>
+            <div id="l449"
+               class="code sev- "><tt><i>449</i>                 <span class="k">else</span><span class="p">:</span></tt>
+            </div>
+            <div id="l450"
+               class="code sev- "><tt><i>450</i>                     <span class="c1"># classes are not related: False</span></tt>
+            </div>
+            <div id="l451"
+               class="code sev- "><tt><i>451</i>                     <span class="k">return</span> <span class="kc">False</span></tt>
+            </div>
+            <div id="l452"
+               class="code sev- "><tt><i>452</i> &nbsp;</tt>
+            </div>
+            <div id="l453"
+               class="code sev- "><tt><i>453</i>             <span class="k">if</span> <span class="s2">&quot;__eq__&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span></tt>
+            </div>
+            <div id="l454"
+               class="code sev- "><tt><i>454</i>                 <span class="bp">cls</span><span class="o">.</span><span class="fm">__eq__</span> <span class="o">=</span> <span class="fm">__eq__</span></tt>
+            </div>
+            <div id="l455"
+               class="code sev- "><tt><i>455</i> &nbsp;</tt>
+            </div>
+            <div id="l456"
+               class="code sev- "><tt><i>456</i>         <span class="c1"># __hash__</span></tt>
+            </div>
+            <div id="l457"
+               class="code sev- "><tt><i>457</i>         <span class="k">if</span> <span class="n">hash_on</span><span class="p">:</span></tt>
+            </div>
+            <div id="l458"
+               class="code sev- "><tt><i>458</i>             <span class="n">hash_names</span> <span class="o">=</span> <span class="n">public_selected_names</span> <span class="k">if</span> <span class="n">hash_public_only</span> <span class="k">else</span> <span class="n">selected_names</span></tt>
+            </div>
+            <div id="l459"
+               class="code sev- "><tt><i>459</i> &nbsp;</tt>
+            </div>
+            <div id="l460"
+               class="code sev- "><tt><i>460</i>             <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></tt>
+            </div>
+            <div id="l461"
+               class="code sev- "><tt><i>461</i>                 <span class="sd">&quot;&quot;&quot; Generated by @autoclass. Implements the __hash__ method by hashing a tuple of field values &quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l462"
+               class="code sev- "><tt><i>462</i> &nbsp;</tt>
+            </div>
+            <div id="l463"
+               class="code sev- "><tt><i>463</i>                 <span class="c1"># note: Should we prepend a unique hash for the class as `attrs` does ?</span></tt>
+            </div>
+            <div id="l464"
+               class="code sev- "><tt><i>464</i>                 <span class="c1"># return hash(tuple([type(self)] + [getattr(self, att_name) for att_name in added]))</span></tt>
+            </div>
+            <div id="l465"
+               class="code sev- "><tt><i>465</i>                 <span class="c1"># &gt; No, it seems more intuitive to not do that.</span></tt>
+            </div>
+            <div id="l466"
+               class="code sev- "><tt><i>466</i>                 <span class="c1"># Warning: the consequence is that instances of subtypes will have the same hash has instance of their</span></tt>
+            </div>
+            <div id="l467"
+               class="code sev- "><tt><i>467</i>                 <span class="c1"># parent class if they have all the same attribute values</span></tt>
+            </div>
+            <div id="l468"
+               class="code sev- "><tt><i>468</i> &nbsp;</tt>
+            </div>
+            <div id="l469"
+               class="code sev- "><tt><i>469</i>                 <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">att_name</span><span class="p">)</span> <span class="k">for</span> <span class="n">att_name</span> <span class="ow">in</span> <span class="n">hash_names</span><span class="p">))</span></tt>
+            </div>
+            <div id="l470"
+               class="code sev- "><tt><i>470</i> &nbsp;</tt>
+            </div>
+            <div id="l471"
+               class="code sev- "><tt><i>471</i>             <span class="k">if</span> <span class="s2">&quot;__hash__&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span></tt>
+            </div>
+            <div id="l472"
+               class="code sev- "><tt><i>472</i>                 <span class="bp">cls</span><span class="o">.</span><span class="fm">__hash__</span> <span class="o">=</span> <span class="fm">__hash__</span></tt>
+            </div>
+            <div id="l473"
+               class="code sev- "><tt><i>473</i> &nbsp;</tt>
+            </div>
+            <div id="l474"
+               class="code sev- "><tt><i>474</i>         <span class="k">return</span> <span class="bp">cls</span></tt>
+            </div>
+            <div id="l475"
+               class="code sev- "><tt><i>475</i> &nbsp;</tt>
+            </div>
+            <div id="l476"
+               class="code sev- "><tt><i>476</i>     <span class="c1"># Apply: Decorator vs decorator factory logic</span></tt>
+            </div>
+            <div id="l477"
+               class="code sev- "><tt><i>477</i>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span></tt>
+            </div>
+            <div id="l478"
+               class="code sev- "><tt><i>478</i>         <span class="c1"># called without parenthesis: directly apply decorator on first argument</span></tt>
+            </div>
+            <div id="l479"
+               class="code sev- "><tt><i>479</i>         <span class="bp">cls</span> <span class="o">=</span> <span class="n">fields</span></tt>
+            </div>
+            <div id="l480"
+               class="code sev- "><tt><i>480</i>         <span class="n">fields</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># set it back to its default value</span></tt>
+            </div>
+            <div id="l481"
+               class="code sev- "><tt><i>481</i>         <span class="k">return</span> <span class="n">_apply_decorator</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span></tt>
+            </div>
+            <div id="l482"
+               class="code sev- "><tt><i>482</i>     <span class="k">else</span><span class="p">:</span></tt>
+            </div>
+            <div id="l483"
+               class="code sev- "><tt><i>483</i>         <span class="c1"># called with parenthesis: return a decorator function</span></tt>
+            </div>
+            <div id="l484"
+               class="code sev- "><tt><i>484</i>         <span class="k">return</span> <span class="n">_apply_decorator</span></tt>
+            </div>
+            <div id="l485"
+               class="code sev- "><tt><i>485</i> &nbsp;</tt>
+            </div>
+            <div id="l486"
+               class="code sev- "><tt><i>486</i> &nbsp;</tt>
+            </div>
+            <div id="l487"
+               class="code sev- "><tt><i>487</i> <span class="k">def</span> <span class="nf">filter_names</span><span class="p">(</span><span class="n">all_names</span><span class="p">,</span></tt>
+            </div>
+            <div id="l488"
+               class="code sev- "><tt><i>488</i>                  <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: Union[str, Tuple[str]]</span></tt>
+            </div>
+            <div id="l489"
+               class="code sev- "><tt><i>489</i>                  <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>  <span class="c1"># type: Union[str, Tuple[str]]</span></tt>
+            </div>
+            <div id="l490"
+               class="code sev- "><tt><i>490</i>                  <span class="n">caller</span><span class="o">=</span><span class="s2">&quot;&quot;</span>      <span class="c1"># type: str</span></tt>
+            </div>
+            <div id="l491"
+               class="code sev- "><tt><i>491</i>                  <span class="p">):</span></tt>
+            </div>
+            <div id="l492"
+               class="code sev- "><tt><i>492</i>     <span class="c1"># type: (...) -&gt; Iterable[str]</span></tt>
+            </div>
+            <div id="l493"
+               class="code sev- "><tt><i>493</i>     <span class="sd">&quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l494"
+               class="code sev- "><tt><i>494</i> <span class="sd">    Common validator for include and exclude arguments</span></tt>
+            </div>
+            <div id="l495"
+               class="code sev- "><tt><i>495</i> &nbsp;</tt>
+            </div>
+            <div id="l496"
+               class="code sev- "><tt><i>496</i> <span class="sd">    :param all_names:</span></tt>
+            </div>
+            <div id="l497"
+               class="code sev- "><tt><i>497</i> <span class="sd">    :param include:</span></tt>
+            </div>
+            <div id="l498"
+               class="code sev- "><tt><i>498</i> <span class="sd">    :param exclude:</span></tt>
+            </div>
+            <div id="l499"
+               class="code sev- "><tt><i>499</i> <span class="sd">    :param caller:</span></tt>
+            </div>
+            <div id="l500"
+               class="code sev- "><tt><i>500</i> <span class="sd">    :return:</span></tt>
+            </div>
+            <div id="l501"
+               class="code sev- "><tt><i>501</i> <span class="sd">    &quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l502"
+               class="code sev- "><tt><i>502</i>     <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span></tt>
+            </div>
+            <div id="l503"
+               class="code sev- "><tt><i>503</i>         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only one of &#39;include&#39; or &#39;exclude&#39; argument should be provided.&quot;</span><span class="p">)</span></tt>
+            </div>
+            <div id="l504"
+               class="code sev- "><tt><i>504</i> &nbsp;</tt>
+            </div>
+            <div id="l505"
+               class="code sev- "><tt><i>505</i>     <span class="c1"># check that include/exclude don&#39;t contain names that are incorrect</span></tt>
+            </div>
+            <div id="l506"
+               class="code sev- "><tt><i>506</i>     <span class="n">selected_names</span> <span class="o">=</span> <span class="n">all_names</span></tt>
+            </div>
+            <div id="l507"
+               class="code sev- "><tt><i>507</i>     <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span></tt>
+            </div>
+            <div id="l508"
+               class="code sev- "><tt><i>508</i>         <span class="k">if</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span></tt>
+            </div>
+            <div id="l509"
+               class="code sev- "><tt><i>509</i>             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Only one of </span><span class="se">\&#39;</span><span class="s1">include</span><span class="se">\&#39;</span><span class="s1"> or </span><span class="se">\&#39;</span><span class="s1">exclude</span><span class="se">\&#39;</span><span class="s1"> argument should be provided.&#39;</span><span class="p">)</span></tt>
+            </div>
+            <div id="l510"
+               class="code sev- "><tt><i>510</i> &nbsp;</tt>
+            </div>
+            <div id="l511"
+               class="code sev- "><tt><i>511</i>         <span class="c1"># get the selected names and check that all names in &#39;include&#39; are actually valid names</span></tt>
+            </div>
+            <div id="l512"
+               class="code sev- "><tt><i>512</i>         <span class="n">included</span> <span class="o">=</span> <span class="p">(</span><span class="n">include</span><span class="p">,)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">include</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">include</span><span class="p">)</span></tt>
+            </div>
+            <div id="l513"
+               class="code sev- "><tt><i>513</i>         <span class="n">incorrect</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">included</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">all_names</span><span class="p">)</span></tt>
+            </div>
+            <div id="l514"
+               class="code sev- "><tt><i>514</i>         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">incorrect</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span></tt>
+            </div>
+            <div id="l515"
+               class="code sev- "><tt><i>515</i>             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`</span><span class="si">%s</span><span class="s2">` definition exception: `include` contains </span><span class="si">%r</span><span class="s2"> that is/are &quot;</span></tt>
+            </div>
+            <div id="l516"
+               class="code sev- "><tt><i>516</i>                              <span class="s2">&quot;not part of </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">caller</span><span class="p">,</span> <span class="n">incorrect</span><span class="p">,</span> <span class="n">all_names</span><span class="p">))</span></tt>
+            </div>
+            <div id="l517"
+               class="code sev- "><tt><i>517</i>         <span class="n">selected_names</span> <span class="o">=</span> <span class="n">included</span></tt>
+            </div>
+            <div id="l518"
+               class="code sev- "><tt><i>518</i> &nbsp;</tt>
+            </div>
+            <div id="l519"
+               class="code sev- "><tt><i>519</i>     <span class="k">elif</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span></tt>
+            </div>
+            <div id="l520"
+               class="code sev- "><tt><i>520</i>         <span class="n">excluded_set</span> <span class="o">=</span> <span class="p">{</span><span class="n">exclude</span><span class="p">}</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exclude</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="nb">set</span><span class="p">(</span><span class="n">exclude</span><span class="p">)</span></tt>
+            </div>
+            <div id="l521"
+               class="code sev- "><tt><i>521</i>         <span class="n">incorrect</span> <span class="o">=</span> <span class="n">excluded_set</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">all_names</span><span class="p">)</span></tt>
+            </div>
+            <div id="l522"
+               class="code sev- "><tt><i>522</i>         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">incorrect</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span></tt>
+            </div>
+            <div id="l523"
+               class="code sev- "><tt><i>523</i>             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`</span><span class="si">%s</span><span class="s2">` definition exception: exclude contains </span><span class="si">%r</span><span class="s2"> that is/are &quot;</span></tt>
+            </div>
+            <div id="l524"
+               class="code sev- "><tt><i>524</i>                              <span class="s2">&quot;not part of </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">caller</span><span class="p">,</span> <span class="n">incorrect</span><span class="p">,</span> <span class="n">all_names</span><span class="p">))</span></tt>
+            </div>
+            <div id="l525"
+               class="code sev- "><tt><i>525</i>         <span class="n">selected_names</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">all_names</span> <span class="k">if</span> <span class="n">n</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">excluded_set</span><span class="p">)</span></tt>
+            </div>
+            <div id="l526"
+               class="code sev- "><tt><i>526</i> &nbsp;</tt>
+            </div>
+            <div id="l527"
+               class="code sev- "><tt><i>527</i>     <span class="k">return</span> <span class="n">selected_names</span></tt>
+            </div>
+            <div id="l528"
+               class="code sev- "><tt><i>528</i> &nbsp;</tt>
+            </div>
+            <div id="l529"
+               class="code sev- "><tt><i>529</i> &nbsp;</tt>
+            </div>
+            <div id="l530"
+               class="code sev- "><tt><i>530</i> <span class="c1"># def method_already_there(cls,</span></tt>
+            </div>
+            <div id="l531"
+               class="code sev- "><tt><i>531</i> <span class="c1">#                          method_name,           # type: str</span></tt>
+            </div>
+            <div id="l532"
+               class="code sev- "><tt><i>532</i> <span class="c1">#                          this_class_only=False  # type: bool</span></tt>
+            </div>
+            <div id="l533"
+               class="code sev- "><tt><i>533</i> <span class="c1">#                          ):</span></tt>
+            </div>
+            <div id="l534"
+               class="code sev- "><tt><i>534</i> <span class="c1">#     # type: (...) -&gt; bool</span></tt>
+            </div>
+            <div id="l535"
+               class="code sev- "><tt><i>535</i> <span class="c1">#     &quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l536"
+               class="code sev- "><tt><i>536</i> <span class="c1">#     Returns True if method `method_name` is already implemented by object_type, that is, its implementation differs</span></tt>
+            </div>
+            <div id="l537"
+               class="code sev- "><tt><i>537</i> <span class="c1">#     from the one in `object`.</span></tt>
+            </div>
+            <div id="l538"
+               class="code sev- "><tt><i>538</i> <span class="c1">#</span></tt>
+            </div>
+            <div id="l539"
+               class="code sev- "><tt><i>539</i> <span class="c1">#     :param cls:</span></tt>
+            </div>
+            <div id="l540"
+               class="code sev- "><tt><i>540</i> <span class="c1">#     :param method_name:</span></tt>
+            </div>
+            <div id="l541"
+               class="code sev- "><tt><i>541</i> <span class="c1">#     :param this_class_only:</span></tt>
+            </div>
+            <div id="l542"
+               class="code sev- "><tt><i>542</i> <span class="c1">#     :return:</span></tt>
+            </div>
+            <div id="l543"
+               class="code sev- "><tt><i>543</i> <span class="c1">#     &quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l544"
+               class="code sev- "><tt><i>544</i> <span class="c1">#     if this_class_only:</span></tt>
+            </div>
+            <div id="l545"
+               class="code sev- "><tt><i>545</i> <span class="c1">#         return method_name in cls.__dict__  # or vars(cls)</span></tt>
+            </div>
+            <div id="l546"
+               class="code sev- "><tt><i>546</i> <span class="c1">#     else:</span></tt>
+            </div>
+            <div id="l547"
+               class="code sev- "><tt><i>547</i> <span class="c1">#         method = getattr(cls, method_name, None)</span></tt>
+            </div>
+            <div id="l548"
+               class="code sev- "><tt><i>548</i> <span class="c1">#         return method is not None and method is not getattr(object, method_name, None)</span></tt>
+            </div>
+            <div id="l549"
+               class="code sev- "><tt><i>549</i> &nbsp;</tt>
+            </div>
+            <div id="l550"
+               class="code sev- "><tt><i>550</i> &nbsp;</tt>
+            </div>
+            <div id="l551"
+               class="code sev- "><tt><i>551</i> <span class="k">def</span> <span class="nf">getownattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">attrib_name</span><span class="p">):</span></tt>
+            </div>
+            <div id="l552"
+               class="code sev- "><tt><i>552</i>     <span class="sd">&quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l553"
+               class="code sev- "><tt><i>553</i> <span class="sd">    Return the value of `cls.&lt;attrib_name&gt;` if it is defined in the class (and not inherited).</span></tt>
+            </div>
+            <div id="l554"
+               class="code sev- "><tt><i>554</i> <span class="sd">    If the attribute is not present or is inherited, an `AttributeError` is raised.</span></tt>
+            </div>
+            <div id="l555"
+               class="code sev- "><tt><i>555</i> &nbsp;</tt>
+            </div>
+            <div id="l556"
+               class="code sev- "><tt><i>556</i> <span class="sd">    &gt;&gt;&gt; class A(object):</span></tt>
+            </div>
+            <div id="l557"
+               class="code sev- "><tt><i>557</i> <span class="sd">    ...     a = 1</span></tt>
+            </div>
+            <div id="l558"
+               class="code sev- "><tt><i>558</i> <span class="sd">    &gt;&gt;&gt;</span></tt>
+            </div>
+            <div id="l559"
+               class="code sev- "><tt><i>559</i> <span class="sd">    &gt;&gt;&gt; class B(A):</span></tt>
+            </div>
+            <div id="l560"
+               class="code sev- "><tt><i>560</i> <span class="sd">    ...     pass</span></tt>
+            </div>
+            <div id="l561"
+               class="code sev- "><tt><i>561</i> <span class="sd">    &gt;&gt;&gt;</span></tt>
+            </div>
+            <div id="l562"
+               class="code sev- "><tt><i>562</i> <span class="sd">    &gt;&gt;&gt; getownattr(A, &#39;a&#39;)</span></tt>
+            </div>
+            <div id="l563"
+               class="code sev- "><tt><i>563</i> <span class="sd">    1</span></tt>
+            </div>
+            <div id="l564"
+               class="code sev- "><tt><i>564</i> <span class="sd">    &gt;&gt;&gt; getownattr(A, &#39;unknown&#39;)</span></tt>
+            </div>
+            <div id="l565"
+               class="code sev- "><tt><i>565</i> <span class="sd">    Traceback (most recent call last):</span></tt>
+            </div>
+            <div id="l566"
+               class="code sev- "><tt><i>566</i> <span class="sd">        ...</span></tt>
+            </div>
+            <div id="l567"
+               class="code sev- "><tt><i>567</i> <span class="sd">    AttributeError: type object &#39;A&#39; has no attribute &#39;unknown&#39;</span></tt>
+            </div>
+            <div id="l568"
+               class="code sev- "><tt><i>568</i> <span class="sd">    &gt;&gt;&gt; getownattr(B, &#39;a&#39;)</span></tt>
+            </div>
+            <div id="l569"
+               class="code sev- "><tt><i>569</i> <span class="sd">    Traceback (most recent call last):</span></tt>
+            </div>
+            <div id="l570"
+               class="code sev- "><tt><i>570</i> <span class="sd">        ...</span></tt>
+            </div>
+            <div id="l571"
+               class="code sev- "><tt><i>571</i> <span class="sd">    AttributeError: type object &#39;B&#39; has no directly defined attribute &#39;a&#39;</span></tt>
+            </div>
+            <div id="l572"
+               class="code sev- "><tt><i>572</i> &nbsp;</tt>
+            </div>
+            <div id="l573"
+               class="code sev- "><tt><i>573</i> <span class="sd">    &quot;&quot;&quot;</span></tt>
+            </div>
+            <div id="l574"
+               class="code sev- "><tt><i>574</i>     <span class="n">attr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">attrib_name</span><span class="p">)</span></tt>
+            </div>
+            <div id="l575"
+               class="code sev- "><tt><i>575</i> &nbsp;</tt>
+            </div>
+            <div id="l576"
+               class="code sev- "><tt><i>576</i>     <span class="k">for</span> <span class="n">base_cls</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__mro__</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span></tt>
+            </div>
+            <div id="l577"
+               class="code sev- "><tt><i>577</i>         <span class="n">a</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">base_cls</span><span class="p">,</span> <span class="n">attrib_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></tt>
+            </div>
+            <div id="l578"
+               class="code sev- "><tt><i>578</i>         <span class="k">if</span> <span class="n">attr</span> <span class="ow">is</span> <span class="n">a</span><span class="p">:</span></tt>
+            </div>
+            <div id="l579"
+               class="code sev- "><tt><i>579</i>             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;type object </span><span class="si">%r</span><span class="s2"> has no directly defined attribute </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">attrib_name</span><span class="p">))</span></tt>
+            </div>
+            <div id="l580"
+               class="code sev- "><tt><i>580</i> &nbsp;</tt>
+            </div>
+            <div id="l581"
+               class="code sev- "><tt><i>581</i>     <span class="k">return</span> <span class="n">attr</span></tt>
+            </div>
+            
+         </div>
+      </div>
+   </body>
+</html>

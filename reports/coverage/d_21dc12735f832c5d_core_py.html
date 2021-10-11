@@ -53,10 +53,10 @@
     </div>
 </div>
 <div id="source">
-    <p id="t1" class="pln"><span class="n"><a href="#t1">1</a></span><span class="t"><span class="com">#  Authors: Sylvain Marie &lt;sylvain.marie@se.com></span>&nbsp;</span><span class="r"></span></p>
-    <p id="t2" class="pln"><span class="n"><a href="#t2">2</a></span><span class="t"><span class="com">#</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t3" class="pln"><span class="n"><a href="#t3">3</a></span><span class="t"><span class="com">#  Copyright (c) Schneider Electric Industries, 2019. All right reserved.</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t4" class="pln"><span class="n"><a href="#t4">4</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p id="t1" class="pln"><span class="n"><a href="#t1">1</a></span><span class="t"><span class="com"># Authors: Sylvain MARIE &lt;sylvain.marie@se.com></span>&nbsp;</span><span class="r"></span></p>
+    <p id="t2" class="pln"><span class="n"><a href="#t2">2</a></span><span class="t"><span class="com">#          + All contributors to &lt;https://github.com/smarie/python-pyfields></span>&nbsp;</span><span class="r"></span></p>
+    <p id="t3" class="pln"><span class="n"><a href="#t3">3</a></span><span class="t"><span class="com">#</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t4" class="pln"><span class="n"><a href="#t4">4</a></span><span class="t"><span class="com"># License: 3-clause BSD, &lt;https://github.com/smarie/python-pyfields/blob/master/LICENSE></span>&nbsp;</span><span class="r"></span></p>
     <p id="t5" class="run"><span class="n"><a href="#t5">5</a></span><span class="t"><span class="key">import</span> <span class="nam">sys</span>&nbsp;</span><span class="r"></span></p>
     <p id="t6" class="run"><span class="n"><a href="#t6">6</a></span><span class="t"><span class="key">from</span> <span class="nam">enum</span> <span class="key">import</span> <span class="nam">Enum</span>&nbsp;</span><span class="r"></span></p>
     <p id="t7" class="run"><span class="n"><a href="#t7">7</a></span><span class="t"><span class="key">from</span> <span class="nam">textwrap</span> <span class="key">import</span> <span class="nam">dedent</span>&nbsp;</span><span class="r"></span></p>
@@ -66,7 +66,7 @@
     <p id="t11" class="run"><span class="n"><a href="#t11">11</a></span><span class="t">    <span class="key">from</span> <span class="nam">inspect</span> <span class="key">import</span> <span class="nam">signature</span><span class="op">,</span> <span class="nam">Parameter</span>&nbsp;</span><span class="r"></span></p>
     <p id="t12" class="exc show_exc"><span class="n"><a href="#t12">12</a></span><span class="t"><span class="key">except</span> <span class="nam">ImportError</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t13" class="pln"><span class="n"><a href="#t13">13</a></span><span class="t">    <span class="com"># noinspection PyUnresolvedReferences,PyPackageRequirements</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t14" class="exc show_exc"><span class="n"><a href="#t14">14</a></span><span class="t">    <span class="key">from</span> <span class="nam">funcsigs</span> <span class="key">import</span> <span class="nam">signature</span><span class="op">,</span> <span class="nam">Parameter</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t14" class="exc show_exc"><span class="n"><a href="#t14">14</a></span><span class="t">    <span class="key">from</span> <span class="nam">funcsigs</span> <span class="key">import</span> <span class="nam">signature</span><span class="op">,</span> <span class="nam">Parameter</span>  <span class="com"># noqa</span>&nbsp;</span><span class="r"></span></p>
     <p id="t15" class="pln"><span class="n"><a href="#t15">15</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t16" class="run"><span class="n"><a href="#t16">16</a></span><span class="t"><span class="key">from</span> <span class="nam">valid8</span> <span class="key">import</span> <span class="nam">ValidationFailure</span><span class="op">,</span> <span class="nam">is_pep484_nonable</span>&nbsp;</span><span class="r"></span></p>
     <p id="t17" class="pln"><span class="n"><a href="#t17">17</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -75,7 +75,7 @@
     <p id="t20" class="pln"><span class="n"><a href="#t20">20</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t21" class="run"><span class="n"><a href="#t21">21</a></span><span class="t"><span class="key">try</span><span class="op">:</span>  <span class="com"># python 3.5+</span>&nbsp;</span><span class="r"></span></p>
     <p id="t22" class="pln"><span class="n"><a href="#t22">22</a></span><span class="t">    <span class="com"># noinspection PyUnresolvedReferences</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t23" class="run"><span class="n"><a href="#t23">23</a></span><span class="t">    <span class="key">from</span> <span class="nam">typing</span> <span class="key">import</span> <span class="nam">List</span><span class="op">,</span> <span class="nam">Callable</span><span class="op">,</span> <span class="nam">Type</span><span class="op">,</span> <span class="nam">Any</span><span class="op">,</span> <span class="nam">Union</span><span class="op">,</span> <span class="nam">Iterable</span><span class="op">,</span> <span class="nam">Tuple</span><span class="op">,</span> <span class="nam">TypeVar</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t23" class="run"><span class="n"><a href="#t23">23</a></span><span class="t">    <span class="key">from</span> <span class="nam">typing</span> <span class="key">import</span> <span class="nam">Callable</span><span class="op">,</span> <span class="nam">Type</span><span class="op">,</span> <span class="nam">Any</span><span class="op">,</span> <span class="nam">Union</span><span class="op">,</span> <span class="nam">Iterable</span><span class="op">,</span> <span class="nam">Tuple</span><span class="op">,</span> <span class="nam">TypeVar</span>&nbsp;</span><span class="r"></span></p>
     <p id="t24" class="run"><span class="n"><a href="#t24">24</a></span><span class="t">    <span class="nam">_NoneType</span> <span class="op">=</span> <span class="nam">type</span><span class="op">(</span><span class="key">None</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t25" class="run"><span class="n"><a href="#t25">25</a></span><span class="t">    <span class="nam">use_type_hints</span> <span class="op">=</span> <span class="nam">sys</span><span class="op">.</span><span class="nam">version_info</span> <span class="op">></span> <span class="op">(</span><span class="num">3</span><span class="op">,</span> <span class="num">0</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t26" class="par run show_par"><span class="n"><a href="#t26">26</a></span><span class="t">    <span class="key">if</span> <span class="nam">use_type_hints</span><span class="op">:</span>&nbsp;</span><span class="r"><span class="annotate short">26&#x202F;&#x219B;&#x202F;36</span><span class="annotate long">line 26 didn't jump to line 36, because the condition on line 26 was never false</span></span></p>
@@ -763,7 +763,7 @@
     <p id="t708" class="pln"><span class="n"><a href="#t708">708</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t709" class="pln"><span class="n"><a href="#t709">709</a></span><span class="t"><span class="str">     - @lazy_attribute (sagemath)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t710" class="pln"><span class="n"><a href="#t710">710</a></span><span class="t"><span class="str">     - @cached_property (werkzeug) and https://stackoverflow.com/questions/24704147/python-what-is-a-lazy-property</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t711" class="pln"><span class="n"><a href="#t711">711</a></span><span class="t"><span class="str">     - https://stackoverflow.com/questions/42023852/how-can-i-get-the-attribute-name-when-working-with-descriptor-protocol-in-python</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t711" class="pln"><span class="n"><a href="#t711">711</a></span><span class="t"><span class="str">     - https://stackoverflow.com/q/42023852/7262247</span>&nbsp;</span><span class="r"></span></p>
     <p id="t712" class="pln"><span class="n"><a href="#t712">712</a></span><span class="t"><span class="str">     - attrs / dataclasses</span>&nbsp;</span><span class="r"></span></p>
     <p id="t713" class="pln"><span class="n"><a href="#t713">713</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t714" class="pln"><span class="n"><a href="#t714">714</a></span><span class="t"><span class="str">    :param type_hint: an optional explicit type hint for the field, to override the type hint defined by PEP484</span>&nbsp;</span><span class="r"></span></p>
@@ -773,8 +773,8 @@
     <p id="t718" class="pln"><span class="n"><a href="#t718">718</a></span><span class="t"><span class="str">    :param nonable: a boolean that can be used to explicitly declare that a field can contain `None`. When this is set</span>&nbsp;</span><span class="r"></span></p>
     <p id="t719" class="pln"><span class="n"><a href="#t719">719</a></span><span class="t"><span class="str">        to an explicit `True` or `False` value, usual type checking and validation (*if any*) are not anymore executed</span>&nbsp;</span><span class="r"></span></p>
     <p id="t720" class="pln"><span class="n"><a href="#t720">720</a></span><span class="t"><span class="str">        on `None` values. Instead ; if this is `True`, type checking and validation will be *deactivated* when the field</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t721" class="pln"><span class="n"><a href="#t721">721</a></span><span class="t"><span class="str">        is set to `None` so as to always accept the value. If this is `False`, an `None`error will be raised when `None` is</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t722" class="pln"><span class="n"><a href="#t722">722</a></span><span class="t"><span class="str">        set on the field.</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t721" class="pln"><span class="n"><a href="#t721">721</a></span><span class="t"><span class="str">        is set to `None` so as to always accept the value. If this is `False`, an `None`error will be raised when `None`</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t722" class="pln"><span class="n"><a href="#t722">722</a></span><span class="t"><span class="str">        is set on the field.</span>&nbsp;</span><span class="r"></span></p>
     <p id="t723" class="pln"><span class="n"><a href="#t723">723</a></span><span class="t"><span class="str">        When this is left as `GUESS` (default), the behaviour is "automatic". This means that</span>&nbsp;</span><span class="r"></span></p>
     <p id="t724" class="pln"><span class="n"><a href="#t724">724</a></span><span class="t"><span class="str">         - if the field (a) is optional with default value `None` or (b) has type hint `typing.Optional[]`, the</span>&nbsp;</span><span class="r"></span></p>
     <p id="t725" class="pln"><span class="n"><a href="#t725">725</a></span><span class="t"><span class="str">           behaviour will be the same as with `nonable=True`.</span>&nbsp;</span><span class="r"></span></p>
@@ -1137,7 +1137,7 @@
     <p id="t1082" class="run"><span class="n"><a href="#t1082">1082</a></span><span class="t">                <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t1083" class="pln"><span class="n"><a href="#t1083">1083</a></span><span class="t">                    <span class="com"># does the converter accept this input ?</span>&nbsp;</span><span class="r"></span></p>
     <p id="t1084" class="run"><span class="n"><a href="#t1084">1084</a></span><span class="t">                    <span class="nam">accepted</span> <span class="op">=</span> <span class="nam">converter</span><span class="op">.</span><span class="nam">accepts</span><span class="op">(</span><span class="nam">obj</span><span class="op">,</span> <span class="nam">self</span><span class="op">,</span> <span class="nam">value</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t1085" class="run"><span class="n"><a href="#t1085">1085</a></span><span class="t">                <span class="key">except</span> <span class="nam">Exception</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t1085" class="run"><span class="n"><a href="#t1085">1085</a></span><span class="t">                <span class="key">except</span> <span class="nam">Exception</span><span class="op">:</span>  <span class="com"># noqa</span>&nbsp;</span><span class="r"></span></p>
     <p id="t1086" class="pln"><span class="n"><a href="#t1086">1086</a></span><span class="t">                    <span class="com"># ignore all exceptions from converters</span>&nbsp;</span><span class="r"></span></p>
     <p id="t1087" class="run"><span class="n"><a href="#t1087">1087</a></span><span class="t">                    <span class="key">continue</span>&nbsp;</span><span class="r"></span></p>
     <p id="t1088" class="pln"><span class="n"><a href="#t1088">1088</a></span><span class="t">                <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -1145,7 +1145,7 @@
     <p id="t1090" class="pln"><span class="n"><a href="#t1090">1090</a></span><span class="t">                        <span class="com"># if so, let's try to convert</span>&nbsp;</span><span class="r"></span></p>
     <p id="t1091" class="run"><span class="n"><a href="#t1091">1091</a></span><span class="t">                        <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t1092" class="run"><span class="n"><a href="#t1092">1092</a></span><span class="t">                            <span class="nam">converted_value</span> <span class="op">=</span> <span class="nam">converter</span><span class="op">.</span><span class="nam">convert</span><span class="op">(</span><span class="nam">obj</span><span class="op">,</span> <span class="nam">self</span><span class="op">,</span> <span class="nam">value</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t1093" class="run"><span class="n"><a href="#t1093">1093</a></span><span class="t">                        <span class="key">except</span> <span class="nam">Exception</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t1093" class="run"><span class="n"><a href="#t1093">1093</a></span><span class="t">                        <span class="key">except</span> <span class="nam">Exception</span><span class="op">:</span>  <span class="com"># noqa</span>&nbsp;</span><span class="r"></span></p>
     <p id="t1094" class="pln"><span class="n"><a href="#t1094">1094</a></span><span class="t">                            <span class="com"># ignore all exceptions from converters</span>&nbsp;</span><span class="r"></span></p>
     <p id="t1095" class="run"><span class="n"><a href="#t1095">1095</a></span><span class="t">                            <span class="key">continue</span>&nbsp;</span><span class="r"></span></p>
     <p id="t1096" class="pln"><span class="n"><a href="#t1096">1096</a></span><span class="t">                        <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -1249,8 +1249,8 @@
 <div id="footer">
     <div class="content">
         <p>
-            <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.5</a>,
-            created at 2021-09-16 14:17 +0000
+            <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v6.0.1</a>,
+            created at 2021-10-11 14:01 +0000
         </p>
     </div>
 </div>
