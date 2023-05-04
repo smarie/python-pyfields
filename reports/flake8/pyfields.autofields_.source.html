@@ -92,7 +92,7 @@
                class="code sev- "><tt><i>25</i> <span class="k">def</span> <span class="nf">_make_init</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span></tt>
             </div>
             <div id="l26"
-               class="code sev- "><tt><i>26</i>     <span class="sd">&quot;&quot;&quot;Utility method used in autofields and autoclass to create the constructor based on the class fields&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>26</i> <span class="w">    </span><span class="sd">&quot;&quot;&quot;Utility method used in autofields and autoclass to create the constructor based on the class fields&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l27"
                class="code sev- "><tt><i>27</i>     <span class="k">if</span> <span class="s2">&quot;__init__&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span></tt>
@@ -137,7 +137,7 @@
                class="code sev- "><tt><i>40</i>     <span class="c1"># type: (...) -&gt; Union[Callable[[DecoratedClass], DecoratedClass], DecoratedClass]</span></tt>
             </div>
             <div id="l41"
-               class="code sev- "><tt><i>41</i>     <span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>41</i> <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l42"
                class="code sev- "><tt><i>42</i> <span class="sd">    Decorator to automatically create fields and constructor on a class.</span></tt>
@@ -431,7 +431,7 @@
                class="code sev- "><tt><i>135</i>                 <span class="k">def</span> <span class="nf">t_gen</span><span class="p">():</span></tt>
             </div>
             <div id="l136"
-               class="code sev- "><tt><i>136</i>                     <span class="sd">&quot;&quot;&quot; generator used to fill the definitions for members only in annotations dict &quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>136</i> <span class="w">                    </span><span class="sd">&quot;&quot;&quot; generator used to fill the definitions for members only in annotations dict &quot;&quot;&quot;</span></tt>
             </div>
             <div id="l137"
                class="code sev- "><tt><i>137</i>                     <span class="n">next_stop_name</span> <span class="o">=</span> <span class="k">yield</span></tt>
@@ -458,7 +458,7 @@
                class="code sev- "><tt><i>144</i>                 <span class="k">def</span> <span class="nf">v_gen</span><span class="p">():</span></tt>
             </div>
             <div id="l145"
-               class="code sev- "><tt><i>145</i>                     <span class="sd">&quot;&quot;&quot; generator used to fill the definitions for members only in the values dict &quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>145</i> <span class="w">                    </span><span class="sd">&quot;&quot;&quot; generator used to fill the definitions for members only in the values dict &quot;&quot;&quot;</span></tt>
             </div>
             <div id="l146"
                class="code sev- "><tt><i>146</i>                     <span class="n">next_stop_name</span><span class="p">,</span> <span class="n">next_stop_type_hint</span> <span class="o">=</span> <span class="k">yield</span></tt>
@@ -611,7 +611,7 @@
                class="code sev- "><tt><i>195</i>                 <span class="k">continue</span></tt>
             </div>
             <div id="l196"
-               class="code sev- "><tt><i>196</i>             <span class="k">elif</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">default_value</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">or</span> <span class="n">callable</span><span class="p">(</span><span class="n">default_value</span><span class="p">))</span> \</tt>
+               class="code sev- "><tt><i>196</i>             <span class="k">elif</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">default_value</span><span class="p">,</span> <span class="nb">type</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">callable</span><span class="p">(</span><span class="n">default_value</span><span class="p">))</span> \</tt>
             </div>
             <div id="l197"
                class="code sev- "><tt><i>197</i>                     <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">default_value</span><span class="p">,</span> <span class="s1">&#39;__name__&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">member_name</span><span class="p">:</span></tt>
@@ -890,7 +890,7 @@
                class="code sev- "><tt><i>282</i> <span class="p">):</span></tt>
             </div>
             <div id="l283"
-               class="code sev- "><tt><i>283</i>     <span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>283</i> <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l284"
                class="code sev- "><tt><i>284</i> <span class="sd">    A decorator to automate many things at once for your class.</span></tt>
@@ -1211,7 +1211,7 @@
                class="code sev- "><tt><i>389</i>                 <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></tt>
             </div>
             <div id="l390"
-               class="code sev- "><tt><i>390</i>                     <span class="sd">&quot;&quot;&quot; Generated by @pyfields.autoclass based on the class fields &quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>390</i> <span class="w">                    </span><span class="sd">&quot;&quot;&quot; Generated by @pyfields.autoclass based on the class fields &quot;&quot;&quot;</span></tt>
             </div>
             <div id="l391"
                class="code sev- "><tt><i>391</i>                     <span class="k">return</span> <span class="p">{</span><span class="n">n</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">dict_names</span><span class="p">}</span></tt>
@@ -1232,7 +1232,7 @@
                class="code sev- "><tt><i>396</i>                 <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dct</span><span class="p">):</span></tt>
             </div>
             <div id="l397"
-               class="code sev- "><tt><i>397</i>                     <span class="sd">&quot;&quot;&quot; Generated by @pyfields.autoclass &quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>397</i> <span class="w">                    </span><span class="sd">&quot;&quot;&quot; Generated by @pyfields.autoclass &quot;&quot;&quot;</span></tt>
             </div>
             <div id="l398"
                class="code sev- "><tt><i>398</i>                     <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">dct</span><span class="p">)</span></tt>
@@ -1265,7 +1265,7 @@
                class="code sev- "><tt><i>407</i>                 <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></tt>
             </div>
             <div id="l408"
-               class="code sev- "><tt><i>408</i>                     <span class="sd">&quot;&quot;&quot; Generated by @pyfields.autoclass based on the class fields &quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>408</i> <span class="w">                    </span><span class="sd">&quot;&quot;&quot; Generated by @pyfields.autoclass based on the class fields &quot;&quot;&quot;</span></tt>
             </div>
             <div id="l409"
                class="code sev- "><tt><i>409</i>                     <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span></tt>
@@ -1280,7 +1280,7 @@
                class="code sev- "><tt><i>412</i>                 <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></tt>
             </div>
             <div id="l413"
-               class="code sev- "><tt><i>413</i>                     <span class="sd">&quot;&quot;&quot; Generated by @pyfields.autoclass based on the class fields &quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>413</i> <span class="w">                    </span><span class="sd">&quot;&quot;&quot; Generated by @pyfields.autoclass based on the class fields &quot;&quot;&quot;</span></tt>
             </div>
             <div id="l414"
                class="code sev- "><tt><i>414</i>                     <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(**{</span><span class="si">%s</span><span class="s1">})&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span></tt>
@@ -1322,7 +1322,7 @@
                class="code sev- "><tt><i>426</i>             <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span></tt>
             </div>
             <div id="l427"
-               class="code sev- "><tt><i>427</i>                 <span class="sd">&quot;&quot;&quot; Generated by @pyfields.autoclass based on the class fields &quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>427</i> <span class="w">                </span><span class="sd">&quot;&quot;&quot; Generated by @pyfields.autoclass based on the class fields &quot;&quot;&quot;</span></tt>
             </div>
             <div id="l428"
                class="code sev- "><tt><i>428</i>                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span></tt>
@@ -1424,7 +1424,7 @@
                class="code sev- "><tt><i>460</i>             <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></tt>
             </div>
             <div id="l461"
-               class="code sev- "><tt><i>461</i>                 <span class="sd">&quot;&quot;&quot; Generated by @autoclass. Implements the __hash__ method by hashing a tuple of field values &quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>461</i> <span class="w">                </span><span class="sd">&quot;&quot;&quot; Generated by @autoclass. Implements the __hash__ method by hashing a tuple of field values &quot;&quot;&quot;</span></tt>
             </div>
             <div id="l462"
                class="code sev- "><tt><i>462</i> &nbsp;</tt>
@@ -1520,7 +1520,7 @@
                class="code sev- "><tt><i>492</i>     <span class="c1"># type: (...) -&gt; Iterable[str]</span></tt>
             </div>
             <div id="l493"
-               class="code sev- "><tt><i>493</i>     <span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>493</i> <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l494"
                class="code sev- "><tt><i>494</i> <span class="sd">    Common validator for include and exclude arguments</span></tt>
@@ -1697,7 +1697,7 @@
                class="code sev- "><tt><i>551</i> <span class="k">def</span> <span class="nf">getownattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">attrib_name</span><span class="p">):</span></tt>
             </div>
             <div id="l552"
-               class="code sev- "><tt><i>552</i>     <span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>552</i> <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l553"
                class="code sev- "><tt><i>553</i> <span class="sd">    Return the value of `cls.&lt;attrib_name&gt;` if it is defined in the class (and not inherited).</span></tt>

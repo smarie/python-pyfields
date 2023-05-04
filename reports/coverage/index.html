@@ -5,66 +5,65 @@
     <title>Coverage report</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
-    <script type="text/javascript" src="jquery.min.js"></script>
-    <script type="text/javascript" src="jquery.ba-throttle-debounce.min.js"></script>
-    <script type="text/javascript" src="jquery.tablesorter.min.js"></script>
-    <script type="text/javascript" src="jquery.hotkeys.js"></script>
-    <script type="text/javascript" src="coverage_html.js"></script>
-    <script type="text/javascript">
-        jQuery(document).ready(coverage.index_ready);
-    </script>
+    <script type="text/javascript" src="coverage_html.js" defer></script>
 </head>
 <body class="indexfile">
-<div id="header">
+<header>
     <div class="content">
         <h1>Coverage report:
-            <span class="pc_cov">83%</span>
+            <span class="pc_cov">87%</span>
         </h1>
-        <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
+        <aside id="help_panel_wrapper">
+            <input id="help_panel_state" type="checkbox">
+            <label for="help_panel_state">
+                <img id="keyboard_icon" src="keybd_closed.png" alt="Show/hide keyboard shortcuts" />
+            </label>
+            <div id="help_panel">
+                <p class="legend">Shortcuts on this page</p>
+                <div class="keyhelp">
+                    <p>
+                        <kbd>n</kbd>
+                        <kbd>s</kbd>
+                        <kbd>m</kbd>
+                        <kbd>x</kbd>
+                        <kbd>b</kbd>
+                        <kbd>p</kbd>
+                        <kbd>c</kbd>
+                        &nbsp; change column sorting
+                    </p>
+                    <p>
+                        <kbd>[</kbd>
+                        <kbd>]</kbd>
+                        &nbsp; prev/next file
+                    </p>
+                    <p>
+                        <kbd>?</kbd> &nbsp; show/hide this help
+                    </p>
+                </div>
+            </div>
+        </aside>
         <form id="filter_container">
             <input id="filter" type="text" value="" placeholder="filter..." />
         </form>
+        <p class="text">
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.2.5">coverage.py v7.2.5</a>,
+            created at 2023-05-04 13:07 +0000
+        </p>
     </div>
-</div>
-<div class="help_panel">
-    <img id="panel_icon" src="keybd_open.png" alt="Hide keyboard shortcuts" />
-    <p class="legend">Hot-keys on this page</p>
-    <div>
-    <p class="keyhelp">
-        <span class="key">n</span>
-        <span class="key">s</span>
-        <span class="key">m</span>
-        <span class="key">x</span>
-        <span class="key">b</span>
-        <span class="key">p</span>
-        <span class="key">c</span> &nbsp; change column sorting
-    </p>
-    </div>
-</div>
-<div id="index">
-    <table class="index">
+</header>
+<main id="index">
+    <table class="index" data-sortable>
         <thead>
             <tr class="tablehead" title="Click to sort">
-                <th class="name left headerSortDown shortkey_n">Module</th>
-                <th class="shortkey_s">statements</th>
-                <th class="shortkey_m">missing</th>
-                <th class="shortkey_x">excluded</th>
-                <th class="shortkey_b">branches</th>
-                <th class="shortkey_p">partial</th>
-                <th class="right shortkey_c">coverage</th>
+                <th class="name left" aria-sort="none" data-shortcut="n">Module</th>
+                <th aria-sort="none" data-default-sort-order="descending" data-shortcut="s">statements</th>
+                <th aria-sort="none" data-default-sort-order="descending" data-shortcut="m">missing</th>
+                <th aria-sort="none" data-default-sort-order="descending" data-shortcut="x">excluded</th>
+                <th aria-sort="none" data-default-sort-order="descending" data-shortcut="b">branches</th>
+                <th aria-sort="none" data-default-sort-order="descending" data-shortcut="p">partial</th>
+                <th class="right" aria-sort="none" data-shortcut="c">coverage</th>
             </tr>
         </thead>
-        <tfoot>
-            <tr class="total">
-                <td class="name left">Total</td>
-                <td>1128</td>
-                <td>160</td>
-                <td>79</td>
-                <td>470</td>
-                <td>88</td>
-                <td class="right" data-ratio="1320 1598">83%</td>
-            </tr>
-        </tfoot>
         <tbody>
             <tr class="file">
                 <td class="name left"><a href="d_21dc12735f832c5d___init___py.html">pyfields/__init__.py</a></td>
@@ -121,13 +120,184 @@
                 <td class="right" data-ratio="193 234">82%</td>
             </tr>
             <tr class="file">
-                <td class="name left"><a href="d_21dc12735f832c5d_typing_utils_py.html">pyfields/typing_utils.py</a></td>
-                <td>47</td>
-                <td>3</td>
-                <td>57</td>
+                <td class="name left"><a href="d_0741856826febfd8___init___py.html">pyfields/tests/__init__.py</a></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 0">100%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_0741856826febfd8__test_benchmarks_py.html">pyfields/tests/_test_benchmarks.py</a></td>
+                <td>55</td>
+                <td>55</td>
+                <td>0</td>
+                <td>16</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 71">0%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_0741856826febfd8__test_py36_py.html">pyfields/tests/_test_py36.py</a></td>
+                <td>130</td>
+                <td>1</td>
+                <td>0</td>
+                <td>36</td>
+                <td>2</td>
+                <td class="right" data-ratio="163 166">98%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_fdb8d8f46e8a7716___init___py.html">pyfields/tests/issues/__init__.py</a></td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 0">100%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_fdb8d8f46e8a7716__test_py36_py.html">pyfields/tests/issues/_test_py36.py</a></td>
+                <td>30</td>
+                <td>1</td>
+                <td>0</td>
+                <td>6</td>
+                <td>0</td>
+                <td class="right" data-ratio="35 36">97%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_fdb8d8f46e8a7716__test_py36_pep563_py.html">pyfields/tests/issues/_test_py36_pep563.py</a></td>
+                <td>12</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="12 12">100%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_fdb8d8f46e8a7716_test_issue_12_py.html">pyfields/tests/issues/test_issue_12.py</a></td>
+                <td>12</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="12 12">100%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_fdb8d8f46e8a7716_test_issue_51_py.html">pyfields/tests/issues/test_issue_51.py</a></td>
+                <td>6</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="6 6">100%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_fdb8d8f46e8a7716_test_issue_53_py.html">pyfields/tests/issues/test_issue_53.py</a></td>
+                <td>11</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="11 11">100%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_fdb8d8f46e8a7716_test_issue_67_py.html">pyfields/tests/issues/test_issue_67.py</a></td>
                 <td>8</td>
-                <td>3</td>
-                <td class="right" data-ratio="49 55">89%</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="8 8">100%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_fdb8d8f46e8a7716_test_issue_73_py.html">pyfields/tests/issues/test_issue_73.py</a></td>
+                <td>46</td>
+                <td>2</td>
+                <td>0</td>
+                <td>16</td>
+                <td>2</td>
+                <td class="right" data-ratio="58 62">94%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_fdb8d8f46e8a7716_test_issue_81_py.html">pyfields/tests/issues/test_issue_81.py</a></td>
+                <td>7</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="7 7">100%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_fdb8d8f46e8a7716_test_issue_84_py.html">pyfields/tests/issues/test_issue_84.py</a></td>
+                <td>49</td>
+                <td>2</td>
+                <td>4</td>
+                <td>16</td>
+                <td>2</td>
+                <td class="right" data-ratio="61 65">94%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_0741856826febfd8_test_autofields_py.html">pyfields/tests/test_autofields.py</a></td>
+                <td>119</td>
+                <td>5</td>
+                <td>0</td>
+                <td>26</td>
+                <td>2</td>
+                <td class="right" data-ratio="138 145">95%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_0741856826febfd8_test_core_py.html">pyfields/tests/test_core.py</a></td>
+                <td>442</td>
+                <td>28</td>
+                <td>2</td>
+                <td>132</td>
+                <td>21</td>
+                <td class="right" data-ratio="525 574">91%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_0741856826febfd8_test_helpers_py.html">pyfields/tests/test_helpers.py</a></td>
+                <td>24</td>
+                <td>0</td>
+                <td>0</td>
+                <td>6</td>
+                <td>0</td>
+                <td class="right" data-ratio="30 30">100%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_0741856826febfd8_test_init_py.html">pyfields/tests/test_init.py</a></td>
+                <td>124</td>
+                <td>4</td>
+                <td>0</td>
+                <td>28</td>
+                <td>2</td>
+                <td class="right" data-ratio="146 152">96%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_0741856826febfd8_test_readme_py.html">pyfields/tests/test_readme.py</a></td>
+                <td>290</td>
+                <td>8</td>
+                <td>9</td>
+                <td>46</td>
+                <td>7</td>
+                <td class="right" data-ratio="321 336">96%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_0741856826febfd8_test_so_py.html">pyfields/tests/test_so.py</a></td>
+                <td>126</td>
+                <td>0</td>
+                <td>0</td>
+                <td>18</td>
+                <td>1</td>
+                <td class="right" data-ratio="143 144">99%</td>
+            </tr>
+            <tr class="file">
+                <td class="name left"><a href="d_21dc12735f832c5d_typing_utils_py.html">pyfields/typing_utils.py</a></td>
+                <td>54</td>
+                <td>4</td>
+                <td>57</td>
+                <td>10</td>
+                <td>4</td>
+                <td class="right" data-ratio="56 64">88%</td>
             </tr>
             <tr class="file">
                 <td class="name left"><a href="d_21dc12735f832c5d_validate_n_convert_py.html">pyfields/validate_n_convert.py</a></td>
@@ -139,18 +309,36 @@
                 <td class="right" data-ratio="234 290">81%</td>
             </tr>
         </tbody>
+        <tfoot>
+            <tr class="total">
+                <td class="name left">Total</td>
+                <td>2626</td>
+                <td>267</td>
+                <td>94</td>
+                <td>818</td>
+                <td>128</td>
+                <td class="right" data-ratio="3003 3444">87%</td>
+            </tr>
+        </tfoot>
     </table>
     <p id="no_rows">
         No items found using the specified filter.
     </p>
-</div>
-<div id="footer">
+</main>
+<footer>
     <div class="content">
         <p>
-            <a class="nav" href="https://coverage.readthedocs.io">coverage.py v6.0.1</a>,
-            created at 2021-10-11 14:01 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.2.5">coverage.py v7.2.5</a>,
+            created at 2023-05-04 13:07 +0000
         </p>
     </div>
-</div>
+    <aside class="hidden">
+        <a id="prevFileLink" class="nav" href="d_21dc12735f832c5d_validate_n_convert_py.html"/>
+        <a id="nextFileLink" class="nav" href="d_21dc12735f832c5d___init___py.html"/>
+        <button type="button" class="button_prev_file" data-shortcut="["/>
+        <button type="button" class="button_next_file" data-shortcut="]"/>
+        <button type="button" class="button_show_hide_help" data-shortcut="?"/>
+    </aside>
+</footer>
 </body>
 </html>

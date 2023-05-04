@@ -113,7 +113,7 @@
                class="code sev- "><tt><i>32</i>                            <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span></tt>
             </div>
             <div id="l33"
-               class="code sev- "><tt><i>33</i>     <span class="sd">&quot;&quot;&quot;A validation function is a callable with signature (val), (obj, val) or (obj, field, val), returning `True`</span></tt>
+               class="code sev- "><tt><i>33</i> <span class="w">    </span><span class="sd">&quot;&quot;&quot;A validation function is a callable with signature (val), (obj, val) or (obj, field, val), returning `True`</span></tt>
             </div>
             <div id="l34"
                class="code sev- "><tt><i>34</i> <span class="sd">    or `None` in case of success&quot;&quot;&quot;</span></tt>
@@ -161,7 +161,7 @@
                class="code sev- "><tt><i>48</i>                          <span class="p">]</span></tt>
             </div>
             <div id="l49"
-               class="code sev- "><tt><i>49</i>     <span class="sd">&quot;&quot;&quot;A validator is a validation function together with optional error message and error type&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>49</i> <span class="w">    </span><span class="sd">&quot;&quot;&quot;A validator is a validation function together with optional error message and error type&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l50"
                class="code sev- "><tt><i>50</i> &nbsp;</tt>
@@ -173,7 +173,7 @@
                class="code sev- "><tt><i>52</i>     <span class="n">VFDefinitionElement</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">ValidationFailure</span><span class="p">],</span> <span class="n">ValidationFuncOrLambda</span><span class="p">]</span></tt>
             </div>
             <div id="l53"
-               class="code sev- "><tt><i>53</i>     <span class="sd">&quot;&quot;&quot;This type represents one of the elements that can define a checker: help msg, failure type, callable&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>53</i> <span class="w">    </span><span class="sd">&quot;&quot;&quot;This type represents one of the elements that can define a checker: help msg, failure type, callable&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l54"
                class="code sev- "><tt><i>54</i> &nbsp;</tt>
@@ -191,7 +191,7 @@
                class="code sev- "><tt><i>58</i>                                                                          <span class="n">Tuple</span><span class="p">[</span><span class="n">VFDefinitionElement</span><span class="p">,</span> <span class="o">...</span><span class="p">]]]]</span></tt>
             </div>
             <div id="l59"
-               class="code sev- "><tt><i>59</i>     <span class="sd">&quot;&quot;&quot;Several validators can be provided as a singleton, iterable, or dict-like. In that case the value can be a</span></tt>
+               class="code sev- "><tt><i>59</i> <span class="w">    </span><span class="sd">&quot;&quot;&quot;Several validators can be provided as a singleton, iterable, or dict-like. In that case the value can be a</span></tt>
             </div>
             <div id="l60"
                class="code sev- "><tt><i>60</i> <span class="sd">    single variable or a tuple, and it will be combined with the key to form the validator. So you can use any of</span></tt>
@@ -218,7 +218,7 @@
                class="code sev- "><tt><i>67</i> <span class="k">class</span> <span class="nc">FieldValidator</span><span class="p">(</span><span class="n">Validator</span><span class="p">):</span></tt>
             </div>
             <div id="l68"
-               class="code sev- "><tt><i>68</i>     <span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>68</i> <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l69"
                class="code sev- "><tt><i>69</i> <span class="sd">    Represents a `Validator` responsible to validate a `field`</span></tt>
@@ -257,7 +257,7 @@
                class="code sev- "><tt><i>77</i>                  <span class="p">):</span></tt>
             </div>
             <div id="l78"
-               class="code sev- "><tt><i>78</i>         <span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>78</i> <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l79"
                class="code sev- "><tt><i>79</i> &nbsp;</tt>
@@ -392,7 +392,7 @@
                class="code sev- "><tt><i>122</i>                       <span class="p">):</span></tt>
             </div>
             <div id="l123"
-               class="code sev- "><tt><i>123</i>         <span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>123</i> <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l124"
                class="code sev- "><tt><i>124</i> <span class="sd">        Adds the provided validation function to the existing list of validation functions</span></tt>
@@ -446,7 +446,7 @@
                class="code sev- "><tt><i>140</i>                                     <span class="o">**</span><span class="n">kw_context_args</span><span class="p">):</span></tt>
             </div>
             <div id="l141"
-               class="code sev- "><tt><i>141</i>             <span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>141</i> <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l142"
                class="code sev- "><tt><i>142</i> &nbsp;</tt>
@@ -638,7 +638,7 @@
                class="code sev- "><tt><i>204</i>         <span class="c1"># type: (...) -&gt; str</span></tt>
             </div>
             <div id="l205"
-               class="code sev- "><tt><i>205</i>         <span class="sd">&quot;&quot;&quot; override this so that qualname is only called if an error is raised, not before &quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>205</i> <span class="w">        </span><span class="sd">&quot;&quot;&quot; override this so that qualname is only called if an error is raised, not before &quot;&quot;&quot;</span></tt>
             </div>
             <div id="l206"
                class="code sev- "><tt><i>206</i>         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">validated_field</span><span class="o">.</span><span class="n">qualname</span></tt>
@@ -716,7 +716,7 @@
                class="code sev- "><tt><i>230</i> <span class="k">class</span> <span class="nc">Converter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span></tt>
             </div>
             <div id="l231"
-               class="code sev- "><tt><i>231</i>     <span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>231</i> <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l232"
                class="code sev- "><tt><i>232</i> <span class="sd">    A converter to be used in `field`s.</span></tt>
@@ -764,7 +764,7 @@
                class="code sev- "><tt><i>246</i>         <span class="c1"># type: (...) -&gt; Optional[bool]</span></tt>
             </div>
             <div id="l247"
-               class="code sev- "><tt><i>247</i>         <span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>247</i> <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l248"
                class="code sev- "><tt><i>248</i> <span class="sd">        Should return `True` or `None` in case the provided value can be converted.</span></tt>
@@ -800,7 +800,7 @@
                class="code sev- "><tt><i>258</i>         <span class="c1"># type: (...) -&gt; Any</span></tt>
             </div>
             <div id="l259"
-               class="code sev- "><tt><i>259</i>         <span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>259</i> <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l260"
                class="code sev- "><tt><i>260</i> <span class="sd">        Converts the provided `value`. This method is only called when `accepts()` has returned `True`.</span></tt>
@@ -857,7 +857,7 @@
                class="code sev- "><tt><i>277</i>         <span class="c1"># type: (...) -&gt; Converter</span></tt>
             </div>
             <div id="l278"
-               class="code sev- "><tt><i>278</i>         <span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>278</i> <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l279"
                class="code sev- "><tt><i>279</i> <span class="sd">        Creates an instance of `Converter` where the `accepts` method is bound to the provided `validation_fun` and the</span></tt>
@@ -968,7 +968,7 @@
                class="code sev- "><tt><i>314</i> <span class="k">class</span> <span class="nc">ConverterWithFuncs</span><span class="p">(</span><span class="n">Converter</span><span class="p">):</span></tt>
             </div>
             <div id="l315"
-               class="code sev- "><tt><i>315</i>     <span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>315</i> <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l316"
                class="code sev- "><tt><i>316</i> <span class="sd">    Represents a converter for which the `accepts` and `convert` methods can be provided in the constructor.</span></tt>
@@ -1046,7 +1046,7 @@
                class="code sev- "><tt><i>340</i>                           <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]]</span></tt>
             </div>
             <div id="l341"
-               class="code sev- "><tt><i>341</i>     <span class="sd">&quot;&quot;&quot;A converter function is a callable with signature (val), (obj, val) or (obj, field, val), returning the</span></tt>
+               class="code sev- "><tt><i>341</i> <span class="w">    </span><span class="sd">&quot;&quot;&quot;A converter function is a callable with signature (val), (obj, val) or (obj, field, val), returning the</span></tt>
             </div>
             <div id="l342"
                class="code sev- "><tt><i>342</i> <span class="sd">    converted value in case of success&quot;&quot;&quot;</span></tt>
@@ -1148,7 +1148,7 @@
                </ul><tt><i>371</i>     <span class="c1"># type: (...) -&gt; Callable[[Any, &#39;Field&#39;, Any], Any]</span></tt>
             </div>
             <div id="l372"
-               class="code sev- "><tt><i>372</i>     <span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>372</i> <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l373"
                class="code sev- "><tt><i>373</i> <span class="sd">    Transforms the provided validation or conversion callable into a callable with 3 arguments (obj, field, val).</span></tt>
@@ -1334,7 +1334,7 @@
                class="code sev- "><tt><i>433</i>     <span class="c1"># type: (...) -&gt; Converter</span></tt>
             </div>
             <div id="l434"
-               class="code sev- "><tt><i>434</i>     <span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>434</i> <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l435"
                class="code sev- "><tt><i>435</i> <span class="sd">    Makes a `Converter` from the provided converter object. Supported formats:</span></tt>
@@ -1409,7 +1409,7 @@
                class="code sev- "><tt><i>458</i>                 <span class="k">return</span> <span class="n">converter_def</span></tt>
             </div>
             <div id="l459"
-               class="code sev- "><tt><i>459</i>             <span class="k">elif</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">converter_def</span><span class="p">):</span></tt>
+               class="code sev- "><tt><i>459</i>             <span class="k">elif</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">converter_def</span><span class="p">):</span></tt>
             </div>
             <div id="l460"
                class="code sev- "><tt><i>460</i>                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;base converter function(s) not compliant with the allowed syntax. Base validation&#39;</span></tt>
@@ -1463,7 +1463,7 @@
                class="code sev- "><tt><i>476</i>                 <span class="k">else</span><span class="p">:</span></tt>
             </div>
             <div id="l477"
-               class="code sev- "><tt><i>477</i>                     <span class="k">if</span> <span class="ow">not</span> <span class="n">is_mini_lambda</span><span class="p">(</span><span class="n">validation_fun</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">validation_fun</span><span class="p">):</span></tt>
+               class="code sev- "><tt><i>477</i>                     <span class="k">if</span> <span class="ow">not</span> <span class="n">is_mini_lambda</span><span class="p">(</span><span class="n">validation_fun</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">validation_fun</span><span class="p">):</span></tt>
             </div>
             <div id="l478"
                class="code sev- "><tt><i>478</i>                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;base converter function(s) not compliant with the allowed syntax. Validator &#39;</span></tt>
@@ -1490,7 +1490,7 @@
                class="code sev- "><tt><i>485</i>         <span class="c1"># check that the definition is valid</span></tt>
             </div>
             <div id="l486"
-               class="code sev- "><tt><i>486</i>         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_mini_lambda</span><span class="p">(</span><span class="n">converter_fun</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">converter_fun</span><span class="p">):</span></tt>
+               class="code sev- "><tt><i>486</i>         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_mini_lambda</span><span class="p">(</span><span class="n">converter_fun</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">converter_fun</span><span class="p">):</span></tt>
             </div>
             <div id="l487"
                class="code sev- "><tt><i>487</i>             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;base converter function(s) not compliant with the allowed syntax. Base converter&#39;</span></tt>
@@ -1523,7 +1523,7 @@
                class="code sev- "><tt><i>496</i>     <span class="c1"># type: (...) -&gt; Tuple[Converter, ...]</span></tt>
             </div>
             <div id="l497"
-               class="code sev- "><tt><i>497</i>     <span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>497</i> <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l498"
                class="code sev- "><tt><i>498</i> <span class="sd">    Creates a tuple of converters from the provided `converters`. The following things are supported:</span></tt>
@@ -1673,7 +1673,7 @@
                class="code sev- "><tt><i>543</i>     <span class="c1"># type: (...) -&gt; Tuple[Any, DetailedConversionResults]</span></tt>
             </div>
             <div id="l544"
-               class="code sev- "><tt><i>544</i>     <span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>544</i> <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l545"
                class="code sev- "><tt><i>545</i> <span class="sd">    Utility method to debug conversion issues.</span></tt>
@@ -1805,7 +1805,7 @@
                class="code sev- "><tt><i>587</i> <span class="k">class</span> <span class="nc">ConversionError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span></tt>
             </div>
             <div id="l588"
-               class="code sev- "><tt><i>588</i>     <span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>588</i> <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l589"
                class="code sev- "><tt><i>589</i> <span class="sd">    Final exception Raised by `trace_convert` when a value cannot be converted successfully</span></tt>
@@ -1889,7 +1889,7 @@
                class="code sev- "><tt><i>615</i> <span class="k">class</span> <span class="nc">DetailedConversionResults</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span></tt>
             </div>
             <div id="l616"
-               class="code sev- "><tt><i>616</i>     <span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>616</i> <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l617"
                class="code sev- "><tt><i>617</i> <span class="sd">    Returned by `trace_convert` for detailed results about which converter failed before the winning one.</span></tt>

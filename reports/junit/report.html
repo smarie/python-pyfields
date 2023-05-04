@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8"/>
-    <title>Test Report</title>
+    <title>report.html</title>
     <link href="assets/style.css" rel="stylesheet" type="text/css"/></head>
   <body onLoad="init()">
     <script>/* This Source Code Form is subject to the terms of the Mozilla Public
@@ -70,9 +70,19 @@ function hideExtras(colresultElem) {
 }
 
 function showFilters() {
+    let visibleString = getQueryParameter('visible') || 'all';
+    visibleString = visibleString.toLowerCase();
+    const checkedItems = visibleString.split(',');
+
     const filterItems = document.getElementsByClassName('filter');
-    for (let i = 0; i < filterItems.length; i++)
+    for (let i = 0; i < filterItems.length; i++) {
         filterItems[i].hidden = false;
+
+        if (visibleString != 'all') {
+            filterItems[i].checked = checkedItems.includes(filterItems[i].getAttribute('data-test-result'));
+            filterTable(filterItems[i]);
+        }
+    }
 }
 
 function addCollapse() {
@@ -243,7 +253,7 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
 }
 </script>
     <h1>report.html</h1>
-    <p>Report generated on 11-Oct-2021 at 14:01:17 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v3.1.1</p>
+    <p>Report generated on 04-May-2023 at 13:07:39 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v3.2.0</p>
     <h2>Environment</h2>
     <table id="environment">
       <tr>
@@ -251,21 +261,21 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
         <td>true</td></tr>
       <tr>
         <td>JAVA_HOME</td>
-        <td>/usr/lib/jvm/adoptopenjdk-11-hotspot-amd64</td></tr>
+        <td>/usr/lib/jvm/temurin-11-jdk-amd64</td></tr>
       <tr>
         <td>Packages</td>
-        <td>{"pluggy": "1.0.0", "py": "1.10.0", "pytest": "6.2.5"}</td></tr>
+        <td>{"pluggy": "1.0.0", "pytest": "7.3.1"}</td></tr>
       <tr>
         <td>Platform</td>
-        <td>Linux-5.8.0-1042-azure-x86_64-with-debian-bullseye-sid</td></tr>
+        <td>Linux-5.15.0-1036-azure-x86_64-with-debian-bookworm-sid</td></tr>
       <tr>
         <td>Plugins</td>
-        <td>{"html": "3.1.1", "metadata": "1.11.0", "typeguard": "2.13.0"}</td></tr>
+        <td>{"html": "3.2.0", "metadata": "2.0.4", "typeguard": "3.0.2"}</td></tr>
       <tr>
         <td>Python</td>
-        <td>3.7.11</td></tr></table>
+        <td>3.7.16</td></tr></table>
     <h2>Summary</h2>
-    <p>189 tests ran in 46.48 seconds. </p>
+    <p>189 tests ran in 29.71 seconds. </p>
     <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="passed">189 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="failed">0 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
     <h2>Results</h2>
     <table id="results-table">
@@ -1687,19 +1697,19 @@ post init man !
         <tr>
           <td class="col-result">Passed</td>
           <td class="col-name">pyfields/tests/test_readme.py::test_native_descriptors</td>
-          <td class="col-duration">45.54</td>
+          <td class="col-duration">28.83</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
             <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>Average time (ns) setting the field:
-2.56 (normal python) ; 2.62 (native field) ; 40.37 (descriptor field)
-Ratio is 1.02
+3.42 (normal python) ; 3.38 (native field) ; 22.03 (descriptor field)
+Ratio is 0.99
 <br/></div></td></tr></tbody>
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
           <td class="col-name">pyfields/tests/test_readme.py::test_make_init_full_defaults</td>
-          <td class="col-duration">0.02</td>
+          <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
@@ -1919,7 +1929,7 @@ post init ! height=12, color=blue, msg=hey
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
-            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>&lt;pyfields.tests.issues.test_issue_53.test_issue_53.&lt;locals&gt;.B object at 0x7fd3b2afe210&gt;
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>&lt;pyfields.tests.issues.test_issue_53.test_issue_53.&lt;locals&gt;.B object at 0x7f71fa0247d0&gt;
 <br/></div></td></tr></tbody>
       <tbody class="passed results-table-row">
         <tr>
