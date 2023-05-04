@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.7.1 - Compatibility fix for typeguard `3.0.0`
+
+ - Fixed `TypeError: check_type() takes 2 positional arguments but 3 were given` triggering erroneous `FieldTypeError` 
+   when `typeguard>=3.0.0` is used. Fixed [#87](https://github.com/smarie/python-pyfields/issues/87)
+
 ### 1.7.0 - Better support for non-deep-copiable default values in `@autofields`
 
  - `@autofields` and `@autoclass` now raise an error when a field definition can not be valid, because the default value can not be deep-copied. This will help users detect issues such as [#84](https://github.com/smarie/python-pyfields/issues/84) earlier. Implementation is done through a new `autocheck` option in the `copy_value` factory.

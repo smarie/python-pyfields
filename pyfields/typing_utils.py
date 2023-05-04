@@ -4,6 +4,8 @@
 # License: 3-clause BSD, <https://github.com/smarie/python-pyfields/blob/master/LICENSE>
 import sys
 
+from pkg_resources import get_distribution
+
 
 class FieldTypeError(TypeError):  # FieldError
     """
@@ -45,7 +47,19 @@ class FieldTypeError(TypeError):  # FieldError
 
 def _make_assert_is_of_type():
     try:
-        from typeguard import check_type
+        from typeguard import check_type as ct
+        from packaging.version import parse as parse_version
+
+        # Note: only do this when we are sure that typeguard can be imported, otherwise this is slow
+        # see https://github.com/smarie/python-getversion/blob/ee495acf6cf06c5e860713edeee396206368e458/getversion/main.py#L84
+        typeguard_version = get_distribution("typeguard").version
+        if parse_version(typeguard_version) < parse_version("3.0.0"):
+            check_type = ct
+        else:
+            # Name has disappeared from 3.0.0
+            def check_type(name, value, typ):
+                ct(value, typ)
+
         try:
             from typing import Union
         except ImportError:
