@@ -30,9 +30,10 @@ DOWNLOAD_URL = URL + "/tarball/" + get_version()
 
 
 # (3) Call setup() with as little args as possible
-setup(
-    download_url=DOWNLOAD_URL,
-    use_scm_version={
-        "write_to": "pyfields/_version.py"
-    },  # we can't put `use_scm_version` in setup.cfg yet unfortunately
-)
+#setup(
+#    download_url=DOWNLOAD_URL,
+#    use_scm_version={
+#        "write_to": "pyfields/_version.py"
+#    },  # we can't put `use_scm_version` in setup.cfg yet unfortunately
+#)
+
