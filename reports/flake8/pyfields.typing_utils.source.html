@@ -161,13 +161,13 @@
                class="code sev- "><tt><i>48</i> <span class="k">def</span> <span class="nf">_make_assert_is_of_type</span><span class="p">():</span></tt>
             </div>
             <div id="l49"
-               class="code sev- "><tt><i>49</i>     <span class="k">try</span><span class="p">:</span></tt>
+               class="code sev- "><tt><i>49</i>     <span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">parse</span> <span class="k">as</span> <span class="n">parse_version</span></tt>
             </div>
             <div id="l50"
-               class="code sev- "><tt><i>50</i>         <span class="kn">from</span> <span class="nn">typeguard</span> <span class="kn">import</span> <span class="n">check_type</span> <span class="k">as</span> <span class="n">ct</span></tt>
+               class="code sev- "><tt><i>50</i>     <span class="k">try</span><span class="p">:</span></tt>
             </div>
             <div id="l51"
-               class="code sev- "><tt><i>51</i>         <span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">parse</span> <span class="k">as</span> <span class="n">parse_version</span></tt>
+               class="code sev- "><tt><i>51</i>         <span class="kn">from</span> <span class="nn">typeguard</span> <span class="kn">import</span> <span class="n">check_type</span> <span class="k">as</span> <span class="n">ct</span></tt>
             </div>
             <div id="l52"
                class="code sev- "><tt><i>52</i> &nbsp;</tt>
@@ -569,67 +569,70 @@
                class="code sev- "><tt><i>181</i>     <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>  <span class="c1"># noqa</span></tt>
             </div>
             <div id="l182"
-               class="code sev- "><tt><i>182</i>     <span class="n">assert_is_of_type</span> <span class="o">=</span> <span class="n">_make_assert_is_of_type</span><span class="p">()</span></tt>
+               class="code sev- "><tt><i>182</i> <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span></tt>
             </div>
             <div id="l183"
-               class="code sev- "><tt><i>183</i> <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span></tt>
+               class="code sev- "><tt><i>183</i>     <span class="n">assert_is_of_type</span> <span class="o">=</span> <span class="kc">None</span></tt>
             </div>
             <div id="l184"
-               class="code sev- "><tt><i>184</i>     <span class="n">assert_is_of_type</span> <span class="o">=</span> <span class="kc">None</span></tt>
+               class="code sev- "><tt><i>184</i> <span class="k">else</span><span class="p">:</span></tt>
             </div>
             <div id="l185"
-               class="code sev- "><tt><i>185</i> &nbsp;</tt>
+               class="code sev- "><tt><i>185</i>     <span class="n">assert_is_of_type</span> <span class="o">=</span> <span class="n">_make_assert_is_of_type</span><span class="p">()</span></tt>
             </div>
             <div id="l186"
                class="code sev- "><tt><i>186</i> &nbsp;</tt>
             </div>
             <div id="l187"
-               class="code sev- "><tt><i>187</i> <span class="n">PY36</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span></tt>
+               class="code sev- "><tt><i>187</i> &nbsp;</tt>
             </div>
             <div id="l188"
-               class="code sev- "><tt><i>188</i> <span class="n">get_type_hints</span> <span class="o">=</span> <span class="kc">None</span></tt>
+               class="code sev- "><tt><i>188</i> <span class="n">PY36</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span></tt>
             </div>
             <div id="l189"
-               class="code sev- "><tt><i>189</i> <span class="k">if</span> <span class="n">PY36</span><span class="p">:</span></tt>
+               class="code sev- "><tt><i>189</i> <span class="n">get_type_hints</span> <span class="o">=</span> <span class="kc">None</span></tt>
             </div>
             <div id="l190"
-               class="code sev- "><tt><i>190</i>     <span class="k">try</span><span class="p">:</span></tt>
+               class="code sev- "><tt><i>190</i> <span class="k">if</span> <span class="n">PY36</span><span class="p">:</span></tt>
             </div>
             <div id="l191"
-               class="code sev- "><tt><i>191</i>         <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">get_type_hints</span> <span class="k">as</span> <span class="n">gth</span></tt>
+               class="code sev- "><tt><i>191</i>     <span class="k">try</span><span class="p">:</span></tt>
             </div>
             <div id="l192"
-               class="code sev- "><tt><i>192</i> &nbsp;</tt>
+               class="code sev- "><tt><i>192</i>         <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">get_type_hints</span> <span class="k">as</span> <span class="n">gth</span></tt>
             </div>
             <div id="l193"
-               class="code sev- "><tt><i>193</i>         <span class="k">def</span> <span class="nf">get_type_hints</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">globalns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">localns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span></tt>
+               class="code sev- "><tt><i>193</i> &nbsp;</tt>
             </div>
             <div id="l194"
-               class="code sev- "><tt><i>194</i> <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>194</i>         <span class="k">def</span> <span class="nf">get_type_hints</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">globalns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">localns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span></tt>
             </div>
             <div id="l195"
-               class="code sev- "><tt><i>195</i> <span class="sd">            Fixed version of typing.get_type_hints to handle self forward references</span></tt>
+               class="code sev- "><tt><i>195</i> <span class="w">            </span><span class="sd">&quot;&quot;&quot;</span></tt>
             </div>
             <div id="l196"
-               class="code sev- "><tt><i>196</i> <span class="sd">            &quot;&quot;&quot;</span></tt>
+               class="code sev- "><tt><i>196</i> <span class="sd">            Fixed version of typing.get_type_hints to handle self forward references</span></tt>
             </div>
             <div id="l197"
-               class="code sev- "><tt><i>197</i>             <span class="k">if</span> <span class="n">globalns</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">localns</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span></tt>
+               class="code sev- "><tt><i>197</i> <span class="sd">            &quot;&quot;&quot;</span></tt>
             </div>
             <div id="l198"
-               class="code sev- "><tt><i>198</i>                 <span class="n">localns</span> <span class="o">=</span> <span class="p">{</span><span class="n">obj</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span> <span class="n">obj</span><span class="p">}</span></tt>
+               class="code sev- "><tt><i>198</i>             <span class="k">if</span> <span class="n">globalns</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">localns</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span></tt>
             </div>
             <div id="l199"
-               class="code sev- "><tt><i>199</i>             <span class="k">return</span> <span class="n">gth</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">globalns</span><span class="o">=</span><span class="n">globalns</span><span class="p">,</span> <span class="n">localns</span><span class="o">=</span><span class="n">localns</span><span class="p">)</span></tt>
+               class="code sev- "><tt><i>199</i>                 <span class="n">localns</span> <span class="o">=</span> <span class="p">{</span><span class="n">obj</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span> <span class="n">obj</span><span class="p">}</span></tt>
             </div>
             <div id="l200"
-               class="code sev- "><tt><i>200</i> &nbsp;</tt>
+               class="code sev- "><tt><i>200</i>             <span class="k">return</span> <span class="n">gth</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">globalns</span><span class="o">=</span><span class="n">globalns</span><span class="p">,</span> <span class="n">localns</span><span class="o">=</span><span class="n">localns</span><span class="p">)</span></tt>
             </div>
             <div id="l201"
-               class="code sev- "><tt><i>201</i>     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span></tt>
+               class="code sev- "><tt><i>201</i> &nbsp;</tt>
             </div>
             <div id="l202"
-               class="code sev- "><tt><i>202</i>         <span class="k">pass</span></tt>
+               class="code sev- "><tt><i>202</i>     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span></tt>
+            </div>
+            <div id="l203"
+               class="code sev- "><tt><i>203</i>         <span class="k">pass</span></tt>
             </div>
             
          </div>
