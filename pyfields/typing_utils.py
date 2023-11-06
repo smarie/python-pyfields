@@ -46,9 +46,9 @@ class FieldTypeError(TypeError):  # FieldError
 
 
 def _make_assert_is_of_type():
+    from packaging.version import parse as parse_version
     try:
         from typeguard import check_type as ct
-        from packaging.version import parse as parse_version
 
         # Note: only do this when we are sure that typeguard can be imported, otherwise this is slow
         # see https://github.com/smarie/python-getversion/blob/ee495acf6cf06c5e860713edeee396206368e458/getversion/main.py#L84
@@ -179,9 +179,10 @@ def _make_assert_is_of_type():
 try:  # very minimal way to check if typing it available, for runtime type checking
     # noinspection PyUnresolvedReferences
     from typing import Tuple  # noqa
-    assert_is_of_type = _make_assert_is_of_type()
 except ImportError:
     assert_is_of_type = None
+else:
+    assert_is_of_type = _make_assert_is_of_type()
 
 
 PY36 = sys.version_info >= (3, 6)
