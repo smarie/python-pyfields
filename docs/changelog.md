@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.7.2 - bugfix
+
+ - Fixed `TypeError: Neither typeguard not pytypes is installed` even with `typeguard` installed. 
+   Fixed [#91] (https://github.com/smarie/python-pyfields/issues/91)
+
 ### 1.7.1 - Compatibility fix for typeguard `3.0.0`
 
  - Fixed `TypeError: check_type() takes 2 positional arguments but 3 were given` triggering erroneous `FieldTypeError` 
